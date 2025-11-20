@@ -49,8 +49,8 @@
     <field name="habitosEnLaOralidad" class="java.lang.String"/>
     <field name="inicioHorarioDeSuenio" class="java.lang.Integer"/>
     <field name="finHorarioDeSuenio" class="java.lang.Integer"/>
-    <field name="tipoHorarioDeSuenio" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$TipoHorarioDeSuenio"/>
-    <field name="companiaSuenio" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$CompaniaSuenio"/>
+    <field name="tipoHorarioDeSuenio" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$TipoHorarioDeSuenio"/>
+    <field name="companiaSuenio" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$CompaniaSuenio"/>
     <field name="especificarCompaniaSuenio" class="java.lang.String"/>
     <field name="edad" class="java.lang.String"/>
     <field name="hipersomnia" class="java.lang.Boolean"/>
@@ -71,18 +71,18 @@
     <field name="cuidadoPersonal" class="java.lang.Boolean"/>
     <field name="otrosConductasPreocupantes" class="java.lang.String"/>
     <field name="observacionesConductasPreocupantes" class="java.lang.String"/>
-    <field name="sexoDeNacimiento" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$SexoDeNacimiento"/>
-    <field name="genero" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Genero"/>
+    <field name="sexoDeNacimiento" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$SexoDeNacimiento"/>
+    <field name="genero" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Genero"/>
     <field name="especificarGeneroOtros" class="java.lang.String"/>
-    <field name="orientacionSexual" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$OrientacionSexual"/>
-    <field name="curiosidadSexual" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$CuriosidadSexual"/>
-    <field name="gradoDeInformacion" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$GradoDeInformacion"/>
-    <field name="actividadSexual" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$ActividadSexual"/>
-    <field name="masturbacion" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Masturbacion"/>
-    <field name="promiscuidad" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Promiscuidad"/>
-    <field name="disfunciones" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Disfunciones"/>
-    <field name="erotismo" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Erotismo"/>
-    <field name="parafilias" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Parafilias"/>
+    <field name="orientacionSexual" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$OrientacionSexual"/>
+    <field name="curiosidadSexual" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$CuriosidadSexual"/>
+    <field name="gradoDeInformacion" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$GradoDeInformacion"/>
+    <field name="actividadSexual" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$ActividadSexual"/>
+    <field name="masturbacion" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Masturbacion"/>
+    <field name="promiscuidad" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Promiscuidad"/>
+    <field name="disfunciones" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Disfunciones"/>
+    <field name="erotismo" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Erotismo"/>
+    <field name="parafilias" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Parafilias"/>
     <field name="observacionesAspectoPsicosexual" class="java.lang.String"/>
     <field name="palabrasRaras" class="java.lang.Boolean"/>
     <field name="logicoYClaro" class="java.lang.Boolean"/>
@@ -281,14 +281,14 @@
     <field name="actitudesAnormales" class="java.lang.Boolean"/>
     <field name="alteracionesDeLaMarcha" class="java.lang.Boolean"/>
     <field name="inquietudConductaMotora" class="java.lang.Boolean"/>
-    <field name="incoherencia" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Incoherencia"/>
-    <field name="bloqueos" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Bloqueos"/>
-    <field name="preservacion" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Preservacion"/>
-    <field name="prolijidad" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Prolijidad"/>
-    <field name="desgragacion" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Desgragacion"/>
-    <field name="estereotipiasEstructuraDelPensamiento" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Estereotipias"/>
-    <field name="neologismos" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Neologismos"/>
-    <field name="musitacion" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Musitacion"/>
+    <field name="incoherencia" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Incoherencia"/>
+    <field name="bloqueos" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Bloqueos"/>
+    <field name="preservacion" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Preservacion"/>
+    <field name="prolijidad" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Prolijidad"/>
+    <field name="desgragacion" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Desgragacion"/>
+    <field name="estereotipiasEstructuraDelPensamiento" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Estereotipias"/>
+    <field name="neologismos" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Neologismos"/>
+    <field name="musitacion" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Musitacion"/>
     <field name="retardo" class="java.lang.Boolean"/>
     <field name="aceleracion" class="java.lang.Boolean"/>
     <field name="fugaDeIdeas" class="java.lang.Boolean"/>
@@ -331,10 +331,10 @@
     <field name="heterocritica" class="java.lang.Boolean"/>
     <field name="proyectosFuturos" class="java.lang.Boolean"/>
     <field name="concienciaDeLaEnfermedad" class="java.lang.Boolean"/>
-    <field name="desorientacionEnTiempo" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Desorientacion"/>
-    <field name="espacio" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$Espacio"/>
-    <field name="respectoASiMismo" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$RespectoASiMismo"/>
-    <field name="respectoAOtrasPersonas" class="com.test.TUdipsaiApi.Model.PsicologiaClinica$RespectoAOtrasPersonas"/>
+    <field name="desorientacionEnTiempo" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Desorientacion"/>
+    <field name="espacio" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$Espacio"/>
+    <field name="respectoASiMismo" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$RespectoASiMismo"/>
+    <field name="respectoAOtrasPersonas" class="com.ucacue.udipsai.modules.psicologiaclinica.domain.model.PsicologiaClinica$RespectoAOtrasPersonas"/>
     <field name="impresionDiagnostica" class="java.lang.String"/>
     <field name="derivacionInterconsulta" class="java.lang.String"/>
     <field name="objetivoPlanTratamientoIndividual" class="java.lang.String"/>
