@@ -62,7 +62,7 @@
     <field name="fuenteDeInformacion" class="java.lang.String"/>
     <field name="fecha" class="java.time.LocalDate"/>
     <field name="motivoConsulta" class="java.lang.String"/>
-    <field name="elEstudianteViveCon" class="com.test.TUdipsaiApi.Model.FichaMedica$ElEstudianteViveCon"/>
+    <field name="elEstudianteViveCon" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$ElEstudianteViveCon"/>
     <field name="elEstudianteViveConOtro" class="java.lang.String"/>
     <field name="nombreDelPadre" class="java.lang.String"/>
     <field name="edadPadre" class="java.lang.Integer"/>
@@ -81,7 +81,7 @@
     <field name="direccionDomiciliaria" class="java.lang.String"/>
     <field name="vivenJuntos" class="java.lang.Boolean"/>
     <field name="otrosCompromisos" class="java.lang.String"/>
-    <field name="tipoFamilia" class="com.test.TUdipsaiApi.Model.FichaMedica$TipoFamilia"/>
+    <field name="tipoFamilia" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$TipoFamilia"/>
     <field name="hijosOtrosFamiliaresVivenCasa" class="java.lang.String"/>
     <field name="embarazoDeseado" class="java.lang.Boolean"/>
     <field name="controlEmbarazo" class="java.lang.Boolean"/>
@@ -92,12 +92,12 @@
     <field name="mesAmenazaAborto" class="java.lang.String"/>
     <field name="causaAmenazaAborto" class="java.lang.String"/>
     <field name="estadoEmocional" class="java.lang.String"/>
-    <field name="dondeNacioNinio" class="com.test.TUdipsaiApi.Model.FichaMedica$DondeNacioNinio"/>
+    <field name="dondeNacioNinio" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$DondeNacioNinio"/>
     <field name="ciudadNacimientoNinio" class="java.lang.String"/>
-    <field name="duracionEmbarazo" class="com.test.TUdipsaiApi.Model.FichaMedica$DuracionEmbarazo"/>
-    <field name="tipoParto" class="com.test.TUdipsaiApi.Model.FichaMedica$TipoParto"/>
-    <field name="partoSegunElComienzo" class="com.test.TUdipsaiApi.Model.FichaMedica$PartoSegunElComienzo"/>
-    <field name="partoSegunFinalizacion" class="com.test.TUdipsaiApi.Model.FichaMedica$PartoSegunFinalizacion"/>
+    <field name="duracionEmbarazo" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$DuracionEmbarazo"/>
+    <field name="tipoParto" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$TipoParto"/>
+    <field name="partoSegunElComienzo" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$PartoSegunElComienzo"/>
+    <field name="partoSegunFinalizacion" class="com.ucacue.udipsai.modules.fichamedica.domain.model.FichaMedica$PartoSegunFinalizacion"/>
     <field name="lloroAlNacer" class="java.lang.Boolean"/>
     <field name="pesoAlNacer" class="java.math.BigDecimal"/>
     <field name="tallaAlNacer" class="java.math.BigDecimal"/>

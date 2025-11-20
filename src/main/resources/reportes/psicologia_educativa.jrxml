@@ -42,11 +42,11 @@
     <field name="estado" class="java.lang.Integer"/>
     <field name="asignaturasGustan" class="java.lang.String"/>
     <field name="asignaturasDisgustan" class="java.lang.String"/>
-    <field name="relacionDocentes" class="com.test.TUdipsaiApi.Model.PsicologiaEducativa$RelacionDocentes"/>
+    <field name="relacionDocentes" class="com.ucacue.udipsai.modules.psicologiaeducativa.domain.model.PsicologiaEducativa$RelacionDocentes"/>
     <field name="causaRelacionDocentes" class="java.lang.String"/>
     <field name="gustaIrInstitucion" class="java.lang.Boolean"/>
     <field name="causaGustaIrInstitucion" class="java.lang.String"/>
-    <field name="relacionConGrupo" class="com.test.TUdipsaiApi.Model.PsicologiaEducativa$RelacionConGrupo"/>
+    <field name="relacionConGrupo" class="com.ucacue.udipsai.modules.psicologiaeducativa.domain.model.PsicologiaEducativa$RelacionConGrupo"/>
     <field name="causaRelacionConGrupo" class="java.lang.String"/>
     <field name="inclusionEducativa" class="java.lang.Boolean"/>
     <field name="causaInclusionEducativa" class="java.lang.String"/>
@@ -73,7 +73,7 @@
     <field name="causaEvaluacionPsicologicaUOtrosAnterior" class="java.lang.String"/>
     <field name="recibeApoyo" class="java.lang.Boolean"/>
     <field name="causaLugarTiempoRecibeApoyo" class="java.lang.String"/>
-    <field name="aprovechamientoGeneral" class="com.test.TUdipsaiApi.Model.PsicologiaEducativa$AprovechamientoGeneral"/>
+    <field name="aprovechamientoGeneral" class="com.ucacue.udipsai.modules.psicologiaeducativa.domain.model.PsicologiaEducativa$AprovechamientoGeneral"/>
     <field name="actividadEscolar" class="java.lang.String"/>
     <field name="observaciones" class="java.lang.String"/>
 

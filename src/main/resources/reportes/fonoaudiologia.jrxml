@@ -47,7 +47,7 @@
     <field name="sabeComoLlamanObjetosEntorno" class="java.lang.Boolean"/>
     <field name="comprendeLoQueSeLeDice" class="java.lang.Boolean"/>
     <field name="reconoceFuenteSonora" class="java.lang.Boolean"/>
-    <field name="comunicacionPreferentementeForma" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ComunicacionPreferentementeForma"/>
+    <field name="comunicacionPreferentementeForma" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ComunicacionPreferentementeForma"/>
     <field name="seARealizadoExamenAudiologico" class="java.lang.Boolean"/>
 
     <!-- Diagnóstico audiológico -->
@@ -97,10 +97,10 @@
     <field name="oidoDerecho" class="java.lang.Boolean"/>
     <field name="oidoIzquierdo" class="java.lang.Boolean"/>
     <field name="bilateral" class="java.lang.Boolean"/>
-    <field name="gradoPerdida" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$GradoPerdida"/>
-    <field name="permanecia" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$Permanecia"/>
+    <field name="gradoPerdida" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$GradoPerdida"/>
+    <field name="permanecia" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$Permanecia"/>
     <field name="otitis" class="java.lang.Boolean"/>
-    <field name="tipoOtitis" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$TipoOtitis"/>
+    <field name="tipoOtitis" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$TipoOtitis"/>
     <field name="duracionOtitisInicio" class="java.util.Date"/>
     <field name="duracionOtitisFin" class="java.util.Date"/>
     <field name="antecedentesFamiliares" class="java.lang.Boolean"/>
@@ -121,7 +121,7 @@
     <field name="otalgiaBilateral" class="java.lang.Boolean"/>
     <field name="permanenciaOtalgiaContinua" class="java.lang.Boolean"/>
     <field name="permanenciaOtalgiaIntermitente" class="java.lang.Boolean"/>
-    <field name="gradoPermanenciaOtalgia" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$GradoPermanenciaOtalgia"/>
+    <field name="gradoPermanenciaOtalgia" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$GradoPermanenciaOtalgia"/>
     <field name="asociadaOtalgiaInfeccionRespiratoriaAlta" class="java.lang.Boolean"/>
     <field name="infeccionRespiratoriaPunzante" class="java.lang.Boolean"/>
     <field name="infeccionRespiratoriaPulsatil" class="java.lang.Boolean"/>
@@ -138,7 +138,7 @@
     <field name="otorreaBilateral" class="java.lang.Boolean"/>
     <field name="permanenciaOtorreaContinua" class="java.lang.Boolean"/>
     <field name="permanenciaOtorreaIntermitente" class="java.lang.Boolean"/>
-    <field name="gradoPermanenciaOtorrea" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$GradoPermanenciaOtorrea"/>
+    <field name="gradoPermanenciaOtorrea" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$GradoPermanenciaOtorrea"/>
     <field name="aspectoClaroOtorrea" class="java.lang.Boolean"/>
     <field name="aspectoSerosoOtorrea" class="java.lang.Boolean"/>
     <field name="aspectoMucosoOtorrea" class="java.lang.Boolean"/>
@@ -173,34 +173,34 @@
     <field name="utilizaAyudaAuditiva" class="java.lang.Boolean"/>
     <field name="especficarAyudaAuditiva" class="java.lang.String"/>
     <field name="percibeSonidoIgualAmbosOidos" class="java.lang.Boolean"/>
-    <field name="conQueOidoEscuchaMejor" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ConQueOidoEscuchaMejor"/>
-    <field name="haceCuantoTiempoPresentaSintomasAuditivos" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$HaceCuantoTiempoPresentaSintomasAuditivos"/>
+    <field name="conQueOidoEscuchaMejor" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ConQueOidoEscuchaMejor"/>
+    <field name="haceCuantoTiempoPresentaSintomasAuditivos" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$HaceCuantoTiempoPresentaSintomasAuditivos"/>
 
     <!-- Antecedentes vestibulares -->
     <field name="faltaEquilibrioCaminar" class="java.lang.Boolean"/>
     <field name="mareos" class="java.lang.Boolean"/>
-    <field name="cuandoMareos" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$CuandoMareos"/>
+    <field name="cuandoMareos" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$CuandoMareos"/>
     <field name="vertigo" class="java.lang.Boolean"/>
 
     <!-- Descripción de otoscopia oído derecho -->
-    <field name="palpacionPabellonOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$PalpacionOido"/>
-    <field name="palpacionMastoidesOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$PalpacionOido"/>
-    <field name="caeOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$CAEOido"/>
-    <field name="obstruccionOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ObstruccionOido"/>
-    <field name="aparienciaMenbranaTimpanicaOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$AparienciaMenbranaTimpanica"/>
+    <field name="palpacionPabellonOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$PalpacionOido"/>
+    <field name="palpacionMastoidesOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$PalpacionOido"/>
+    <field name="caeOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$CAEOido"/>
+    <field name="obstruccionOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ObstruccionOido"/>
+    <field name="aparienciaMenbranaTimpanicaOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$AparienciaMenbranaTimpanica"/>
     <field name="perforacionOidoDerecho" class="java.lang.Boolean"/>
     <field name="burbujaOidoDerecho" class="java.lang.Boolean"/>
-    <field name="coloracionOidoDerecho" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ColoracionOido"/>
+    <field name="coloracionOidoDerecho" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ColoracionOido"/>
 
     <!-- Descripción de otoscopia oído izquierdo -->
-    <field name="palpacionPabellonOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$PalpacionOido"/>
-    <field name="palpacionMastoidesOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$PalpacionOido"/>
-    <field name="caeOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$CAEOido"/>
-    <field name="obstruccionOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ObstruccionOido"/>
-    <field name="aparienciaMenbranaTimpanicaOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$AparienciaMenbranaTimpanica"/>
+    <field name="palpacionPabellonOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$PalpacionOido"/>
+    <field name="palpacionMastoidesOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$PalpacionOido"/>
+    <field name="caeOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$CAEOido"/>
+    <field name="obstruccionOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ObstruccionOido"/>
+    <field name="aparienciaMenbranaTimpanicaOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$AparienciaMenbranaTimpanica"/>
     <field name="perforacionOidoIzquierdo" class="java.lang.Boolean"/>
     <field name="burbujaOidoIzquierdo" class="java.lang.Boolean"/>
-    <field name="coloracionOidoIzquierdo" class="com.test.TUdipsaiApi.Model.Fonoaudiologia$ColoracionOido"/>
+    <field name="coloracionOidoIzquierdo" class="com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia$ColoracionOido"/>
 
 
 
