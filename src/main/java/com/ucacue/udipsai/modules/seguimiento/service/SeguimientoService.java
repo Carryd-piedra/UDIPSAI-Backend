@@ -111,8 +111,8 @@ public class SeguimientoService {
             pacienteDTO.setTelefono(seguimiento.getPaciente().getTelefono());
             pacienteDTO.setCelular(seguimiento.getPaciente().getCelular());
             pacienteDTO.setProyecto(seguimiento.getPaciente().getProyecto());
+            pacienteDTO.setNivelEducativo(seguimiento.getPaciente().getNivelEducativo());
             pacienteDTO.setAnioEducacion(seguimiento.getPaciente().getAnioEducacion());
-            pacienteDTO.setParalelo(seguimiento.getPaciente().getParalelo());
             pacienteDTO.setPerteneceInclusion(seguimiento.getPaciente().getPerteneceInclusion());
             pacienteDTO.setTieneDiscapacidad(seguimiento.getPaciente().getTieneDiscapacidad());
             pacienteDTO.setPortadorCarnet(seguimiento.getPaciente().isPortadorCarnet());

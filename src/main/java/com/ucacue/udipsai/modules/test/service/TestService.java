@@ -8,10 +8,6 @@ import com.ucacue.udipsai.modules.especialistas.domain.model.Especialidad;
 import com.ucacue.udipsai.modules.especialistas.domain.model.Especialistas;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialidadDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistasDTO;
-import com.ucacue.udipsai.modules.instituciones.domain.model.InstitucionEducativa;
-import com.ucacue.udipsai.modules.instituciones.domain.model.Jornada;
-import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
-import com.ucacue.udipsai.modules.instituciones.dto.JornadaDTO;
 import com.ucacue.udipsai.modules.paciente.domain.model.Paciente;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import com.ucacue.udipsai.modules.test.domain.model.Test;
@@ -172,8 +168,8 @@ public class TestService {
         dto.setTelefono(paciente.getTelefono());
         dto.setCelular(paciente.getCelular());
         dto.setProyecto(paciente.getProyecto());
+        dto.setNivelEducativo(paciente.getNivelEducativo());
         dto.setAnioEducacion(paciente.getAnioEducacion());
-        dto.setParalelo(paciente.getParalelo());
         dto.setPerteneceInclusion(paciente.getPerteneceInclusion());
         dto.setTieneDiscapacidad(paciente.getTieneDiscapacidad());
         dto.setPortadorCarnet(paciente.isPortadorCarnet());
@@ -220,8 +216,8 @@ public class TestService {
         paciente.setTelefono(dto.getTelefono());
         paciente.setCelular(dto.getCelular());
         paciente.setProyecto(dto.getProyecto());
+        paciente.setNivelEducativo(dto.getNivelEducativo());
         paciente.setAnioEducacion(dto.getAnioEducacion());
-        paciente.setParalelo(dto.getParalelo());
         paciente.setPerteneceInclusion(dto.getPerteneceInclusion());
         paciente.setTieneDiscapacidad(dto.getTieneDiscapacidad());
         paciente.setPortadorCarnet(dto.isPortadorCarnet());
@@ -293,7 +289,7 @@ public class TestService {
         return especialista;  // Aquí devolvemos el objeto especialista, no el DTO
     }
 
-    private InstitucionEducativaDTO convertInstitucionEducativaToDTO(InstitucionEducativa institucionEducativa) {
+    /* private InstitucionEducativaDTO convertInstitucionEducativaToDTO(InstitucionEducativa institucionEducativa) {
         if (institucionEducativa == null) {
             return null;
         }
@@ -339,7 +335,7 @@ public class TestService {
         jornada.setNombreJornada(dto.getNombreJornada());
         jornada.setEstadoJornada(dto.getEstadoJornada());
         return jornada;
-    }
+    } */
 
     private EspecialidadDTO convertEspecialidadToDTO(Especialidad especialidad) {
         if (especialidad == null) {

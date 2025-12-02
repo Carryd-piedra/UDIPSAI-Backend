@@ -14,9 +14,9 @@ VALUES
 (2, 1, 'AZOGUES');
 INSERT INTO especialidad (id, area, id_permiso)
 VALUES
-    (1, 'ohhh', 1),
-    (2, 'hhhh', 2),
-    (3, 'hhhh', 3),
+    (1, 'Secretaria', 1),
+    (2, 'Psicologia Educativa', 2),
+    (3, 'Fonologia ', 3),
     (4, 'hhhh', 4),
     (5, 'hhhh', 5),
     (6, 'hhhh', 6),

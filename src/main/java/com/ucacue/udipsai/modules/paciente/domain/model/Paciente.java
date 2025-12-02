@@ -74,11 +74,11 @@ public class Paciente {
     @JoinColumn(name = "jornada_id")
     private Jornada jornada;
 
+    @Column(name = "nivel_educativo")
+    private String nivelEducativo;
+
     @Column(name = "anio_educacion")
     private String anioEducacion;
-
-    @Column(name = "paralelo")
-    private String paralelo;
 
     @Column(name = "anioUniversitario")
     private String anioUniversitario;
@@ -119,9 +119,9 @@ public class Paciente {
     @Column(name = "pertenece_a_proyecto")
     private Boolean perteneceAProyecto;
 
-        @Convert(converter = DocumentoAdjuntoListConverter.class)
-        @Column(name = "documentos_paciente", columnDefinition = "json")
-        private List<DocumentoAdjunto> documentos_paciente = new ArrayList<>();
+    @Convert(converter = DocumentoAdjuntoListConverter.class)
+    @Column(name = "documentos_paciente", columnDefinition = "json")
+    private List<DocumentoAdjunto> documentos_paciente = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "ficha_diagnostica_id", referencedColumnName = "id")
@@ -155,8 +155,8 @@ public class Paciente {
         this.institucionEducativa = otro.institucionEducativa;
         this.proyecto = otro.proyecto;
         this.jornada = otro.jornada;
+        this.nivelEducativo = otro.nivelEducativo;
         this.anioEducacion = otro.anioEducacion;
-        this.paralelo = otro.paralelo;
         this.anioUniversitario = otro.anioUniversitario;
         this.ciclo = otro.ciclo;
         this.carrera = otro.carrera;

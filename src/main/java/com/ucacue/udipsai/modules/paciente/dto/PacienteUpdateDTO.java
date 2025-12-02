@@ -29,8 +29,8 @@ public class PacienteUpdateDTO {
     private Integer institucionEducativa;
     private Integer jornada;
     private String proyecto;
+    private String nivelEducativo;
     private String anioEducacion;
-    private String paralelo;
     private String anioUniversitario;
     private String ciclo;
     private String carrera;

@@ -34,8 +34,8 @@ public class PacienteSinImagenDTO {
     private InstitucionEducativa institucionEducativa;
     private String proyecto;
     private Jornada jornada;
+    private String nivelEducativo;
     private String anioEducacion;
-    private String paralelo;
     private String anioUniversitario;
     private String ciclo;
     private String carrera;

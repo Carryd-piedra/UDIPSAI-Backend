@@ -61,7 +61,7 @@ public class ExcelService {
             }
 
             Paciente paciente = new Paciente();
-            boolean hasError = false; // Indicador de error en este paciente
+            // boolean hasError = false; // Indicador de error en este paciente
 
             try {
                 // Procesar ID

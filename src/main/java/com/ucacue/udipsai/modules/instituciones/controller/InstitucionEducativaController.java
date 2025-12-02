@@ -2,7 +2,6 @@ package com.ucacue.udipsai.modules.instituciones.controller;
 
 import com.ucacue.udipsai.modules.instituciones.domain.model.InstitucionEducativa;
 import com.ucacue.udipsai.modules.instituciones.service.InstitucionEducativaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +15,6 @@ public class InstitucionEducativaController {
 
     private final InstitucionEducativaService institucionEducativaService;
 
-    @Autowired
     public InstitucionEducativaController(InstitucionEducativaService institucionEducativaService) {
         this.institucionEducativaService = institucionEducativaService;
     }

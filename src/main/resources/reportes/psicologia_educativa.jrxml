@@ -26,8 +26,8 @@
     <field name="paciente.institucionEducativa.nombreInstitucion" class="java.lang.String"/>
     <field name="paciente.proyecto" class="java.lang.String"/>
     <field name="paciente.jornada.nombreJornada" class="java.lang.String"/>
+    <field name="paciente.nivelEducativo" class="java.lang.String"/>
     <field name="paciente.anioEducacion" class="java.lang.String"/>
-    <field name="paciente.paralelo" class="java.lang.String"/>
     <field name="paciente.perteneceInclusion" class="java.lang.String"/>
     <field name="paciente.tieneDiscapacidad" class="java.lang.String"/>
     <field name="paciente.portadorCarnet" class="java.lang.Boolean"/>
@@ -344,6 +344,20 @@
 
             <!-- Año de Educación -->
             <rectangle>
+                <reportElement x="10" y="235" width="360" height="20" forecolor="#B0B0B0"/> <!-- y=235 -->
+            </rectangle>
+            <staticText>
+                <reportElement x="15" y="237" width="120" height="15"/>
+                <textElement textAlignment="Left"/>
+                <text><![CDATA[Año de Educación:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="140" y="237" width="220" height="15"/>
+                <textFieldExpression><![CDATA[$F{paciente.anioEducacion}]]></textFieldExpression>
+            </textField>
+
+            <!-- Año de Educación -->
+            <rectangle>
                 <reportElement x="10" y="230" width="360" height="20" forecolor="#B0B0B0"/>
             </rectangle>
             <staticText>
@@ -354,20 +368,6 @@
             <textField>
                 <reportElement x="140" y="232" width="220" height="15"/>
                 <textFieldExpression><![CDATA[$F{paciente.anioEducacion}]]></textFieldExpression>
-            </textField>
-
-            <!-- Paralelo -->
-            <rectangle>
-                <reportElement x="10" y="250" width="360" height="20" forecolor="#B0B0B0"/>
-            </rectangle>
-            <staticText>
-                <reportElement x="15" y="252" width="120" height="15"/>
-                <textElement textAlignment="Left"/>
-                <text><![CDATA[Paralelo:]]></text>
-            </staticText>
-            <textField>
-                <reportElement x="140" y="252" width="150" height="15"/>
-                <textFieldExpression><![CDATA[$F{paciente.paralelo}]]></textFieldExpression>
             </textField>
 
             <!-- Pertenece a Inclusión -->

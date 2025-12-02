@@ -2,7 +2,6 @@ package com.ucacue.udipsai.modules.instituciones.service;
 
 import com.ucacue.udipsai.modules.instituciones.domain.model.InstitucionEducativa;
 import com.ucacue.udipsai.modules.instituciones.domain.repository.InstitucionEducativaRepositorio;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +12,6 @@ public class InstitucionEducativaService {
 
     private final InstitucionEducativaRepositorio institucionEducativaRepositorio;
 
-    @Autowired
     public InstitucionEducativaService(InstitucionEducativaRepositorio institucionEducativaRepositorio) {
         this.institucionEducativaRepositorio = institucionEducativaRepositorio;
     }

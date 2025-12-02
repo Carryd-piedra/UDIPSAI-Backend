@@ -10,18 +10,35 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTH_HEADER = "access-token-udipsai";
     private static final String TOKEN = "nOsr9FprhOWfLEti5KGJUK6RJWL8R0Ek";
 
+    // Rutas que no requieren autenticación
+    private static final List<String> PUBLIC_PATHS = Arrays.asList(
+            "/swagger-ui.html",
+            "/swagger-ui/"
+    );
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        System.out.println("JwtAuthenticationFilter is processing the request.");
+        String requestPath = request.getRequestURI();
+
+        // Verificar si la ruta es pública (no requiere autenticación)
+        if (isPublicPath(requestPath)) {
+            System.out.println("Public path accessed: " + requestPath);
+            chain.doFilter(request, response);
+            return;
+        }
+
+        System.out.println("JwtAuthenticationFilter is processing the request: " + requestPath);
 
         String token = request.getHeader(AUTH_HEADER);
 
@@ -43,4 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Continuar con la cadena de filtros
         chain.doFilter(request, response);
     }
+
+    /**
+     * Verifica si la ruta solicitada es pública
+     */
+    private boolean isPublicPath(String requestPath) {
+        return PUBLIC_PATHS.stream()
+                .anyMatch(requestPath::startsWith);
+    }
 }
+

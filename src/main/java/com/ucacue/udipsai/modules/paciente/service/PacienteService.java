@@ -4,10 +4,8 @@ import com.ucacue.udipsai.modules.documentos.service.DocumentoService;
 import com.ucacue.udipsai.modules.historial.service.HistorialCambiosService;
 import com.ucacue.udipsai.modules.documentos.domain.model.Documento;
 import com.ucacue.udipsai.modules.documentos.domain.repository.DocumentoRepositorio;
-import com.ucacue.udipsai.modules.fichamedica.domain.repository.FichaMedicaRepository;
 import com.ucacue.udipsai.modules.instituciones.domain.model.InstitucionEducativa;
 import com.ucacue.udipsai.modules.instituciones.domain.repository.InstitucionEducativaRepositorio;
-import com.ucacue.udipsai.modules.instituciones.domain.repository.JornadaRepositorio;
 import com.ucacue.udipsai.modules.paciente.domain.model.Paciente;
 import com.ucacue.udipsai.modules.paciente.domain.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.sedes.domain.model.Sede;
@@ -36,9 +34,6 @@ public class PacienteService {
     private InstitucionEducativaRepositorio institucionEducativaRepositorio;
 
     @Autowired
-    private JornadaRepositorio jornadaRepositorio;
-
-    @Autowired
     private DocumentoService documentoService;
 
     @Autowired
@@ -48,15 +43,11 @@ public class PacienteService {
     private HistorialCambiosService historialCambiosService;
 
     @Autowired
-    private FichaMedicaRepository fichaMedicaRepository;
-
-    @Autowired
     private DocumentoRepositorio documentoRepositorio;
 
     @Autowired
     private ImagenService imagenService;  // Servicio para compresión/descompresión de imágenes
 
-    private static final String IMAGE_DIRECTORY = System.getProperty("user.home") + "/UdipsaiImagenesPacientes/";
 
     // Obtener un paciente por su ID
     public Optional<Paciente> getPacienteById(Integer id) {
@@ -95,8 +86,8 @@ public class PacienteService {
         dto.setInstitucionEducativa(paciente.getInstitucionEducativa());
         dto.setProyecto(paciente.getProyecto());
         dto.setJornada(paciente.getJornada());
+        dto.setNivelEducativo(paciente.getNivelEducativo());
         dto.setAnioEducacion(paciente.getAnioEducacion());
-        dto.setParalelo(paciente.getParalelo());
         dto.setAnioUniversitario(paciente.getAnioUniversitario());
         dto.setCarrera(paciente.getCarrera());
         dto.setCiclo(paciente.getCiclo());
@@ -156,8 +147,8 @@ public class PacienteService {
         paciente.setTelefono(pacienteUpdateDTO.getTelefono());
         paciente.setCelular(pacienteUpdateDTO.getCelular());
         paciente.setProyecto(pacienteUpdateDTO.getProyecto());
+        paciente.setNivelEducativo(pacienteUpdateDTO.getNivelEducativo());
         paciente.setAnioEducacion(pacienteUpdateDTO.getAnioEducacion());
-        paciente.setParalelo(pacienteUpdateDTO.getParalelo());
         paciente.setAnioUniversitario(pacienteUpdateDTO.getAnioUniversitario());
         paciente.setCarrera(pacienteUpdateDTO.getCarrera());
         paciente.setCiclo(pacienteUpdateDTO.getCiclo());
@@ -194,7 +185,6 @@ public class PacienteService {
 
         // Guardar la imagen en la carpeta (no en la base de datos)
         if (pacienteUpdateDTO.getImagen() != null) {
-            String fileName = "imagen-" + pacienteUpdateDTO.getNombresApellidos().replace(" ", "_") + "-" + pacienteUpdateDTO.getCedula();
             guardarImagenBase64(pacienteUpdateDTO.getImagen(), "imagen", pacienteUpdateDTO.getNombresApellidos(), pacienteUpdateDTO.getCedula());
         }
 
@@ -231,8 +221,8 @@ public class PacienteService {
             paciente.setTelefono(pacienteUpdateDTO.getTelefono());
             paciente.setCelular(pacienteUpdateDTO.getCelular());
             paciente.setProyecto(pacienteUpdateDTO.getProyecto());
+            paciente.setNivelEducativo(pacienteUpdateDTO.getNivelEducativo());
             paciente.setAnioEducacion(pacienteUpdateDTO.getAnioEducacion());
-            paciente.setParalelo(pacienteUpdateDTO.getParalelo());
             paciente.setAnioUniversitario(pacienteUpdateDTO.getAnioUniversitario());
             paciente.setCarrera(pacienteUpdateDTO.getCarrera());
             paciente.setCiclo(pacienteUpdateDTO.getCiclo());
@@ -269,7 +259,6 @@ public class PacienteService {
 
             // Guardar la imagen en la carpeta (si se actualiza)
             if (pacienteUpdateDTO.getImagen() != null) {
-                String fileName = "imagen-" + pacienteUpdateDTO.getNombresApellidos().replace(" ", "_") + "-" + pacienteUpdateDTO.getCedula();
                 guardarImagenBase64(pacienteUpdateDTO.getImagen(), "imagen", pacienteUpdateDTO.getNombresApellidos(), pacienteUpdateDTO.getCedula());
             }
 
@@ -349,7 +338,6 @@ public class PacienteService {
 
         dto.setProyecto(paciente.getProyecto());
         dto.setAnioEducacion(paciente.getAnioEducacion());
-        dto.setParalelo(paciente.getParalelo());
         dto.setAnioUniversitario(paciente.getAnioUniversitario());
         dto.setCarrera(paciente.getCarrera());
         dto.setCiclo(paciente.getCiclo());

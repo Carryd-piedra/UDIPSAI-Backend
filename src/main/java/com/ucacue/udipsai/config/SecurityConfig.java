@@ -24,6 +24,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/listar").permitAll()
+                        .requestMatchers("/listar", "/api/especialistas/login").permitAll()
+                        // Rutas públicas de Swagger y documentación
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic.disable())

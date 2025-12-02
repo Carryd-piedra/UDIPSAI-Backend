@@ -3,11 +3,9 @@ package com.ucacue.udipsai.modules.fonoaudiologia.service;
 import com.ucacue.udipsai.modules.fonoaudiologia.domain.model.Fonoaudiologia;
 import com.ucacue.udipsai.modules.paciente.domain.model.Paciente;
 import com.ucacue.udipsai.modules.reportes.service.ReportTransformService;
-import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -62,8 +60,8 @@ public class FonoaudiologiaReportService {
             String backgroundImage = "https://upload.wikimedia.org/wikipedia/commons/6/6c/Logo_Universidad_Cat%C3%B3lica_de_Cuenca.jpg";
 
             // Cargar la plantilla JRXML
-            ClassPathResource resource = new ClassPathResource("reportes/fonoaudiologia.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
+            // ClassPathResource resource = new ClassPathResource("reportes/fonoaudiologia.jrxml");
+            // JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 
             // Crear un datasource con el registro de Fonoaudiología
 
