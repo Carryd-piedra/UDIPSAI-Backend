@@ -5,7 +5,9 @@ import com.ucacue.udipsai.modules.historial.service.HistorialCambiosService;
 import com.ucacue.udipsai.modules.documentos.domain.model.Documento;
 import com.ucacue.udipsai.modules.documentos.domain.repository.DocumentoRepositorio;
 import com.ucacue.udipsai.modules.instituciones.domain.model.InstitucionEducativa;
+import com.ucacue.udipsai.modules.instituciones.domain.model.Jornada;
 import com.ucacue.udipsai.modules.instituciones.domain.repository.InstitucionEducativaRepositorio;
+import com.ucacue.udipsai.modules.instituciones.domain.repository.JornadaRepositorio;
 import com.ucacue.udipsai.modules.paciente.domain.model.Paciente;
 import com.ucacue.udipsai.modules.paciente.domain.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.sedes.domain.model.Sede;
@@ -32,6 +34,9 @@ public class PacienteService {
 
     @Autowired
     private InstitucionEducativaRepositorio institucionEducativaRepositorio;
+
+    @Autowired
+    private JornadaRepositorio jornadaRepositorio;
 
     @Autowired
     private DocumentoService documentoService;
@@ -137,7 +142,7 @@ public class PacienteService {
 
         // Guardar los datos del paciente
         paciente.setFechaApertura(pacienteUpdateDTO.getFechaApertura());
-        paciente.setPacienteEstado(pacienteUpdateDTO.getPacienteEstado());
+        paciente.setPacienteEstado(1);
         paciente.setNombresApellidos(pacienteUpdateDTO.getNombresApellidos());
         paciente.setCiudad(pacienteUpdateDTO.getCiudad());
         paciente.setFechaNacimiento(pacienteUpdateDTO.getFechaNacimiento());
@@ -244,6 +249,16 @@ public class PacienteService {
                     paciente.setInstitucionEducativa(institucion.get());
                 } else {
                     throw new RuntimeException("Institución Educativa no encontrada con ID: " + pacienteUpdateDTO.getInstitucionEducativa());
+                }
+            }
+
+            // Asinar Jornada
+            if (pacienteUpdateDTO.getJornada() != null) {
+                Optional<Jornada> jornada = jornadaRepositorio.findById(pacienteUpdateDTO.getJornada());
+                if (jornada.isPresent()) {
+                    paciente.setJornada(jornada.get());
+                } else {
+                    throw new RuntimeException("Jornada no encontrada con ID: " + pacienteUpdateDTO.getInstitucionEducativa());
                 }
             }
 

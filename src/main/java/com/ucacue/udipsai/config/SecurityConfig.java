@@ -20,20 +20,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Deshabilitado para pruebas
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/listar").permitAll()
-                        .requestMatchers("/listar", "/api/especialistas/login").permitAll()
-                        // Rutas públicas de Swagger y documentación
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // PERMITIR TODO
                 )
                 .httpBasic(httpBasic -> httpBasic.disable())
-                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .formLogin(form -> form.disable());
 
         return http.build();
     }

@@ -20,9 +20,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String TOKEN = "nOsr9FprhOWfLEti5KGJUK6RJWL8R0Ek";
 
     // Rutas que no requieren autenticación
+    // Actualiza tu lista de rutas públicas
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
-            "/swagger-ui.html",
-            "/swagger-ui/"
+            "/swagger-ui/",          // Recursos de la interfaz (JS, CSS)
+            "/swagger-ui.html",      // Página principal
+            "/v3/api-docs",          // El JSON de la documentación (CRUCIAL)
+            "/favicon.ico",          // Icono del navegador
+            "/listar",               // Tus otras rutas públicas
+            "/api/especialistas/login",
+            "/api/pacientes/listar",
+            "/api/instituciones/listar",
+            "/api/sedes/listar",
+            "/api/pacientes/actualizar/{id}"
     );
 
     @Override
