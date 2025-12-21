@@ -1,0 +1,160 @@
+package com.ucacue.udipsai.modules.paciente;
+
+import com.ucacue.udipsai.modules.documentos.Documento;
+import com.ucacue.udipsai.modules.documentos.DocumentoAdjunto;
+import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
+import com.ucacue.udipsai.modules.sedes.Sede;
+import com.ucacue.udipsai.core.util.DocumentoAdjuntoListConverter;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "pacientes")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Paciente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Builder.Default
+    @Column(name = "fecha_apertura")
+    private LocalDateTime fechaApertura = LocalDateTime.now();
+
+    @Builder.Default
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
+    @Column(name = "nombres_apellidos", nullable = false)
+    private String nombresApellidos;
+
+    @Column(length = 100)
+    private String ciudad;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+
+    @Column(unique = true, length = 15)
+    private String cedula;
+
+    @Column(columnDefinition = "TEXT")
+    private String domicilio;
+
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
+    @Column(name = "numero_telefono", length = 20)
+    private String numeroTelefono;
+
+    @Column(name = "numero_celular", length = 20)
+    private String numeroCelular;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sede_id")
+    private Sede sede;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "institucion_educativa_id")
+    private InstitucionEducativa institucionEducativa;
+
+    @Builder.Default
+    @Column(name = "pertenece_inclusion")
+    private Boolean perteneceInclusion = false;
+
+    @Builder.Default
+    @Column(name = "tiene_discapacidad")
+    private Boolean tieneDiscapacidad = false;
+
+    @Builder.Default
+    @Column(name = "portador_carnet")
+    private Boolean portadorCarnet = false;
+
+    @Builder.Default
+    @Column(name = "pertenece_a_proyecto")
+    private Boolean perteneceAProyecto = false;
+
+    @Column(columnDefinition = "TEXT")
+    private String diagnostico;
+
+    @Column(columnDefinition = "TEXT", name = "motivo_consulta")
+    private String motivoConsulta;
+
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;
+
+    @Column(name = "tipo_discapacidad")
+    private String tipoDiscapacidad;
+
+    @Column(name = "detalle_discapacidad")
+    private String detalleDiscapacidad;
+
+    @Column(name = "porcentaje_discapacidad")
+    private Integer porcentajeDiscapacidad;
+
+    @Column(name = "proyecto")
+    private String proyecto;
+
+    @Column(name = "nivel_educativo")
+    private String nivelEducativo;
+
+    @Column(name = "anio_educacion")
+    private String anioEducacion;
+
+    @Column(name = "anio_universitario")
+    private String anioUniversitario;
+
+    @Column(name = "carrera")
+    private String carrera;
+
+    @Column(name = "ciclo")
+    private String ciclo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "jornada", length = 20)
+    private JornadaEnum jornada;
+
+    @Builder.Default
+    @Convert(converter = DocumentoAdjuntoListConverter.class)
+    @Column(name = "documentos_paciente", columnDefinition = "jsonb")
+    private List<DocumentoAdjunto> documentosPaciente = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ficha_diagnostica_id")
+    private Documento fichaDiagnostica;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ficha_compromiso_id")
+    private Documento fichaCompromiso;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ficha_unica_id")
+    private Documento fichaUnica;
+
+    @Transient
+    public int getEdad() {
+        if (fechaNacimiento == null)
+            return 0;
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears();
+    }
+
+    public enum JornadaEnum {
+        MATUTINA,
+        VESPERTINA,
+        NOCTURNA,
+        INTEGRAL,
+        INDEFINIDA,
+        OTROS
+    }
+}

@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ucacue.udipsai.modules.documentos.domain.model.DocumentoAdjunto;
+import com.ucacue.udipsai.modules.documentos.DocumentoAdjunto;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

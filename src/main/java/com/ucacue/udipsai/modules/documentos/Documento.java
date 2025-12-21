@@ -1,0 +1,29 @@
+package com.ucacue.udipsai.modules.documentos;
+
+import com.ucacue.udipsai.modules.paciente.Paciente;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "documentos")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Documento {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "url", nullable = false)
+    private String url;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
+    
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+}
