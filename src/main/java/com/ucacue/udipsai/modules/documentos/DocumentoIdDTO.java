@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DocumentoIdDTO {
-    private Long id;
+    private Integer id;
 
-    public DocumentoIdDTO(Long id) {
+    public DocumentoIdDTO(Integer id) {
         this.id = id;
     }
 

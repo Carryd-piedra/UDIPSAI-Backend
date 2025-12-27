@@ -3,39 +3,51 @@ package com.ucacue.udipsai.modules.psicologiaeducativa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/psicologia-educativa")
+@RequestMapping("/api/psicologia-educativa")
 @CrossOrigin(origins = "*")
+@Slf4j
 public class PsicologiaEducativaController {
 
     @Autowired
     private PsicologiaEducativaService service;
 
     @GetMapping
-    public List<PsicologiaEducativaDTO> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<PsicologiaEducativaDTO>> listarFichasPsicologiaEducativa() {
+        log.info("Petición GET para listar todas las fichas de psicología educativa activas");
+        return ResponseEntity.ok(service.listarFichasPsicologiaEducativa());
     }
 
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<PsicologiaEducativaDTO> getByPaciente(@PathVariable Integer pacienteId) {
-        PsicologiaEducativaDTO ficha = service.getByPacienteId(pacienteId);
+    public ResponseEntity<PsicologiaEducativaDTO> obtenerFichaPsicologiaEducativaPorPacienteId(@PathVariable Integer pacienteId) {
+        log.info("Petición GET para obtener ficha de psicología educativa por paciente ID: {}", pacienteId);
+        PsicologiaEducativaDTO ficha = service.obtenerFichaPsicologiaEducativaPorPacienteId(pacienteId);
         if (ficha != null) {
             return ResponseEntity.ok(ficha);
         }
+        log.warn("Ficha de psicología educativa no encontrada para paciente ID: {}", pacienteId);
         return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<PsicologiaEducativaDTO> createUpdate(@RequestBody PsicologiaEducativaRequest request) {
-        return ResponseEntity.ok(service.createUpdate(request));
+    public ResponseEntity<PsicologiaEducativaDTO> guardarFichaPsicologiaEducativa(@RequestBody PsicologiaEducativaRequest request) {
+        log.info("Petición POST para guardar/actualizar ficha de psicología educativa para paciente ID: {}", request.getPacienteId());
+        try {
+            return ResponseEntity.ok(service.guardarFichaPsicologiaEducativa(request));
+        } catch (Exception e) {
+            log.error("Error al guardar ficha de psicología educativa: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        service.delete(id);
+    public ResponseEntity<Void> eliminarFichaPsicologiaEducativa(@PathVariable Integer id) {
+        log.info("Petición DELETE para eliminar ficha de psicología educativa ID: {}", id);
+        service.eliminarFichaPsicologiaEducativa(id);
         return ResponseEntity.noContent().build();
     }
 }

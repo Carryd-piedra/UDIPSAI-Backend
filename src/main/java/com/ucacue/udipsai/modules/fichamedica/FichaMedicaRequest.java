@@ -14,5 +14,4 @@ public class FichaMedicaRequest {
     private DesarrolloMotor desarrolloMotor;
     private Alimentacion alimentacion;
     private AntecedentesMedicos antecedentesMedicos;
-    // genograma file handled via MultipartFile
 }

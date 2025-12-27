@@ -1,53 +1,60 @@
 package com.ucacue.udipsai.modules.sedes;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sedes")
-@CrossOrigin(origins = "*")
+@Slf4j
 public class SedeController {
 
-    @Autowired
-    private SedeService sedeService;
+    private final SedeService sedeService;
 
-    @GetMapping("/listar")
-    public ResponseEntity<List<Sede>> getAllActiveSedes() {
-        List<Sede> sedes = sedeService.getAllActiveSedes();
-        return ResponseEntity.ok(sedes);
+    public SedeController(SedeService sedeService) {
+        this.sedeService = sedeService;
     }
 
-    @GetMapping("/listar/{id}")
-    public ResponseEntity<Sede> getSedeById(@PathVariable Integer id) {
-        Optional<Sede> sede = sedeService.getSedeById(id);
-        return sede.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping()
+    public ResponseEntity<List<Sede>> listarSedesActivas() {
+        log.info("Petición GET para listar todas las sedes");
+        return ResponseEntity.ok(sedeService.listarSedesActivas());
     }
 
-    @PostMapping("/insertar")
-    public ResponseEntity<Sede> crearSede(@RequestBody Sede sede) {
-        Sede nuevaSede = sedeService.saveOrUpdate(sede);
-        return ResponseEntity.ok(nuevaSede);
+    @GetMapping("/{id}")
+    public ResponseEntity<Sede> obtenerSedePorId(@PathVariable Integer id) {
+        return sedeService.obtenerSedePorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.warn("Sede con ID {} no encontrada en la petición GET", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
-    @PutMapping("/actualizar/{id}")
-    public ResponseEntity<Sede> actualizarSede(@PathVariable Integer id, @RequestBody Sede sede) {
-        Optional<Sede> sedeOpt = sedeService.getSedeById(id);
-        if (sedeOpt.isPresent()) {
-            sede.setId(id);
-            Sede sedeActualizada = sedeService.saveOrUpdate(sede);
-            return ResponseEntity.ok(sedeActualizada);
-        } else {
-            return ResponseEntity.notFound().build();
+    @PostMapping()
+    public ResponseEntity<Sede> crearSede(@RequestBody Sede request) {
+        log.info("Petición POST para crear sede: {}", request.getNombre());
+        Sede nuevaSede = sedeService.crearSede(request);
+        return new ResponseEntity<>(nuevaSede, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Sede> actualizarSede(@PathVariable Integer id, @RequestBody Sede nuevaSede) {
+        try {
+            log.info("Petición PUT para actualizar la sede ID: {}", id);
+            return ResponseEntity.ok(sedeService.actualizarSede(id, nuevaSede));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @DeleteMapping("/eliminar/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSede(@PathVariable Integer id) {
-        sedeService.deleteSede(id);
-        return ResponseEntity.ok().build();
+        log.info("Petición DELETE para desactivar sede ID: {}", id);
+        sedeService.eliminarSede(id);
+        return ResponseEntity.noContent().build();
     }
 }

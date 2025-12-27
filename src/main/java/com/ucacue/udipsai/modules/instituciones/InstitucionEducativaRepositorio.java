@@ -12,6 +12,5 @@ public interface InstitucionEducativaRepositorio extends JpaRepository<Instituci
     Optional<InstitucionEducativa> findByNombre(String nombre);
     Optional<InstitucionEducativa> findByTipo(String tipo);
     Optional<InstitucionEducativa> findByDireccion(String direccion);
-    Optional<InstitucionEducativa> findByNombreIgnoreCase(String nombre);
-
+    boolean existsByNombre(String nombre);
 }

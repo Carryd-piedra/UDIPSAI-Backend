@@ -15,11 +15,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class EvaluacionService {
 
     @Autowired
@@ -43,27 +45,36 @@ public class EvaluacionService {
     @Autowired
     private StorageService storageService;
 
-    public List<EvaluacionDTO> getAllEvaluaciones() {
+    public List<EvaluacionDTO> listarEvaluaciones() {
+        log.info("Consultando todas las evaluaciones activas");
         return evaluacionRepositorio.findByActivoTrue().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public List<EvaluacionDTO> getEvaluacionesByPaciente(Integer pacienteId) {
+    public List<EvaluacionDTO> listarEvaluacionesPorPacienteId(Integer pacienteId) {
+        log.info("Consultando evaluaciones activas para el paciente ID: {}", pacienteId);
         return evaluacionRepositorio.findByPacienteIdAndActivoTrue(pacienteId).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public EvaluacionDTO createEvaluacion(EvaluacionRequest request, MultipartFile file) {
+    public EvaluacionDTO crearEvaluacion(EvaluacionRequest request, MultipartFile file) {
+        log.info("Iniciando creación de evaluación para Paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) throw new IllegalArgumentException("El ID del paciente es requerido");
         if (request.getEspecialistaId() == null) throw new IllegalArgumentException("El ID del especialista es requerido");
 
         Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Error al crear evaluación: Paciente ID {} no encontrado", request.getPacienteId());
+                    return new RuntimeException("Paciente no encontrado");
+                });
         Especialista especialista = especialistaRepositorio.findById(request.getEspecialistaId())
-                .orElseThrow(() -> new RuntimeException("Especialista no encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Error al crear evaluación: Especialista ID {} no encontrado", request.getEspecialistaId());
+                    return new RuntimeException("Especialista no encontrado");
+                });
 
         Evaluacion evaluacion = new Evaluacion();
         evaluacion.setPaciente(paciente);
@@ -74,46 +85,56 @@ public class EvaluacionService {
 
         if (file != null && !file.isEmpty()) {
             String filename = storageService.store(file);
+            log.info("Archivo de evaluación almacenado: {}", filename);
             Documento documento = new Documento();
             documento.setUrl(filename);
+            documento.setNombre(request.getNombreArchivo() != null ? request.getNombreArchivo() : "Evaluación");
             documento.setPaciente(paciente);
             documento.setActivo(true);
+
             documento = documentoRepositorio.save(documento);
             evaluacion.setDocumento(documento);
         }
 
-        return convertToDTO(evaluacionRepositorio.save(evaluacion));
+        Evaluacion saved = evaluacionRepositorio.save(evaluacion);
+        log.info("Evaluación creada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
-    public Resource loadFileAsResource(Long id) {
+    public Resource cargarArchivoComoRecurso(Long id) {
+        log.info("Solicitando recurso para evaluación ID: {}", id);
         Evaluacion evaluacion = evaluacionRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evaluacion no encontrada"));
+                .orElseThrow(() -> {
+                    log.warn("Evaluación ID {} no encontrada", id);
+                    return new RuntimeException("Evaluacion no encontrada");
+                });
         if (evaluacion.getDocumento() != null) {
             return storageService.loadAsResource(evaluacion.getDocumento().getUrl());
         }
+        log.warn("La evaluación ID {} no tiene documento adjunto", id);
         return null;
     }
 
-    public void deleteEvaluacion(Long id) {
+    public void eliminarEvaluacion(Long id) {
         if (id == null) return;
-        evaluacionRepositorio.findById(id).ifPresent(e -> {
+        evaluacionRepositorio.findById(id).ifPresentOrElse(e -> {
+            log.info("Desactivando evaluación ID: {}", id);
             e.setActivo(false);
             evaluacionRepositorio.save(e);
-        });
+        }, () -> log.warn("Intento de eliminar evaluación inexistente ID: {}", id));
     }
 
-    private EvaluacionDTO convertToDTO(Evaluacion evaluacion) {
+    private EvaluacionDTO convertirADTO(Evaluacion evaluacion) {
         EvaluacionDTO dto = new EvaluacionDTO();
         dto.setId(evaluacion.getId());
-        dto.setPaciente(pacienteService.convertToDTO(evaluacion.getPaciente()));
-        dto.setEspecialista(especialistaService.convertToDTO(evaluacion.getEspecialista()));
+        dto.setPaciente(pacienteService.convertirADTO(evaluacion.getPaciente()));
+        dto.setEspecialista(especialistaService.convertirADTO(evaluacion.getEspecialista()));
         dto.setNombreArchivo(evaluacion.getNombreArchivo());
         dto.setFecha(evaluacion.getFecha());
         dto.setActivo(evaluacion.getActivo());
         
         if (evaluacion.getDocumento() != null) {
-            dto.setDocumento(new DocumentoDTO(evaluacion.getDocumento().getId(), evaluacion.getDocumento().getUrl()));
-            dto.setFileUrl(evaluacion.getDocumento().getUrl());
+            dto.setDocumento(new DocumentoDTO(evaluacion.getDocumento().getId(), evaluacion.getDocumento().getUrl(), evaluacion.getDocumento().getNombre()));
         }
         return dto;
     }

@@ -15,6 +15,5 @@ public class EvaluacionDTO {
     private LocalDate fecha;
     private Boolean activo;
     private DocumentoDTO documento;
-    // URL for direct download if needed
     private String fileUrl;
 }

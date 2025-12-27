@@ -1,29 +1,33 @@
 package com.ucacue.udipsai.modules.paciente;
 
-import com.ucacue.udipsai.modules.documentos.Documento;
-import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
-import com.ucacue.udipsai.modules.documentos.DocumentoIdDTO;
-import com.ucacue.udipsai.modules.documentos.DocumentoRepositorio;
-import com.ucacue.udipsai.modules.documentos.DocumentoService;
 import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
 import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaRepositorio;
 import com.ucacue.udipsai.modules.sedes.Sede;
 import com.ucacue.udipsai.modules.sedes.SedeRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaDTO;
+import com.ucacue.udipsai.modules.sedes.SedeDTO;
 
-import java.io.IOException;
+import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
+import com.ucacue.udipsai.modules.fichamedica.FichaMedicaRepository;
+import com.ucacue.udipsai.modules.fonoaudiologia.FonoaudiologiaRepository;
+import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinicaRepository;
+import com.ucacue.udipsai.modules.psicologiaeducativa.PsicologiaEducativaRepository;
+
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PacienteService {
 
     @Autowired
@@ -33,76 +37,45 @@ public class PacienteService {
     private InstitucionEducativaRepositorio institucionEducativaRepositorio;
 
     @Autowired
-    private DocumentoService documentoService;
-
-    @Autowired
     private SedeRepositorio sedeRepositorio;
-
-    @Autowired
-    private DocumentoRepositorio documentoRepositorio;
 
     @Autowired
     private StorageService storageService;
 
-    public Optional<Paciente> getPacienteById(Integer id) {
-        return pacienteRepositorio.findById(id);
-    }
+    @Autowired
+    private FichaMedicaRepository fichaMedicaRepository;
 
-    public PacienteDTO getPacienteDTOById(Integer id) {
-        return pacienteRepositorio.findById(id)
-                .map(this::convertToDTO)
-                .orElse(null);
-    }
+    @Autowired
+    private FonoaudiologiaRepository fonoaudiologiaRepository;
 
-    public List<PacienteDTO> getAllPacientes() {
+    @Autowired
+    private PsicologiaClinicaRepository psicologiaClinicaRepository;
+
+    @Autowired
+    private PsicologiaEducativaRepository psicologiaEducativaRepository;
+
+
+    @Transactional(readOnly = true)
+    public List<PacienteDTO> listarPacientesActivos() {
+        log.info("Consultando todos los pacientes activos");
         return pacienteRepositorio.findByActivoTrue().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public PacienteDTO createPaciente(PacienteRequest request, MultipartFile foto) {
-        Paciente paciente = new Paciente();
-        mapRequestToEntity(request, paciente);
-
-        paciente.setFechaApertura(LocalDateTime.now());
-        paciente.setActivo(true);
-
-        if (foto != null && !foto.isEmpty()) {
-            String filename = storageService.store(foto);
-            paciente.setFotoUrl(filename);
-        }
-
-        Paciente saved = pacienteRepositorio.save(paciente);
-        return convertToDTO(saved);
+    @Transactional(readOnly = true)
+    public PacienteDTO obtenerPacientePorId(Integer id) {
+        log.info("Consultando paciente por ID: {}", id);
+        return pacienteRepositorio.findById(id)
+                .map(this::convertirADTO)
+                .orElseThrow(() -> {
+                    log.error("Error al obtener paciente: Paciente no encontrado ID: {}", id);
+                    return new RuntimeException("Paciente no encontrado");
+                });
     }
 
-    @Transactional
-    public PacienteDTO updatePaciente(Integer id, PacienteRequest request, MultipartFile foto) {
-        Paciente paciente = pacienteRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
-
-        mapRequestToEntity(request, paciente);
-
-        if (foto != null && !foto.isEmpty()) {
-            String filename = storageService.store(foto);
-            paciente.setFotoUrl(filename);
-        }
-
-        Paciente saved = pacienteRepositorio.save(paciente);
-
-        return convertToDTO(saved);
-    }
-
-    @Transactional
-    public void deletePaciente(Integer id) {
-        Paciente paciente = pacienteRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
-        paciente.setActivo(false);
-        pacienteRepositorio.save(paciente);
-    }
-
-    public List<PacienteDTO> searchPacientes(String search, Integer sedeId) {
+    public List<PacienteDTO> buscarPacientes(String search, Integer sedeId) {
+        log.info("Buscando pacientes. Search: {}, SedeId: {}", search, sedeId);
         Specification<Paciente> spec = Specification.where(null);
 
         if (StringUtils.hasText(search)) {
@@ -119,11 +92,71 @@ public class PacienteService {
         spec = spec.and((root, query, cb) -> cb.equal(root.get("activo"), true));
 
         return pacienteRepositorio.findAll(spec).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    private void mapRequestToEntity(PacienteRequest request, Paciente paciente) {
+    @Transactional
+    public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto) {
+        log.info("Iniciando creación de paciente: {}", request.getNombresApellidos());
+        if (pacienteRepositorio.existsByCedula(request.getCedula())) {
+            log.error("Ya existe un paciente con la cédula: {}", request.getCedula());
+            throw new RuntimeException("Ya existe un paciente con la cédula: " + request.getCedula());
+        }
+
+        Paciente paciente = new Paciente();
+        mapearRequestAEntidad(request, paciente);
+        paciente.setFechaApertura(LocalDateTime.now());
+        paciente.setActivo(true);
+
+        if (foto != null && !foto.isEmpty()) {
+            String filename = storageService.store(foto);
+            paciente.setFotoUrl(filename);
+            log.debug("Foto guardada para paciente ID: {}", paciente.getId());
+        }
+
+        Paciente saved = pacienteRepositorio.save(paciente);
+        log.info("Paciente creado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto) {
+        log.info("Iniciando actualización de paciente ID: {}", id);
+        Paciente paciente = pacienteRepositorio.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Error al actualizar: Paciente no encontrado ID: {}", id);
+                    return new RuntimeException("Paciente no encontrado");
+                });
+
+        mapearRequestAEntidad(request, paciente);
+
+        if (foto != null && !foto.isEmpty()) {
+            String filename = storageService.store(foto);
+            paciente.setFotoUrl(filename);
+            log.debug("Foto actualizada para paciente ID: {}", id);
+        }
+
+        Paciente saved = pacienteRepositorio.save(paciente);
+        log.info("Paciente actualizado exitosamente ID: {}", saved.getId());
+
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public void eliminarPaciente(Integer id) {
+        log.info("Iniciando eliminación de paciente ID: {}", id);
+        Paciente paciente = pacienteRepositorio.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Intento de eliminar paciente inexistente ID: {}", id);
+                    return new RuntimeException("Paciente no encontrado");
+                });
+        paciente.setActivo(false);
+        pacienteRepositorio.save(paciente);
+        log.info("Paciente ID {} desactivado", id);
+    }
+
+    private void mapearRequestAEntidad(PacienteRequest request, Paciente paciente) {
         paciente.setNombresApellidos(request.getNombresApellidos());
         paciente.setCiudad(request.getCiudad());
         paciente.setFechaNacimiento(request.getFechaNacimiento());
@@ -135,9 +168,6 @@ public class PacienteService {
         paciente.setJornada(request.getJornada());
         paciente.setNivelEducativo(request.getNivelEducativo());
         paciente.setAnioEducacion(request.getAnioEducacion());
-        paciente.setAnioUniversitario(request.getAnioUniversitario());
-        paciente.setCarrera(request.getCarrera());
-        paciente.setCiclo(request.getCiclo());
         paciente.setPerteneceInclusion(request.getPerteneceInclusion());
         paciente.setTieneDiscapacidad(request.getTieneDiscapacidad());
         paciente.setPortadorCarnet(request.getPortadorCarnet());
@@ -160,14 +190,9 @@ public class PacienteService {
                     .orElseThrow(() -> new RuntimeException("Sede not found"));
             paciente.setSede(sede);
         }
-
-        if (request.getFichaCompromisoId() != null) {
-            Documento doc = documentoRepositorio.findById(request.getFichaCompromisoId()).orElse(null);
-            paciente.setFichaCompromiso(doc);
-        }
     }
 
-    public PacienteDTO convertToDTO(Paciente paciente) {
+    public PacienteDTO convertirADTO(Paciente paciente) {
         return PacienteDTO.builder()
                 .id(paciente.getId())
                 .fechaApertura(paciente.getFechaApertura())
@@ -181,15 +206,14 @@ public class PacienteService {
                 .fotoUrl(paciente.getFotoUrl())
                 .numeroTelefono(paciente.getNumeroTelefono())
                 .numeroCelular(paciente.getNumeroCelular())
-                .institucionEducativa(paciente.getInstitucionEducativa())
-                .sede(paciente.getSede())
+                .institucionEducativa(paciente.getInstitucionEducativa() != null ? new InstitucionEducativaDTO(
+                    paciente.getInstitucionEducativa().getId(), paciente.getInstitucionEducativa().getNombre()) : null)
+                .sede(paciente.getSede() != null ? new SedeDTO(
+                    paciente.getSede().getId(), paciente.getSede().getNombre()) : null)
                 .proyecto(paciente.getProyecto())
                 .jornada(paciente.getJornada())
                 .nivelEducativo(paciente.getNivelEducativo())
                 .anioEducacion(paciente.getAnioEducacion())
-                .anioUniversitario(paciente.getAnioUniversitario())
-                .ciclo(paciente.getCiclo())
-                .carrera(paciente.getCarrera())
                 .perteneceInclusion(paciente.getPerteneceInclusion())
                 .tieneDiscapacidad(paciente.getTieneDiscapacidad())
                 .portadorCarnet(paciente.getPortadorCarnet())
@@ -200,31 +224,29 @@ public class PacienteService {
                 .tipoDiscapacidad(paciente.getTipoDiscapacidad())
                 .detalleDiscapacidad(paciente.getDetalleDiscapacidad())
                 .porcentajeDiscapacidad(paciente.getPorcentajeDiscapacidad())
-                .fichaDiagnostica(paciente.getFichaDiagnostica() != null
-                        ? new DocumentoIdDTO(paciente.getFichaDiagnostica().getId())
-                        : null)
-                .fichaCompromiso(paciente.getFichaCompromiso() != null
-                        ? new DocumentoIdDTO(paciente.getFichaCompromiso().getId())
-                        : null)
-                .fichaUnica(
-                        paciente.getFichaUnica() != null ? new DocumentoIdDTO(paciente.getFichaUnica().getId()) : null)
-                .documentos_paciente(paciente.getDocumentosPaciente())
+                .documentos(paciente.getDocumentos() != null ? 
+                        paciente.getDocumentos().stream()
+                                .filter(d -> d.getActivo())
+                                .map(d -> new DocumentoDTO(d.getId(), d.getUrl(), d.getNombre()))
+                                .collect(Collectors.toList()) : Collections.emptyList())
                 .build();
     }
 
-    @Transactional
-    public DocumentoDTO addDocumentoToPaciente(Integer pacienteId, MultipartFile file) throws IOException {
-        Paciente paciente = pacienteRepositorio.findById(pacienteId)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+    @Transactional(readOnly = true)
+    public PacienteSummaryDTO obtenerResumenFichas(Integer id) {
+        log.info("Obteniendo resumen de fichas para paciente ID: {}", id);
+        List<String> nombres = new java.util.ArrayList<>();
 
-        String fileUrl = documentoService.guardarArchivoEnDisco(file.getBytes());
-        Documento documento = new Documento();
-        documento.setUrl(fileUrl);
-        documento = documentoRepositorio.save(documento);
+        if (fichaMedicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Clínica (Ficha Médica)");
+        if (fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Fonoaudiología");
+        if (psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Clínica");
+        if (psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Educativa");
 
-        paciente.setFichaDiagnostica(documento);
-        pacienteRepositorio.save(paciente);
-
-        return new DocumentoDTO(documento.getId(), documento.getUrl());
+        return PacienteSummaryDTO.builder()
+                .totalFichas(nombres.size())
+                .nombresFichas(nombres)
+                .build();
     }
 }
+
+

@@ -36,12 +36,11 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public String store(MultipartFile file) { // Returns the filename
+    public String store(MultipartFile file) { 
         try {
             if (file.isEmpty()) {
                 throw new RuntimeException("Failed to store empty file.");
             }
-            // Sanitize and create unique filename
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
@@ -52,7 +51,6 @@ public class FileSystemStorageService implements StorageService {
             Path destinationFile = this.rootLocation.resolve(Paths.get(newFilename))
                     .normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-                // Security check
                 throw new RuntimeException("Cannot store file outside current directory.");
             }
             try (InputStream inputStream = file.getInputStream()) {

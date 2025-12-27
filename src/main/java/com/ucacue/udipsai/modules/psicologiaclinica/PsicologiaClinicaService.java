@@ -6,11 +6,13 @@ import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PsicologiaClinicaService {
 
     @Autowired
@@ -22,38 +24,48 @@ public class PsicologiaClinicaService {
     @Autowired
     private PacienteService pacienteService;
 
-    public List<PsicologiaClinicaDTO> getAll() {
+    public List<PsicologiaClinicaDTO> listarFichasPsicologiaClinica() {
+        log.info("Consultando todas las fichas de psicología clínica activas");
         return repository.findAll().stream()
                 .filter(PsicologiaClinica::getActivo)
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public PsicologiaClinicaDTO getByPacienteId(Integer pacienteId) {
+    public PsicologiaClinicaDTO obtenerFichaPsicologiaClinicaPorPacienteId(Integer pacienteId) {
+        log.info("Consultando ficha de psicología clínica por paciente ID: {}", pacienteId);
         PsicologiaClinica ficha = repository.findByPacienteIdAndActivo(pacienteId, true);
         if (ficha != null && ficha.getActivo()) {
-            return convertToDTO(ficha);
+            return convertirADTO(ficha);
         }
         return null;
     }
     
-    public PsicologiaClinica obtenerFichaPorIdPaciente(Integer pacienteId) {
-        // Legacy support/Report support
+    public PsicologiaClinica obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
+        log.debug("Consultando entidad ficha psicología clínica por paciente ID: {}", pacienteId);
         return repository.findByPacienteIdAndActivo(pacienteId, true);
     }
 
     @Transactional
-    public PsicologiaClinicaDTO createUpdate(PsicologiaClinicaRequest request) {
+    public PsicologiaClinicaDTO guardarFichaPsicologiaClinica(PsicologiaClinicaRequest request) {
+        log.info("Iniciando guardado de ficha psicología clínica para paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
+            log.error("ID de paciente nulo en request");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
         PsicologiaClinica ficha = repository.findByPacienteIdAndActivo(request.getPacienteId(), true);
         
         if (ficha == null) {
+            log.info("Creando nueva ficha para paciente ID: {}", request.getPacienteId());
             ficha = new PsicologiaClinica();
             Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Paciente ID {} no encontrado", request.getPacienteId());
+                    return new RuntimeException("Paciente no encontrado");
+                });
             ficha.setPaciente(paciente);
+        } else {
+            log.info("Actualizando ficha existente ID: {}", ficha.getId());
         }
 
         if (request.getAnamnesis() != null) ficha.setAnamnesis(request.getAnamnesis());
@@ -67,21 +79,25 @@ public class PsicologiaClinicaService {
         if (request.getDiagnostico() != null) ficha.setDiagnostico(request.getDiagnostico());
         
         ficha.setActivo(true);
-        return convertToDTO(repository.save(ficha));
+        PsicologiaClinica saved = repository.save(ficha);
+        log.info("Ficha guardada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
-    public void delete(Integer id) {
+    public void eliminarFichaPsicologiaClinica(Integer id) {
+        log.info("Eliminando (desactivando) ficha psicología clínica ID: {}", id);
         if (id == null) return;
         repository.findById(id).ifPresent(f -> {
             f.setActivo(false);
             repository.save(f);
+            log.info("Ficha ID {} desactivada", id);
         });
     }
 
-    private PsicologiaClinicaDTO convertToDTO(PsicologiaClinica ficha) {
+    private PsicologiaClinicaDTO convertirADTO(PsicologiaClinica ficha) {
         PsicologiaClinicaDTO dto = new PsicologiaClinicaDTO();
         dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertToDTO(ficha.getPaciente()));
+        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
         dto.setActivo(ficha.getActivo());
         
         dto.setAnamnesis(ficha.getAnamnesis());

@@ -10,5 +10,4 @@ public class EvaluacionRequest {
     private String nombreArchivo;
     private LocalDate fecha;
     private Boolean activo;
-    // File will be handled via MultipartFile in controller, but this DTO holds metadata
 }

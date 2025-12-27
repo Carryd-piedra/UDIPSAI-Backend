@@ -1,11 +1,10 @@
 package com.ucacue.udipsai.modules.paciente;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ucacue.udipsai.modules.documentos.DocumentoAdjunto;
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
+import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
+import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.paciente.Paciente.JornadaEnum;
-import com.ucacue.udipsai.modules.sedes.Sede;
-import com.ucacue.udipsai.modules.documentos.DocumentoIdDTO;
+import com.ucacue.udipsai.modules.sedes.SedeDTO;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,8 +40,8 @@ public class PacienteDTO {
     private String numeroTelefono;
     private String numeroCelular;
     
-    private InstitucionEducativa institucionEducativa;
-    private Sede sede;
+    private InstitucionEducativaDTO institucionEducativa;
+    private SedeDTO sede;
     
     private String proyecto;
     private JornadaEnum jornada;
@@ -65,10 +64,5 @@ public class PacienteDTO {
     private String detalleDiscapacidad;
     private Integer porcentajeDiscapacidad;
     
-    private DocumentoIdDTO fichaDiagnostica;
-    private DocumentoIdDTO fichaCompromiso;
-    private DocumentoIdDTO fichaUnica;
-    
-    private List<DocumentoAdjunto> documentos_paciente;
+    private List<DocumentoDTO> documentos;
 }
-

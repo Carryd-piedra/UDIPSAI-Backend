@@ -1,14 +1,15 @@
 package com.ucacue.udipsai.modules.instituciones;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InstitucionEducativaDTO {
     private Integer id;
-    private String nombreInstitucion;
-    private String direccion;
-    private String tipoInstitucion;
-    private Integer institucionEstado;
+    private String nombre;
 }

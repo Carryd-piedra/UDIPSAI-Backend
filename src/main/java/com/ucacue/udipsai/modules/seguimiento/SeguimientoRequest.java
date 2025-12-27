@@ -10,5 +10,5 @@ public class SeguimientoRequest {
     private LocalDate fecha;
     private String observacion;
     private Boolean activo;
-    private Long documentoId;
+    private Integer documentoId;
 }

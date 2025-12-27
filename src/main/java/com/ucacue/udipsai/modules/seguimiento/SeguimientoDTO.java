@@ -19,7 +19,7 @@ public class SeguimientoDTO {
     private Boolean activo;
     private DocumentoIdDTO documento;
 
-    public void setDocumentoId(Long id) {
+    public void setDocumentoId(Integer id) {
         this.documento = new DocumentoIdDTO(id);
     }
 }

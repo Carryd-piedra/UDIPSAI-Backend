@@ -3,35 +3,41 @@ package com.ucacue.udipsai.modules.asignacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/asignaciones")
+@RequestMapping("/api/asignaciones")
 @CrossOrigin(origins = "*")
+@Slf4j
 public class AsignacionController {
 
     @Autowired
     private AsignacionService asignacionService;
 
     @GetMapping
-    public List<AsignacionDTO> getAllAsignaciones() {
-        return asignacionService.getAllAsignaciones();
+    public List<AsignacionDTO> listarAsignaciones() {
+        log.info("Petición GET para listar todas las asignaciones activas");
+        return asignacionService.listarAsignaciones();
     }
 
     @PostMapping
-    public ResponseEntity<AsignacionDTO> createAsignacion(@RequestBody AsignacionRequest request) {
-        return ResponseEntity.ok(asignacionService.createAsignacion(request));
+    public ResponseEntity<AsignacionDTO> crearAsignacion(@RequestBody AsignacionRequest request) {
+        log.info("Petición POST para crear asignación con Paciente ID: {} y Pasante ID: {}", request.getPacienteId(), request.getPasanteId());
+        return ResponseEntity.ok(asignacionService.crearAsignacion(request));
     }
     
     @GetMapping("/pasante/{pasanteId}")
-    public List<AsignacionDTO> getAsignacionesByPasante(@PathVariable Integer pasanteId) {
-        return asignacionService.getAsignacionesByPasante(pasanteId);
+    public List<AsignacionDTO> listarAsignacionesPorPasanteId(@PathVariable Integer pasanteId) {
+        log.info("Petición GET para listar asignaciones del pasante ID: {}", pasanteId);
+        return asignacionService.listarAsignacionesPorPasanteId(pasanteId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAsignacion(@PathVariable Long id) {
-        asignacionService.deleteAsignacion(id);
+    public ResponseEntity<Void> eliminarAsignacion(@PathVariable Long id) {
+        log.info("Petición DELETE para eliminar asignación ID: {}", id);
+        asignacionService.eliminarAsignacion(id);
         return ResponseEntity.noContent().build();
     }
 }

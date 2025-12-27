@@ -2,12 +2,14 @@ package com.ucacue.udipsai.modules.paciente;
 
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.util.Base64;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.GZIPInputStream;
 
 @Service
+@Slf4j
 public class ImagenService {
 
     private static final String IMAGE_DIRECTORY = System.getProperty("user.home") + "/UdipsaiImagenesPacientes/";
@@ -26,26 +28,23 @@ public class ImagenService {
             throws IOException {
         File directory = new File(directoryPath);
         if (!directory.exists()) {
-            boolean created = directory.mkdirs(); // Crear el directorio si no existe
+            boolean created = directory.mkdirs(); 
             if (!created) {
                 throw new IOException("No se pudo crear el directorio: " + directoryPath);
             }
         }
 
-        // Decodificar la imagen de base64 a bytes
         byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
 
-        // Guardar el archivo comprimido en el directorio especificado
         File compressedFile = new File(directoryPath + fileName + ".txt.gz");
         try (FileOutputStream fos = new FileOutputStream(compressedFile);
                 GZIPOutputStream gzipOut = new GZIPOutputStream(fos)) {
             gzipOut.write(decodedBytes);
         }
 
-        return compressedFile.getAbsolutePath(); // Retornar la ruta del archivo comprimido
+        return compressedFile.getAbsolutePath(); 
     }
 
-    // Descomprimir el archivo y devolver la imagen en formato Base64
     public String getDecompressedImage(String compressedFilePath) throws IOException {
         File compressedFile = new File(compressedFilePath);
         if (!compressedFile.exists()) {
@@ -66,8 +65,7 @@ public class ImagenService {
             return Base64.getEncoder().encodeToString(decompressedBytes);
 
         } catch (IOException e) {
-            // Loguear el error (si tienes un logger)
-            System.err.println("Error al descomprimir la imagen: " + e.getMessage());
+            log.error("Error al descomprimir la imagen", e);
             throw new IOException("Error al descomprimir la imagen", e);
         }
     }

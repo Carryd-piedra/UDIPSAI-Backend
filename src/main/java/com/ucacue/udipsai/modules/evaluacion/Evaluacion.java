@@ -38,14 +38,6 @@ public class Evaluacion {
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
 
-    // Linking to Documento entity if we want to keep using Documento table, 
-    // or just storing URL directly here if we want to simplify further.
-    // The previous Test module had 'Long documentoId'. 
-    // To be consistent with 'Seguimiento' and 'Documento' relation, 
-    // we can link to Documento entity or just store file path. 
-    // DocumentoService uses Documento entity. Let's keep it consistent with Documento entity usage.
-    // However, if we look at `TestService` it was creating a Documento.
-    // Let's allow relation to Documento.
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "documento_id", referencedColumnName = "id")
     private Documento documento;

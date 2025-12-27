@@ -8,11 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class DocumentoService {
 
     @Autowired
@@ -24,68 +25,55 @@ public class DocumentoService {
     @Autowired
     private StorageService storageService;
 
-    public Optional<Documento> getDocumentoById(Long id) {
+    public Optional<Documento> obtenerDocumentoPorId(Integer id) {
+        log.debug("Buscando documento por ID: {}", id);
         return documentoRepositorio.findById(id);
     }
 
-    public Documento saveDocumento(MultipartFile file, Long pacienteId, String nombre) {
-        Paciente paciente = pacienteRepositorio.findById(pacienteId.intValue())
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado con ID: " + pacienteId));
+    public Documento crearDocumento(MultipartFile file, Integer pacienteId, String nombre) {
+        log.info("Iniciando creación de documento para Paciente ID: {}, Nombre: {}", pacienteId, nombre);
+        Paciente paciente = pacienteRepositorio.findById(pacienteId)
+                .orElseThrow(() -> {
+                    log.error("Error al crear documento: Paciente ID {} no encontrado", pacienteId);
+                    return new RuntimeException("Paciente no encontrado con ID: " + pacienteId);
+                });
 
         String filename = storageService.store(file);
+        log.info("Archivo almacenado con nombre: {}", filename);
 
         Documento documento = new Documento();
         documento.setUrl(filename);
+        documento.setNombre(nombre != null ? nombre : file.getOriginalFilename());
         documento.setPaciente(paciente);
         documento.setActivo(true);
         Documento savedDoc = documentoRepositorio.save(documento);
-
-        // Actualizar lista en Paciente (JSON field)
-        DocumentoAdjunto docAdjunto = new DocumentoAdjunto(
-                savedDoc.getId(),
-                nombre != null ? nombre : file.getOriginalFilename(),
-                filename
-        );
-        paciente.getDocumentosPaciente().add(docAdjunto);
-        pacienteRepositorio.save(paciente);
+        log.info("Documento guardado en base de datos con ID: {}", savedDoc.getId());
 
         return savedDoc;
     }
 
-    public Resource loadDocumentoAsResource(Long id) {
+
+    public Resource cargarDocumentoComoRecurso(Integer id) {
+        log.info("Cargando recurso de documento ID: {}", id);
         Documento documento = documentoRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado con ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("Error al cargar recurso: Documento ID {} no encontrado", id);
+                    return new RuntimeException("Documento no encontrado con ID: " + id);
+                });
         return storageService.loadAsResource(documento.getUrl());
     }
 
     @Transactional
-    public void deleteDocumento(Long id) {
+    public void eliminarDocumento(Integer id) {
+        log.info("Solicitud para eliminar documento ID: {}", id);
         Documento documento = documentoRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado con ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("Error al eliminar: Documento ID {} no encontrado", id);
+                    return new RuntimeException("Documento no encontrado con ID: " + id);
+                });
 
-        // Eliminar referencia en Paciente list
-        Paciente paciente = documento.getPaciente();
-        if (paciente != null) {
-            List<DocumentoAdjunto> docs = paciente.getDocumentosPaciente();
-            docs.removeIf(d -> d.getId() == id);
-            paciente.setDocumentosPaciente(docs);
-            pacienteRepositorio.save(paciente);
-        }
-
-        // Soft delete logic if needed, but for files maybe hard delete or just flag?
-        // Entity has 'activo', let's use it.
         documento.setActivo(false);
         documentoRepositorio.save(documento);
-        
-        // Note: StorageService usually doesn't delete files to be safe, but can be added if needed.
-    }
-    
-    // Legacy support method replacement if needed for direct byte access, 
-    // but Controller should prefer Resource
-    public String guardarArchivoEnDisco(byte[] content) {
-        // This is tricky as StorageService expects MultipartFile.
-        // If this is strictly needed by other services, we might need a store(byte[]) method in StorageService.
-        // For now, assuming most uploads come as MultipartFile.
-        return null; 
+        log.info("Documento ID {} marcado como inactivo (eliminado)", id);
     }
 }

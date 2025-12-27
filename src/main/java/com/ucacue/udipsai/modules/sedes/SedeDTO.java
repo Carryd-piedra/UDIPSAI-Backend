@@ -1,15 +1,15 @@
-package com.ucacue.udipsai.modules.documentos;
+package com.ucacue.udipsai.modules.sedes;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class DocumentoDTO {
+@AllArgsConstructor
+public class SedeDTO {
     private Integer id;
-    private String url;
     private String nombre;
-
 }

@@ -1,10 +1,9 @@
 package com.ucacue.udipsai.modules.paciente;
 
 import com.ucacue.udipsai.modules.documentos.Documento;
-import com.ucacue.udipsai.modules.documentos.DocumentoAdjunto;
 import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
 import com.ucacue.udipsai.modules.sedes.Sede;
-import com.ucacue.udipsai.core.util.DocumentoAdjuntoListConverter;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -126,21 +125,9 @@ public class Paciente {
     private JornadaEnum jornada;
 
     @Builder.Default
-    @Convert(converter = DocumentoAdjuntoListConverter.class)
-    @Column(name = "documentos_paciente", columnDefinition = "jsonb")
-    private List<DocumentoAdjunto> documentosPaciente = new ArrayList<>();
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Documento> documentos = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ficha_diagnostica_id")
-    private Documento fichaDiagnostica;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ficha_compromiso_id")
-    private Documento fichaCompromiso;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ficha_unica_id")
-    private Documento fichaUnica;
 
     @Transient
     public int getEdad() {

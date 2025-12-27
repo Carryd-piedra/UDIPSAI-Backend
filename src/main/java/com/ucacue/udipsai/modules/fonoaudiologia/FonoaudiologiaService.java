@@ -5,16 +5,18 @@ import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class FonoaudiologiaService {
 
     @Autowired
-    private FonoaudiologiaRepository repository;
+    private FonoaudiologiaRepository fonoaudiologiaRepository;
 
     @Autowired
     private PacienteRepositorio pacienteRepositorio;
@@ -22,38 +24,47 @@ public class FonoaudiologiaService {
     @Autowired
     private PacienteService pacienteService;
 
-    public List<FonoaudiologiaDTO> getAll() {
-        return repository.findAll().stream()
+    public List<FonoaudiologiaDTO> listarFichasFonoaudiologia() {
+        log.info("Consultando todas las fichas de fonoaudiología activas");
+        return fonoaudiologiaRepository.findAll().stream()
                 .filter(Fonoaudiologia::getActivo)
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public FonoaudiologiaDTO getByPacienteId(Integer pacienteId) {
-        Fonoaudiologia ficha = repository.findByPacienteIdAndActivo(pacienteId, true);
+    public FonoaudiologiaDTO obtenerFichaFonoaudiologiaPorPacienteId(Integer pacienteId) {
+        log.info("Consultando ficha de fonoaudiología activa para el paciente ID: {}", pacienteId);
+        Fonoaudiologia ficha = fonoaudiologiaRepository.findByPacienteIdAndActivo(pacienteId, true);
         if (ficha != null && ficha.getActivo()) {
-            return convertToDTO(ficha);
+            return convertirADTO(ficha);
         }
         return null;
     }
     
-    public Fonoaudiologia obtenerPorIdPaciente(Integer pacienteId) {
-        // Legacy/Report support
-        return repository.findByPacienteIdAndActivo(pacienteId, true);
+    public Fonoaudiologia obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
+        log.debug("Consultando entidad Fonoaudiologia por Paciente ID: {}", pacienteId);
+        return fonoaudiologiaRepository.findByPacienteIdAndActivo(pacienteId, true);
     }
 
     @Transactional
-    public FonoaudiologiaDTO createUpdate(FonoaudiologiaRequest request) {
+    public FonoaudiologiaDTO guardarFichaFonoaudiologia(FonoaudiologiaRequest request) {
+        log.info("Iniciando guardado de ficha fonoaudiología para Paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        Fonoaudiologia ficha = repository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        Fonoaudiologia ficha = fonoaudiologiaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
         
         if (ficha == null) {
+            log.info("Creando nueva ficha de fonoaudiología para Paciente ID: {}", request.getPacienteId());
             ficha = new Fonoaudiologia();
             Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Error al guardar ficha: Paciente ID {} no encontrado", request.getPacienteId());
+                    return new RuntimeException("Paciente no encontrado");
+                });
             ficha.setPaciente(paciente);
+        } else {
+             log.info("Actualizando ficha de fonoaudiología existente ID: {}", ficha.getId());
         }
 
         if (request.getHabla() != null) ficha.setHabla(request.getHabla());
@@ -64,21 +75,25 @@ public class FonoaudiologiaService {
         if (request.getOtoscopia() != null) ficha.setOtoscopia(request.getOtoscopia());
         
         ficha.setActivo(true);
-        return convertToDTO(repository.save(ficha));
+        Fonoaudiologia saved = fonoaudiologiaRepository.save(ficha);
+        log.info("Ficha de fonoaudiología guardada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
-    public void delete(Integer id) {
+    public void eliminarFichaFonoaudiologia(Integer id) {
         if (id == null) return;
-        repository.findById(id).ifPresent(f -> {
+        log.info("Eliminando ficha fonoaudiología ID: {}", id);
+        fonoaudiologiaRepository.findById(id).ifPresent(f -> {
             f.setActivo(false);
-            repository.save(f);
+            fonoaudiologiaRepository.save(f);
+            log.info("Ficha fonoaudiología ID: {} desactivada", id);
         });
     }
 
-    private FonoaudiologiaDTO convertToDTO(Fonoaudiologia ficha) {
+    private FonoaudiologiaDTO convertirADTO(Fonoaudiologia ficha) {
         FonoaudiologiaDTO dto = new FonoaudiologiaDTO();
         dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertToDTO(ficha.getPaciente()));
+        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
         dto.setActivo(ficha.getActivo());
         
         dto.setHabla(ficha.getHabla());

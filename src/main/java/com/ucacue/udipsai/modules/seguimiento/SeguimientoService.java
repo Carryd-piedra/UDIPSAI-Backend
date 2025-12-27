@@ -11,11 +11,13 @@ import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SeguimientoService {
 
     @Autowired
@@ -36,42 +38,55 @@ public class SeguimientoService {
     @Autowired
     private PacienteService pacienteService;
 
-    public List<SeguimientoDTO> getAllSeguimientos() {
+    public List<SeguimientoDTO> listarSeguimientosActivos() {
+        log.info("Consultando todos los seguimientos activos");
         return seguimientoRepository.findByActivo(true).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public List<SeguimientoDTO> getSeguimientosByPacienteId(Integer pacienteId) {
+    public List<SeguimientoDTO> listarSeguimientosPorPacienteId(Integer pacienteId) {
+        log.info("Consultando seguimientos para paciente ID: {}", pacienteId);
         return seguimientoRepository.findByPacienteIdAndActivo(pacienteId, true).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public SeguimientoDTO createSeguimiento(SeguimientoRequest request) {
+    public SeguimientoDTO crearSeguimiento(SeguimientoRequest request) {
+        log.info("Creando nuevo seguimiento");
         Seguimiento seguimiento = new Seguimiento();
-        mapRequestToEntity(request, seguimiento);
+        mapearRequestAEntidad(request, seguimiento);
         seguimiento.setActivo(true);
-        return convertToDTO(seguimientoRepository.save(seguimiento));
+        Seguimiento saved = seguimientoRepository.save(seguimiento);
+        log.info("Seguimiento creado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
     
-    public SeguimientoDTO updateSeguimiento(Integer id, SeguimientoRequest request) {
+    public SeguimientoDTO actualizarSeguimiento(Integer id, SeguimientoRequest request) {
+        log.info("Actualizando seguimiento ID: {}", id);
         if (id == null) throw new IllegalArgumentException("ID requerido para actualizar");
         Seguimiento seguimiento = seguimientoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Seguimiento no encontrado"));
-        mapRequestToEntity(request, seguimiento);
-        return convertToDTO(seguimientoRepository.save(seguimiento));
+                .orElseThrow(() -> {
+                    log.error("Seguimiento ID {} no encontrado", id);
+                    return new RuntimeException("Seguimiento no encontrado");
+                });
+        mapearRequestAEntidad(request, seguimiento);
+        Seguimiento saved = seguimientoRepository.save(seguimiento);
+        log.info("Seguimiento actualizado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
-    public void deleteSeguimiento(Integer id) {
+    public void eliminarSeguimiento(Integer id) {
+        log.info("Eliminando (desactivando) seguimiento ID: {}", id);
         if (id == null) return;
         seguimientoRepository.findById(id).ifPresent(s -> {
             s.setActivo(false);
             seguimientoRepository.save(s);
+            log.info("Seguimiento ID {} desactivado", id);
         });
     }
 
-    private void mapRequestToEntity(SeguimientoRequest request, Seguimiento seguimiento) {
+    private void mapearRequestAEntidad(SeguimientoRequest request, Seguimiento seguimiento) {
         if (request.getEspecialistaId() != null) {
             Especialista esp = especialistaRepositorio.findById(request.getEspecialistaId()).orElse(null);
             seguimiento.setEspecialista(esp);
@@ -90,7 +105,7 @@ public class SeguimientoService {
         }
     }
 
-    public SeguimientoDTO convertToDTO(Seguimiento seguimiento) {
+    public SeguimientoDTO convertirADTO(Seguimiento seguimiento) {
         SeguimientoDTO dto = new SeguimientoDTO();
         dto.setId(seguimiento.getId());
         dto.setFecha(seguimiento.getFecha());
@@ -98,10 +113,10 @@ public class SeguimientoService {
         dto.setActivo(seguimiento.getActivo());
 
         if (seguimiento.getEspecialista() != null) {
-            dto.setEspecialista(especialistaService.convertToDTO(seguimiento.getEspecialista()));
+            dto.setEspecialista(especialistaService.convertirADTO(seguimiento.getEspecialista()));
         }
         if (seguimiento.getPaciente() != null) {
-            dto.setPaciente(pacienteService.convertToDTO(seguimiento.getPaciente()));
+            dto.setPaciente(pacienteService.convertirADTO(seguimiento.getPaciente()));
         }
         if (seguimiento.getDocumento() != null) {
             dto.setDocumento(new DocumentoIdDTO(seguimiento.getDocumento().getId()));

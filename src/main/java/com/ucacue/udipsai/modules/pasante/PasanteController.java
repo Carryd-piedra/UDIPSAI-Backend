@@ -10,12 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/pasantes")
+@RequestMapping("/api/pasantes")
 @CrossOrigin(origins = "*")
+@Slf4j
 public class PasanteController {
 
     @Autowired
@@ -28,68 +30,83 @@ public class PasanteController {
     private ObjectMapper objectMapper;
 
     @GetMapping
-    public List<PasanteDTO> getAllPasantes() {
-        return pasanteService.getAllPasantes();
+    public ResponseEntity<List<PasanteDTO>> listarPasantesActivos() {
+        log.info("Petición GET para listar todos los pasantes activos");
+        return ResponseEntity.ok(pasanteService.listarPasantesActivos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PasanteDTO> getPasanteById(@PathVariable Integer id) {
-        PasanteDTO pasante = pasanteService.getPasanteById(id);
+    public ResponseEntity<PasanteDTO> obtenerPasantePorId(@PathVariable Integer id) {
+        log.info("Petición GET para obtener pasante ID: {}", id);
+        PasanteDTO pasante = pasanteService.obtenerPasantePorId(id);
         if (pasante != null) {
             return ResponseEntity.ok(pasante);
         }
+        log.warn("Pasante no encontrado ID: {}", id);
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/buscar")
-    public List<PasanteDTO> searchPasantes(
+    public ResponseEntity<List<PasanteDTO>> buscarPasantes(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer tutorId) {
-        return pasanteService.searchPasantes(search, tutorId);
+        log.info("Petición búsqueda pasantes. Search: {}, TutorId: {}", search, tutorId);
+        return ResponseEntity.ok(pasanteService.buscarPasantes(search, tutorId));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPasante(
+    public ResponseEntity<?> crearPasante(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
+        log.info("Petición POST para crear pasante. Data: {}", dataJson);
         try {
             PasanteRequest request = objectMapper.readValue(dataJson, PasanteRequest.class);
-            PasanteDTO created = pasanteService.createPasante(request, file);
+            PasanteDTO created = pasanteService.crearPasante(request, file);
             return ResponseEntity.ok(created);
         } catch (JsonProcessingException e) {
+            log.error("Error parsing JSON al crear pasante: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error parsing JSON");
         } catch (Exception e) {
+            log.error("Error al crear pasante: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error creating pasante: " + e.getMessage());
         }
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updatePasante(
+    public ResponseEntity<?> actualizarPasante(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
+        log.info("Petición PUT para actualizar pasante ID: {}", id);
         try {
             PasanteRequest request = objectMapper.readValue(dataJson, PasanteRequest.class);
-            PasanteDTO updated = pasanteService.updatePasante(id, request, file);
+            PasanteDTO updated = pasanteService.actualizarPasante(id, request, file);
             return ResponseEntity.ok(updated);
         } catch (JsonProcessingException e) {
+            log.error("Error parsing JSON al actualizar pasante ID {}: {}", id, e.getMessage());
             return ResponseEntity.badRequest().body("Error parsing JSON");
         } catch (Exception e) {
+            log.error("Error al actualizar pasante ID {}: {}", id, e.getMessage());
             return ResponseEntity.badRequest().body("Error updating pasante: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePasante(@PathVariable Integer id) {
-        pasanteService.deletePasante(id);
+    public ResponseEntity<Void> eliminarPasante(@PathVariable Integer id) {
+        log.info("Petición DELETE para eliminar pasante ID: {}", id);
+        pasanteService.eliminarPasante(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/fotos/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> obtenerFotoPasante(@PathVariable String filename) {
+        log.debug("Solicitando foto de pasante: {}", filename);
         Resource file = storageService.loadAsResource(filename);
-        if (file == null) return ResponseEntity.notFound().build();
+        if (file == null) {
+            log.warn("Foto no encontrada: {}", filename);
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
                 .body(file);

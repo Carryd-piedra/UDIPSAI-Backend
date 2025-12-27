@@ -26,15 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Primero busca en Especialistas
-        // Asumiendo que 'cedula' o 'email' (si existe) es el username. Usaremos 'cedula' basado en la entidad.
         Optional<Especialista> especialista = especialistaRepositorio.findByCedula(username);
         if (especialista.isPresent()) {
             return new User(especialista.get().getCedula(), especialista.get().getContrasenia(),
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_ESPECIALISTA")));
         }
 
-        // Si no en Pasantes
         Optional<Pasante> pasante = pasanteRepositorio.findByCedula(username);
         if (pasante.isPresent()) {
             return new User(pasante.get().getCedula(), pasante.get().getContrasenia(),

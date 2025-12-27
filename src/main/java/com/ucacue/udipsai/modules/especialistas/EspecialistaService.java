@@ -1,17 +1,20 @@
 package com.ucacue.udipsai.modules.especialistas;
 
+import com.ucacue.udipsai.modules.sedes.SedeDTO;
 import com.ucacue.udipsai.modules.sedes.SedeRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class EspecialistaService {
 
     @Autowired
@@ -19,13 +22,6 @@ public class EspecialistaService {
 
     @Autowired
     private EspecialistaRepositorio especialistaRepositorio;
-
-    // ... existing autowired (implicit to be maintained by tool context, but we are adding passwordEncoder)
-
-// To avoid messing up imports or class structure, I will perform multiple small edits if needed, but a single replace is cleaner if I match context.
-// Actually, I need to add the import first and the field. Then update mapRequestToEntity.
-// Let's do a replace for the imports and class fields first.
-
 
     @Autowired
     private EspecialidadRepositorio especialidadRepositorio;
@@ -36,70 +32,37 @@ public class EspecialistaService {
     @Autowired
     private StorageService storageService;
 
-    public List<EspecialistaDTO> getAllEspecialistas() {
+    @Transactional(readOnly = true)
+    public List<EspecialistaDTO> listarEspecialistasActivos() {
+        log.info("Consultando todos los especialistas activos");
         return especialistaRepositorio.findByActivoTrue().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public EspecialistaDTO getEspecialistaById(Integer id) {
-        if (id == null) return null;
+    @Transactional(readOnly = true)
+    public EspecialistaDTO obtenerEspecialistaPorId(Integer id) {
+        log.debug("Buscando especialista ID: {}", id);
+        if (id == null)
+            return null;
         return especialistaRepositorio.findById(id)
-                .map(this::convertToDTO)
-                .orElse(null);
+                .map(this::convertirADTO)
+                .orElseThrow(() -> {
+                    log.warn("Especialista ID {} no encontrado", id);
+                    return new RuntimeException("Especialista no encontrado");
+                });
     }
 
     @Transactional
-    public EspecialistaDTO createEspecialista(EspecialistaRequest request, MultipartFile foto) {
-        if (especialistaRepositorio.existsByCedula(request.getCedula())) {
-            throw new RuntimeException("Especialista con cédula " + request.getCedula() + " ya existe");
-        }
-
-        Especialista especialista = new Especialista();
-        mapRequestToEntity(request, especialista);
-        especialista.setActivo(true);
-
-        if (foto != null && !foto.isEmpty()) {
-            String filename = storageService.store(foto);
-            especialista.setFotoUrl(filename);
-        }
-
-        return convertToDTO(especialistaRepositorio.save(especialista));
-    }
-
-    @Transactional
-    public EspecialistaDTO updateEspecialista(Integer id, EspecialistaRequest request, MultipartFile foto) {
-        if (id == null) throw new IllegalArgumentException("ID requerido para actualizar");
-        Especialista especialista = especialistaRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialista no encontrado"));
-
-        mapRequestToEntity(request, especialista);
-
-        if (foto != null && !foto.isEmpty()) {
-            String filename = storageService.store(foto);
-            especialista.setFotoUrl(filename);
-        }
-
-        return convertToDTO(especialistaRepositorio.save(especialista));
-    }
-
-    public void deleteEspecialista(Integer id) {
-        if (id == null) return;
-        especialistaRepositorio.findById(id).ifPresent(e -> {
-            e.setActivo(false);
-            especialistaRepositorio.save(e);
-        });
-    }
-
-    public List<EspecialistaDTO> searchEspecialistas(String search, Integer especialidadId, Integer sedeId) {
+    public List<EspecialistaDTO> buscarEspecialistas(String search, Integer especialidadId, Integer sedeId) {
+        log.info("Buscando especialistas. Search: {}, EspID: {}, SedeID: {}", search, especialidadId, sedeId);
         Specification<Especialista> spec = Specification.where(null);
 
         if (search != null && !search.isEmpty()) {
             String likePattern = "%" + search.toLowerCase() + "%";
             spec = spec.and((root, query, cb) -> cb.or(
                     cb.like(cb.lower(root.get("nombresApellidos")), likePattern),
-                    cb.like(cb.lower(root.get("cedula")), likePattern)
-            ));
+                    cb.like(cb.lower(root.get("cedula")), likePattern)));
         }
 
         if (especialidadId != null) {
@@ -113,19 +76,79 @@ public class EspecialistaService {
         spec = spec.and((root, query, cb) -> cb.equal(root.get("activo"), true));
 
         return especialistaRepositorio.findAll(spec).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    // Mappers
+    @Transactional
+    public EspecialistaDTO crearEspecialista(EspecialistaRequest request, MultipartFile foto) {
+        log.info("Iniciando creación de especialista. Cédula: {}", request.getCedula());
+        if (especialistaRepositorio.existsByCedula(request.getCedula())) {
+            log.error("Ya existe un especialista con la cédula: {}", request.getCedula());
+            throw new RuntimeException("Ya existe un especialista con la cédula: " + request.getCedula());
+        }
 
-    private void mapRequestToEntity(EspecialistaRequest request, Especialista especialista) {
+        Especialista especialista = new Especialista();
+        mapearRequestAEntidad(request, especialista);
+        especialista.setActivo(true);
+
+        if (foto != null && !foto.isEmpty()) {
+            String filename = storageService.store(foto);
+            especialista.setFotoUrl(filename);
+            log.info("Foto guardada para especialista ID: {}", especialista.getId());
+        }
+
+        if (request.getContrasenia() == null || request.getContrasenia().isEmpty()) {
+            throw new RuntimeException("La contraseña es obligatoria");
+        }
+
+        Especialista saved = especialistaRepositorio.save(especialista);
+        log.info("Especialista creado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public EspecialistaDTO actualizarEspecialista(Integer id, EspecialistaRequest request, MultipartFile foto) {
+        log.info("Iniciando actualización de especialista ID: {}", id);
+        if (id == null)
+            throw new IllegalArgumentException("ID requerido para actualizar");
+        Especialista especialista = especialistaRepositorio.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Error al actualizar: Especialista no encontrado ID: {}", id);
+                    return new RuntimeException("Especialista no encontrado");
+                });
+
+        mapearRequestAEntidad(request, especialista);
+
+        if (foto != null && !foto.isEmpty()) {
+            String filename = storageService.store(foto);
+            especialista.setFotoUrl(filename);
+            log.info("Foto guardada para especialista ID: {}", id);
+        }
+
+        Especialista saved = especialistaRepositorio.save(especialista);
+        log.info("Especialista actualizado exitosamente ID: {}", saved.getId());
+
+        return convertirADTO(saved);
+    }
+
+    public void eliminarEspecialista(Integer id) {
+        if (id == null)
+            return;
+        especialistaRepositorio.findById(id).ifPresentOrElse(e -> {
+            log.info("Desactivando especialista ID: {}", id);
+            e.setActivo(false);
+            especialistaRepositorio.save(e);
+        }, () -> log.warn("Intento de eliminar especialista inexistente ID: {}", id));
+    }
+
+    private void mapearRequestAEntidad(EspecialistaRequest request, Especialista especialista) {
         especialista.setCedula(request.getCedula());
         especialista.setNombresApellidos(request.getNombresApellidos());
         if (request.getContrasenia() != null && !request.getContrasenia().isEmpty()) {
             especialista.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
         }
-        
+
         if (request.getEspecialidadId() != null) {
             especialista.setEspecialidad(especialidadRepositorio.findById(request.getEspecialidadId()).orElse(null));
         }
@@ -133,21 +156,22 @@ public class EspecialistaService {
         if (request.getSedeId() != null) {
             especialista.setSede(sedeRepositorio.findById(request.getSedeId()).orElse(null));
         }
-        
+
         if (request.getActivo() != null) {
-             especialista.setActivo(request.getActivo());
+            especialista.setActivo(request.getActivo());
         }
     }
 
-    public EspecialistaDTO convertToDTO(Especialista especialista) {
+    public EspecialistaDTO convertirADTO(Especialista especialista) {
         return EspecialistaDTO.builder()
                 .id(especialista.getId())
                 .cedula(especialista.getCedula())
                 .nombresApellidos(especialista.getNombresApellidos())
                 .fotoUrl(especialista.getFotoUrl())
-                .especialidad(especialista.getEspecialidad() != null ? 
-                        new EspecialidadDTO(especialista.getEspecialidad().getId(), especialista.getEspecialidad().getArea(), null) : null)
-                .sede(especialista.getSede())
+                .especialidad(especialista.getEspecialidad() != null ? new EspecialidadDTO(
+                        especialista.getEspecialidad().getId(), especialista.getEspecialidad().getArea(), null) : null)
+                .sede(especialista.getSede() != null ? new SedeDTO(
+                    especialista.getSede().getId(), especialista.getSede().getNombre()) : null)
                 .activo(especialista.getActivo())
                 .build();
     }

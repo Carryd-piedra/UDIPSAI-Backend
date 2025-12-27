@@ -1,18 +1,22 @@
 package com.ucacue.udipsai.modules.pasante;
 
 import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
+
 import com.ucacue.udipsai.modules.especialistas.EspecialistaService;
 import com.ucacue.udipsai.modules.storage.StorageService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PasanteService {
 
     @Autowired
@@ -30,62 +34,85 @@ public class PasanteService {
     @Autowired
     private StorageService storageService;
 
-    public List<PasanteDTO> getAllPasantes() {
+    @Transactional(readOnly = true)
+    public List<PasanteDTO> listarPasantesActivos() {
+        log.info("Consultando todos los pasantes activos");
+
         return pasanteRepositorio.findByActivoTrue().stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public PasanteDTO getPasanteById(Integer id) {
+    @Transactional(readOnly = true)
+    public PasanteDTO obtenerPasantePorId(Integer id) {
+        log.info("Consultando pasante por ID: {}", id);
+
         if (id == null) return null;
         return pasanteRepositorio.findById(id)
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .orElse(null);
     }
 
     @Transactional
-    public PasanteDTO createPasante(PasanteRequest request, MultipartFile foto) {
+    public PasanteDTO crearPasante(PasanteRequest request, MultipartFile foto) {
+        log.info("Iniciando creación de pasante: {}", request.getCedula());
         if (pasanteRepositorio.existsByCedula(request.getCedula())) {
+            log.error("Intento de crear pasante duplicado. Cédula: {}", request.getCedula());
             throw new RuntimeException("Pasante con cédula " + request.getCedula() + " ya existe");
         }
 
         Pasante pasante = new Pasante();
-        mapRequestToEntity(request, pasante);
+        mapearRequestAEntidad(request, pasante);
         pasante.setActivo(true);
 
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
             pasante.setFotoUrl(filename);
+            log.debug("Foto guardada para pasante: {}", filename);
         }
 
-        return convertToDTO(pasanteRepositorio.save(pasante));
+        Pasante saved = pasanteRepositorio.save(pasante);
+        log.info("Pasante creado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
     @Transactional
-    public PasanteDTO updatePasante(Integer id, PasanteRequest request, MultipartFile foto) {
+    public PasanteDTO actualizarPasante(Integer id, PasanteRequest request, MultipartFile foto) {
+        log.info("Iniciando actualización de pasante ID: {}", id);
         if (id == null) throw new IllegalArgumentException("ID requerido para actualizar");
         Pasante pasante = pasanteRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pasante no encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Pasante ID {} no encontrado para actualización", id);
+                    return new RuntimeException("Pasante no encontrado");
+                });
 
-        mapRequestToEntity(request, pasante);
+        mapearRequestAEntidad(request, pasante);
 
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
             pasante.setFotoUrl(filename);
+            log.debug("Foto actualizada para pasante ID: {}", id);
         }
 
-        return convertToDTO(pasanteRepositorio.save(pasante));
+        Pasante saved = pasanteRepositorio.save(pasante);
+        log.info("Pasante actualizado exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
     }
 
-    public void deletePasante(Integer id) {
+    public void eliminarPasante(Integer id) {
+        log.info("Iniciando eliminación de pasante ID: {}", id);
         if (id == null) return;
         pasanteRepositorio.findById(id).ifPresent(p -> {
             p.setActivo(false);
             pasanteRepositorio.save(p);
+            log.info("Pasante ID {} desactivado", id);
         });
     }
 
-    public List<PasanteDTO> searchPasantes(String search, Integer tutorId) {
+    @Transactional(readOnly = true)
+    public List<PasanteDTO> buscarPasantes(String search, Integer tutorId) {
+        log.info("Buscando pasantes. Search: {}, TutorId: {}", search, tutorId);
+
         Specification<Pasante> spec = Specification.where(null);
 
         if (search != null && !search.isEmpty()) {
@@ -103,13 +130,11 @@ public class PasanteService {
         spec = spec.and((root, query, cb) -> cb.equal(root.get("activo"), true));
 
         return pasanteRepositorio.findAll(spec).stream()
-                .map(this::convertToDTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    // Mappers
-
-    private void mapRequestToEntity(PasanteRequest request, Pasante pasante) {
+    private void mapearRequestAEntidad(PasanteRequest request, Pasante pasante) {
         pasante.setCedula(request.getCedula());
         pasante.setNombresApellidos(request.getNombresApellidos());
         if (request.getContrasenia() != null && !request.getContrasenia().isEmpty()) {
@@ -127,7 +152,7 @@ public class PasanteService {
         }
     }
 
-    public PasanteDTO convertToDTO(Pasante pasante) {
+    public PasanteDTO convertirADTO(Pasante pasante) {
         return PasanteDTO.builder()
                 .id(pasante.getId())
                 .cedula(pasante.getCedula())
@@ -135,7 +160,7 @@ public class PasanteService {
                 .fotoUrl(pasante.getFotoUrl())
                 .inicioPasantia(pasante.getInicioPasantia())
                 .finPasantia(pasante.getFinPasantia())
-                .tutor(pasante.getTutor() != null ? especialistaService.convertToDTO(pasante.getTutor()) : null)
+                .tutor(pasante.getTutor() != null ? especialistaService.convertirADTO(pasante.getTutor()) : null)
                 .activo(pasante.getActivo())
                 .build();
     }
