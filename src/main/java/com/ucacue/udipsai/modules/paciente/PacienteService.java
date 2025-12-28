@@ -237,7 +237,7 @@ public class PacienteService {
         log.info("Obteniendo resumen de fichas para paciente ID: {}", id);
         List<String> nombres = new java.util.ArrayList<>();
 
-        if (fichaMedicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Clínica (Ficha Médica)");
+        if (fichaMedicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Ficha Médica");
         if (fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Fonoaudiología");
         if (psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Clínica");
         if (psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Educativa");

@@ -5,7 +5,8 @@ import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class PsicologiaClinicaService {
     @Autowired
     private PacienteService pacienteService;
 
+    @Transactional(readOnly = true)
     public List<PsicologiaClinicaDTO> listarFichasPsicologiaClinica() {
         log.info("Consultando todas las fichas de psicología clínica activas");
         return repository.findAll().stream()
@@ -32,6 +34,7 @@ public class PsicologiaClinicaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public PsicologiaClinicaDTO obtenerFichaPsicologiaClinicaPorPacienteId(Integer pacienteId) {
         log.info("Consultando ficha de psicología clínica por paciente ID: {}", pacienteId);
         PsicologiaClinica ficha = repository.findByPacienteIdAndActivo(pacienteId, true);
@@ -41,6 +44,7 @@ public class PsicologiaClinicaService {
         return null;
     }
     
+    @Transactional(readOnly = true)
     public PsicologiaClinica obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
         log.debug("Consultando entidad ficha psicología clínica por paciente ID: {}", pacienteId);
         return repository.findByPacienteIdAndActivo(pacienteId, true);

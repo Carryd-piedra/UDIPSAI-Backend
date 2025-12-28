@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 public class HistoriaPostnatal {
 
-    @Column(name = "convulciones")
-    private Boolean convulciones;
+    @Column(name = "convulsiones")
+    private Boolean convulsiones;
 
     @Column(name = "medicacion")
     private Boolean medicacion;

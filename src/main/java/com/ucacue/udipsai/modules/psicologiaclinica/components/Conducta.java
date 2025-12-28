@@ -2,7 +2,6 @@ package com.ucacue.udipsai.modules.psicologiaclinica.components;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Embeddable
@@ -42,7 +41,6 @@ public class Conducta {
     @Column(name = "otros_conductas_preocupantes")
     private String otrosConductasPreocupantes;
 
-    @Lob
     @Column(name = "observaciones_conductas_preocupantes", columnDefinition = "TEXT")
     private String observacionesConductasPreocupantes;
 }

@@ -5,8 +5,9 @@ import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.extern.slf4j.Slf4j;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class FonoaudiologiaService {
     @Autowired
     private PacienteService pacienteService;
 
+    @Transactional(readOnly = true)
     public List<FonoaudiologiaDTO> listarFichasFonoaudiologia() {
         log.info("Consultando todas las fichas de fonoaudiología activas");
         return fonoaudiologiaRepository.findAll().stream()
@@ -32,6 +34,7 @@ public class FonoaudiologiaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public FonoaudiologiaDTO obtenerFichaFonoaudiologiaPorPacienteId(Integer pacienteId) {
         log.info("Consultando ficha de fonoaudiología activa para el paciente ID: {}", pacienteId);
         Fonoaudiologia ficha = fonoaudiologiaRepository.findByPacienteIdAndActivo(pacienteId, true);
@@ -41,6 +44,7 @@ public class FonoaudiologiaService {
         return null;
     }
     
+    @Transactional(readOnly = true)
     public Fonoaudiologia obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
         log.debug("Consultando entidad Fonoaudiologia por Paciente ID: {}", pacienteId);
         return fonoaudiologiaRepository.findByPacienteIdAndActivo(pacienteId, true);

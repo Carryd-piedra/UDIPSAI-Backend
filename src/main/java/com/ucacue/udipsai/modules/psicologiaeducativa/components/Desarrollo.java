@@ -34,7 +34,7 @@ public class Desarrollo {
 
     @Column(name = "perdida_anio")
     private Boolean perdidaAnio;
-
+    
     @Column(name = "grado_causa_perdida_anio")
     private String gradoCausaPerdidaAnio;
 

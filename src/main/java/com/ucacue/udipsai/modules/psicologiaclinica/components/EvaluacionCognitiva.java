@@ -8,14 +8,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Embeddable
 @Data
 public class EvaluacionCognitiva {
 
-    @Lob
     @Column(name = "observaciones_guia_de_observacion", columnDefinition = "TEXT")
     private String observacionesGuiaDeObservacion;
 

@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Embeddable
@@ -48,7 +47,6 @@ public class Suenio {
     @Column(name = "sonambulismo")
     private Boolean sonambulismo;
 
-    @Lob
     @Column(name = "observaciones_habitos_de_suenio", columnDefinition = "TEXT")
     private String observacionesHabitosDeSuenio;
 }

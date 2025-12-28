@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Embeddable
@@ -59,7 +58,6 @@ public class Sexualidad {
     @Column(name = "parafilias")
     private Parafilias parafilias;
 
-    @Lob
     @Column(name = "observaciones_aspecto_psicosexual", columnDefinition = "TEXT")
     private String observacionesAspectoPsicosexual;
 }

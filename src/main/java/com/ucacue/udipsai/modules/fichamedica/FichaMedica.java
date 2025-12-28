@@ -1,6 +1,7 @@
 package com.ucacue.udipsai.modules.fichamedica;
 
 import com.ucacue.udipsai.modules.paciente.Paciente;
+
 import com.ucacue.udipsai.modules.fichamedica.components.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
