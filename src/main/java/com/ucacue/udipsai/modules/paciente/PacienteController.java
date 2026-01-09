@@ -11,10 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/pacientes")
@@ -33,9 +34,11 @@ public class PacienteController {
 
 
     @GetMapping()
-    public ResponseEntity<List<PacienteDTO>> listarPacientesActivos() {
-        log.info("Petición GET para listar todos los pacientes activos");
-        return ResponseEntity.ok(pacienteService.listarPacientesActivos());
+    public ResponseEntity<Page<PacienteDTO>> listarPacientes(
+            PacienteCriteriaDTO criteria,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Petición GET para listar pacientes con filtros: {}", criteria);
+        return ResponseEntity.ok(pacienteService.filtrarPacientes(criteria, pageable));
     }
 
     @GetMapping("/{id}")
@@ -47,16 +50,6 @@ public class PacienteController {
         }
         log.warn("Paciente no encontrado ID: {}", id);
         return ResponseEntity.notFound().build();
-    }
-
-    @PostMapping("/buscar")
-    public ResponseEntity<List<PacienteDTO>> buscarPacientes(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "sedeId", required = false) Integer sedeId) {
-
-        log.info("Petición búsqueda pacientes. Search: {}, SedeId: {}", search, sedeId);
-        List<PacienteDTO> pacientes = pacienteService.buscarPacientes(search, sedeId);
-        return ResponseEntity.ok(pacientes);
     }
 
     @GetMapping("/foto/{filename:.+}")

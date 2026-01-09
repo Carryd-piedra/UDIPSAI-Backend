@@ -1,19 +1,19 @@
-package com.ucacue.udipsai.modules.fichamedica;
+package com.ucacue.udipsai.modules.historiaclinica;
 
 import com.ucacue.udipsai.modules.paciente.Paciente;
 
-import com.ucacue.udipsai.modules.fichamedica.components.*;
+import com.ucacue.udipsai.modules.historiaclinica.components.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "fichas_medicas")
+@Table(name = "historias_clinicas")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FichaMedica {
+public class HistoriaClinica {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

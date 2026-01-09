@@ -1,15 +1,21 @@
 package com.ucacue.udipsai.modules.seguimiento;
 
-import com.ucacue.udipsai.modules.documentos.DocumentoIdDTO;
+import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
 import com.ucacue.udipsai.modules.especialistas.EspecialistaDTO;
 import com.ucacue.udipsai.modules.paciente.PacienteDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SeguimientoDTO {
     private Integer id;
     private EspecialistaDTO especialista;
@@ -17,9 +23,5 @@ public class SeguimientoDTO {
     private LocalDate fecha;
     private String observacion;
     private Boolean activo;
-    private DocumentoIdDTO documento;
-
-    public void setDocumentoId(Integer id) {
-        this.documento = new DocumentoIdDTO(id);
-    }
+    private DocumentoDTO documento;
 }

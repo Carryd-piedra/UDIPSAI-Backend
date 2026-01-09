@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.fichamedica;
+package com.ucacue.udipsai.modules.historiaclinica;
 
 import com.ucacue.udipsai.modules.paciente.Paciente;
 import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class FichaMedicaService {
+public class HistoriaClinicaService {
 
     @Autowired
-    private FichaMedicaRepository fichaMedicaRepository;
+    private HistoriaClinicaRepository historiaClinicaRepository;
 
     @Autowired
     private PacienteRepositorio pacienteRepositorio;
@@ -31,120 +31,120 @@ public class FichaMedicaService {
     private StorageService storageService;
 
     @Transactional(readOnly = true)
-    public List<FichaMedicaDTO> listarFichasMedicas() {
+    public List<HistoriaClinicaDTO> listarHistoriasClinicas() {
 
-        log.info("Consultando todas las fichas médicas activas");
-        return fichaMedicaRepository.findAll().stream()
-                .filter(FichaMedica::getActivo)
+        log.info("Consultando todas las historias clínicas activas");
+        return historiaClinicaRepository.findAll().stream()
+                .filter(HistoriaClinica::getActivo)
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public FichaMedicaDTO obtenerFichaMedicaPorPacienteId(Integer pacienteId) {
+    public HistoriaClinicaDTO obtenerHistoriaClinicaPorPacienteId(Integer pacienteId) {
 
-        log.info("Consultando ficha médica activa para el paciente ID: {}", pacienteId);
-        FichaMedica ficha = fichaMedicaRepository.findByPacienteIdAndActivo(pacienteId, true);
-        if (ficha != null && ficha.getActivo()) {
-            return convertirADTO(ficha);
+        log.info("Consultando historia clínica activa para el paciente ID: {}", pacienteId);
+        HistoriaClinica historia = historiaClinicaRepository.findByPacienteIdAndActivo(pacienteId, true);
+        if (historia != null && historia.getActivo()) {
+            return convertirADTO(historia);
         }
         return null;
     }
 
     @Transactional(readOnly = true)
-    public FichaMedica obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
+    public HistoriaClinica obtenerEntidadHistoriaPorIdPaciente(Integer pacienteId) {
 
-        log.debug("Consultando entidad FichaMedica por Paciente ID: {}", pacienteId);
-        return fichaMedicaRepository.findByPacienteIdAndActivo(pacienteId, true);
+        log.debug("Consultando entidad HistoriaClinica por Paciente ID: {}", pacienteId);
+        return historiaClinicaRepository.findByPacienteIdAndActivo(pacienteId, true);
     }
 
     @Transactional
-    public FichaMedicaDTO guardarFichaMedica(FichaMedicaRequest request, MultipartFile genogramaFile) {
-        log.info("Iniciando guardado de ficha médica para Paciente ID: {}", request.getPacienteId());
+    public HistoriaClinicaDTO guardarHistoriaClinica(HistoriaClinicaRequest request, MultipartFile genogramaFile) {
+        log.info("Iniciando guardado de historia clínica para Paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             log.error("El ID del paciente es requerido");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        FichaMedica ficha = fichaMedicaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        HistoriaClinica historia = historiaClinicaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
 
-        if (ficha == null) {
-            log.info("Creando nueva ficha médica para Paciente ID: {}", request.getPacienteId());
-            ficha = new FichaMedica();
+        if (historia == null) {
+            log.info("Creando nueva historia clínica para Paciente ID: {}", request.getPacienteId());
+            historia = new HistoriaClinica();
             Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
                     .orElseThrow(() -> {
-                        log.error("Error al guardar ficha: Paciente ID {} no encontrado", request.getPacienteId());
+                        log.error("Error al guardar historia: Paciente ID {} no encontrado", request.getPacienteId());
                         return new RuntimeException("Paciente no encontrado");
                     });
-            ficha.setPaciente(paciente);
+            historia.setPaciente(paciente);
         } else {
-            log.info("Actualizando ficha médica existente ID: {}", ficha.getId());
+            log.info("Actualizando historia clínica existente ID: {}", historia.getId());
         }
 
         if (request.getDatosFamiliares() != null)
-            ficha.setDatosFamiliares(request.getDatosFamiliares());
+            historia.setDatosFamiliares(request.getDatosFamiliares());
         if (request.getHistoriaPrenatal() != null)
-            ficha.setHistoriaPrenatal(request.getHistoriaPrenatal());
+            historia.setHistoriaPrenatal(request.getHistoriaPrenatal());
         if (request.getHistoriaNatal() != null)
-            ficha.setHistoriaNatal(request.getHistoriaNatal());
+            historia.setHistoriaNatal(request.getHistoriaNatal());
         if (request.getHistoriaPostnatal() != null)
-            ficha.setHistoriaPostnatal(request.getHistoriaPostnatal());
+            historia.setHistoriaPostnatal(request.getHistoriaPostnatal());
         if (request.getDesarrolloMotor() != null)
-            ficha.setDesarrolloMotor(request.getDesarrolloMotor());
+            historia.setDesarrolloMotor(request.getDesarrolloMotor());
         if (request.getAlimentacion() != null)
-            ficha.setAlimentacion(request.getAlimentacion());
+            historia.setAlimentacion(request.getAlimentacion());
         if (request.getAntecedentesMedicos() != null)
-            ficha.setAntecedentesMedicos(request.getAntecedentesMedicos());
+            historia.setAntecedentesMedicos(request.getAntecedentesMedicos());
 
-        ficha.setActivo(true);
+        historia.setActivo(true);
 
         if (genogramaFile != null && !genogramaFile.isEmpty()) {
             String filename = storageService.store(genogramaFile);
             log.info("Genograma almacenado: {}", filename);
-            ficha.setGenogramaUrl(filename);
+            historia.setGenogramaUrl(filename);
         }
 
-        FichaMedica saved = fichaMedicaRepository.save(ficha);
-        log.info("Ficha médica guardada exitosamente ID: {}", saved.getId());
+        HistoriaClinica saved = historiaClinicaRepository.save(historia);
+        log.info("Historia clínica guardada exitosamente ID: {}", saved.getId());
         return convertirADTO(saved);
     }
 
     public Resource cargarGenogramaComoRecurso(Integer pacienteId) {
         log.info("Solicitando recurso genograma para paciente ID: {}", pacienteId);
-        FichaMedica ficha = fichaMedicaRepository.findByPacienteIdAndActivo(pacienteId, true);
-        if (ficha != null && ficha.getGenogramaUrl() != null) {
-            return storageService.loadAsResource(ficha.getGenogramaUrl());
+        HistoriaClinica historia = historiaClinicaRepository.findByPacienteIdAndActivo(pacienteId, true);
+        if (historia != null && historia.getGenogramaUrl() != null) {
+            return storageService.loadAsResource(historia.getGenogramaUrl());
         }
         log.warn("Genograma no encontrado o URL nula para paciente ID: {}", pacienteId);
         return null;
     }
 
     @Transactional
-    public void eliminarFichaMedica(Integer id) {
+    public void eliminarHistoriaClinica(Integer id) {
 
         if (id == null)
             return;
-        log.info("Eliminando ficha médica ID: {}", id);
-        fichaMedicaRepository.findById(id).ifPresent(f -> {
+        log.info("Eliminando historia clínica ID: {}", id);
+        historiaClinicaRepository.findById(id).ifPresent(f -> {
             f.setActivo(false);
-            fichaMedicaRepository.save(f);
-            log.info("Ficha médica ID: {} desactivada", id);
+            historiaClinicaRepository.save(f);
+            log.info("Historia clínica ID: {} desactivada", id);
         });
     }
 
-    private FichaMedicaDTO convertirADTO(FichaMedica ficha) {
-        FichaMedicaDTO dto = new FichaMedicaDTO();
-        dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
-        dto.setActivo(ficha.getActivo());
-        dto.setGenogramaUrl(ficha.getGenogramaUrl());
+    private HistoriaClinicaDTO convertirADTO(HistoriaClinica historia) {
+        HistoriaClinicaDTO dto = new HistoriaClinicaDTO();
+        dto.setId(historia.getId());
+        dto.setPaciente(pacienteService.convertirADTO(historia.getPaciente()));
+        dto.setActivo(historia.getActivo());
+        dto.setGenogramaUrl(historia.getGenogramaUrl());
 
-        dto.setDatosFamiliares(ficha.getDatosFamiliares());
-        dto.setHistoriaPrenatal(ficha.getHistoriaPrenatal());
-        dto.setHistoriaNatal(ficha.getHistoriaNatal());
-        dto.setHistoriaPostnatal(ficha.getHistoriaPostnatal());
-        dto.setDesarrolloMotor(ficha.getDesarrolloMotor());
-        dto.setAlimentacion(ficha.getAlimentacion());
-        dto.setAntecedentesMedicos(ficha.getAntecedentesMedicos());
+        dto.setDatosFamiliares(historia.getDatosFamiliares());
+        dto.setHistoriaPrenatal(historia.getHistoriaPrenatal());
+        dto.setHistoriaNatal(historia.getHistoriaNatal());
+        dto.setHistoriaPostnatal(historia.getHistoriaPostnatal());
+        dto.setDesarrolloMotor(historia.getDesarrolloMotor());
+        dto.setAlimentacion(historia.getAlimentacion());
+        dto.setAntecedentesMedicos(historia.getAntecedentesMedicos());
 
         return dto;
     }

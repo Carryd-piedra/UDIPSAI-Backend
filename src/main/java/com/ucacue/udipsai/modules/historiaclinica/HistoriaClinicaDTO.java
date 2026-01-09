@@ -1,11 +1,11 @@
-package com.ucacue.udipsai.modules.fichamedica;
+package com.ucacue.udipsai.modules.historiaclinica;
 
 import com.ucacue.udipsai.modules.paciente.PacienteDTO;
-import com.ucacue.udipsai.modules.fichamedica.components.*;
+import com.ucacue.udipsai.modules.historiaclinica.components.*;
 import lombok.Data;
 
 @Data
-public class FichaMedicaDTO {
+public class HistoriaClinicaDTO {
     private Integer id;
     private PacienteDTO paciente;
     private Boolean activo;

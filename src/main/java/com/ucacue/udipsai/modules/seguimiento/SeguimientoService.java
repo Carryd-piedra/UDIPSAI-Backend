@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.seguimiento;
 
 import com.ucacue.udipsai.modules.documentos.Documento;
-import com.ucacue.udipsai.modules.documentos.DocumentoIdDTO;
+
 import com.ucacue.udipsai.modules.documentos.DocumentoRepositorio;
 import com.ucacue.udipsai.modules.especialistas.Especialista;
 import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
@@ -11,7 +11,11 @@ import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ucacue.udipsai.modules.storage.StorageService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +32,12 @@ public class SeguimientoService {
 
     @Autowired
     private PacienteRepositorio pacienteRepositorio;
-    
+
     @Autowired
     private DocumentoRepositorio documentoRepositorio;
+
+    @Autowired
+    private StorageService storageService;
 
     @Autowired
     private EspecialistaService especialistaService;
@@ -38,6 +45,7 @@ public class SeguimientoService {
     @Autowired
     private PacienteService pacienteService;
 
+    @Transactional(readOnly = true)
     public List<SeguimientoDTO> listarSeguimientosActivos() {
         log.info("Consultando todos los seguimientos activos");
         return seguimientoRepository.findByActivo(true).stream()
@@ -45,6 +53,7 @@ public class SeguimientoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<SeguimientoDTO> listarSeguimientosPorPacienteId(Integer pacienteId) {
         log.info("Consultando seguimientos para paciente ID: {}", pacienteId);
         return seguimientoRepository.findByPacienteIdAndActivo(pacienteId, true).stream()
@@ -52,25 +61,38 @@ public class SeguimientoService {
                 .collect(Collectors.toList());
     }
 
-    public SeguimientoDTO crearSeguimiento(SeguimientoRequest request) {
+    @Transactional
+    public SeguimientoDTO crearSeguimiento(SeguimientoRequest request, MultipartFile file) {
         log.info("Creando nuevo seguimiento");
         Seguimiento seguimiento = new Seguimiento();
         mapearRequestAEntidad(request, seguimiento);
         seguimiento.setActivo(true);
+
+        if (file != null && !file.isEmpty()) {
+            guardarYAsociarDocumento(seguimiento, file);
+        }
+
         Seguimiento saved = seguimientoRepository.save(seguimiento);
         log.info("Seguimiento creado exitosamente ID: {}", saved.getId());
         return convertirADTO(saved);
     }
-    
-    public SeguimientoDTO actualizarSeguimiento(Integer id, SeguimientoRequest request) {
+
+    @Transactional
+    public SeguimientoDTO actualizarSeguimiento(Integer id, SeguimientoRequest request, MultipartFile file) {
         log.info("Actualizando seguimiento ID: {}", id);
-        if (id == null) throw new IllegalArgumentException("ID requerido para actualizar");
+        if (id == null)
+            throw new IllegalArgumentException("ID requerido para actualizar");
         Seguimiento seguimiento = seguimientoRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Seguimiento ID {} no encontrado", id);
                     return new RuntimeException("Seguimiento no encontrado");
                 });
         mapearRequestAEntidad(request, seguimiento);
+
+        if (file != null && !file.isEmpty()) {
+            guardarYAsociarDocumento(seguimiento, file);
+        }
+
         Seguimiento saved = seguimientoRepository.save(seguimiento);
         log.info("Seguimiento actualizado exitosamente ID: {}", saved.getId());
         return convertirADTO(saved);
@@ -78,7 +100,8 @@ public class SeguimientoService {
 
     public void eliminarSeguimiento(Integer id) {
         log.info("Eliminando (desactivando) seguimiento ID: {}", id);
-        if (id == null) return;
+        if (id == null)
+            return;
         seguimientoRepository.findById(id).ifPresent(s -> {
             s.setActivo(false);
             seguimientoRepository.save(s);
@@ -97,30 +120,41 @@ public class SeguimientoService {
         }
         seguimiento.setFecha(request.getFecha());
         seguimiento.setObservacion(request.getObservacion());
-        if (request.getActivo() != null) seguimiento.setActivo(request.getActivo());
-        
+        if (request.getActivo() != null)
+            seguimiento.setActivo(request.getActivo());
+
         if (request.getDocumentoId() != null) {
             Documento doc = documentoRepositorio.findById(request.getDocumentoId()).orElse(null);
             seguimiento.setDocumento(doc);
         }
     }
 
-    public SeguimientoDTO convertirADTO(Seguimiento seguimiento) {
-        SeguimientoDTO dto = new SeguimientoDTO();
-        dto.setId(seguimiento.getId());
-        dto.setFecha(seguimiento.getFecha());
-        dto.setObservacion(seguimiento.getObservacion());
-        dto.setActivo(seguimiento.getActivo());
+    private void guardarYAsociarDocumento(Seguimiento seguimiento, MultipartFile file) {
+        String filename = storageService.store(file);
+        Documento doc = new Documento();
+        doc.setNombre(file.getOriginalFilename());
+        doc.setUrl(filename);
+        doc.setActivo(true);
 
-        if (seguimiento.getEspecialista() != null) {
-            dto.setEspecialista(especialistaService.convertirADTO(seguimiento.getEspecialista()));
-        }
+        // Asociar al paciente si existe
         if (seguimiento.getPaciente() != null) {
-            dto.setPaciente(pacienteService.convertirADTO(seguimiento.getPaciente()));
+            doc.setPaciente(seguimiento.getPaciente());
         }
-        if (seguimiento.getDocumento() != null) {
-            dto.setDocumento(new DocumentoIdDTO(seguimiento.getDocumento().getId()));
-        }
-        return dto;
+
+        documentoRepositorio.save(doc);
+        seguimiento.setDocumento(doc);
+    }
+
+    public SeguimientoDTO convertirADTO(Seguimiento seguimiento) {
+        return SeguimientoDTO.builder()
+                .id(seguimiento.getId())
+                .fecha(seguimiento.getFecha())
+                .observacion(seguimiento.getObservacion())
+                .activo(seguimiento.getActivo())
+                .especialista(seguimiento.getEspecialista() != null ? especialistaService.convertirADTO(seguimiento.getEspecialista()) : null)
+                .paciente(seguimiento.getPaciente() != null ? pacienteService.convertirADTO(seguimiento.getPaciente()) : null)
+                .documento(seguimiento.getDocumento() != null ? new DocumentoDTO(seguimiento.getDocumento().getId(), seguimiento.getDocumento().getUrl(),
+                        seguimiento.getDocumento().getNombre()) : null)
+                .build();
     }
 }

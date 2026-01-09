@@ -111,15 +111,6 @@ public class Paciente {
     @Column(name = "anio_educacion")
     private String anioEducacion;
 
-    @Column(name = "anio_universitario")
-    private String anioUniversitario;
-
-    @Column(name = "carrera")
-    private String carrera;
-
-    @Column(name = "ciclo")
-    private String ciclo;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "jornada", length = 20)
     private JornadaEnum jornada;

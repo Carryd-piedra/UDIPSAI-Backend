@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.fichamedica.components;
+package com.ucacue.udipsai.modules.historiaclinica.components;
 
-import com.ucacue.udipsai.modules.fichamedica.FichaMedica.*;
+import com.ucacue.udipsai.modules.historiaclinica.HistoriaClinica.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

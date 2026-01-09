@@ -16,12 +16,17 @@ import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.sedes.SedeDTO;
 
 import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
-import com.ucacue.udipsai.modules.fichamedica.FichaMedicaRepository;
+import com.ucacue.udipsai.modules.historiaclinica.HistoriaClinicaRepository;
 import com.ucacue.udipsai.modules.fonoaudiologia.FonoaudiologiaRepository;
 import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinicaRepository;
 import com.ucacue.udipsai.modules.psicologiaeducativa.PsicologiaEducativaRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Join;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +48,7 @@ public class PacienteService {
     private StorageService storageService;
 
     @Autowired
-    private FichaMedicaRepository fichaMedicaRepository;
+    private HistoriaClinicaRepository historiaClinicaRepository;
 
     @Autowired
     private FonoaudiologiaRepository fonoaudiologiaRepository;
@@ -53,7 +58,6 @@ public class PacienteService {
 
     @Autowired
     private PsicologiaEducativaRepository psicologiaEducativaRepository;
-
 
     @Transactional(readOnly = true)
     public List<PacienteDTO> listarPacientesActivos() {
@@ -74,26 +78,40 @@ public class PacienteService {
                 });
     }
 
-    public List<PacienteDTO> buscarPacientes(String search, Integer sedeId) {
-        log.info("Buscando pacientes. Search: {}, SedeId: {}", search, sedeId);
-        Specification<Paciente> spec = Specification.where(null);
+    @Transactional(readOnly = true)
+    public Page<PacienteDTO> filtrarPacientes(PacienteCriteriaDTO criteria, Pageable pageable) {
+        log.info("Filtrando pacientes con criterios: {}", criteria);
 
-        if (StringUtils.hasText(search)) {
-            String likePattern = "%" + search.toLowerCase() + "%";
-            spec = spec.and((root, query, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("nombresApellidos")), likePattern),
-                    cb.like(cb.lower(root.get("cedula")), likePattern)));
-        }
+        Specification<Paciente> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        if (sedeId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("sede").get("id"), sedeId));
-        }
+            if (StringUtils.hasText(criteria.getSearch())) {
+                String searchPattern = "%" + criteria.getSearch().toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("nombresApellidos")), searchPattern),
+                        cb.like(cb.lower(root.get("cedula")), searchPattern)));
+            }
 
-        spec = spec.and((root, query, cb) -> cb.equal(root.get("activo"), true));
+            if (StringUtils.hasText(criteria.getCiudad())) {
+                predicates.add(cb.like(cb.lower(root.get("ciudad")),
+                        "%" + criteria.getCiudad().toLowerCase() + "%"));
+            }
+            if (criteria.getActivo() != null) {
+                predicates.add(cb.equal(root.get("activo"), criteria.getActivo()));
+            }
+            if (criteria.getSedeId() != null) {
+                Join<Object, Object> sedeJoin = root.join("sede");
+                predicates.add(cb.equal(sedeJoin.get("id"), criteria.getSedeId()));
+            }
+            if (criteria.getInstitucionEducativaId() != null) {
+                Join<Object, Object> ieJoin = root.join("institucionEducativa");
+                predicates.add(cb.equal(ieJoin.get("id"), criteria.getInstitucionEducativaId()));
+            }
 
-        return pacienteRepositorio.findAll(spec).stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return pacienteRepositorio.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional
@@ -207,9 +225,10 @@ public class PacienteService {
                 .numeroTelefono(paciente.getNumeroTelefono())
                 .numeroCelular(paciente.getNumeroCelular())
                 .institucionEducativa(paciente.getInstitucionEducativa() != null ? new InstitucionEducativaDTO(
-                    paciente.getInstitucionEducativa().getId(), paciente.getInstitucionEducativa().getNombre()) : null)
+                        paciente.getInstitucionEducativa().getId(), paciente.getInstitucionEducativa().getNombre())
+                        : null)
                 .sede(paciente.getSede() != null ? new SedeDTO(
-                    paciente.getSede().getId(), paciente.getSede().getNombre()) : null)
+                        paciente.getSede().getId(), paciente.getSede().getNombre()) : null)
                 .proyecto(paciente.getProyecto())
                 .jornada(paciente.getJornada())
                 .nivelEducativo(paciente.getNivelEducativo())
@@ -224,11 +243,10 @@ public class PacienteService {
                 .tipoDiscapacidad(paciente.getTipoDiscapacidad())
                 .detalleDiscapacidad(paciente.getDetalleDiscapacidad())
                 .porcentajeDiscapacidad(paciente.getPorcentajeDiscapacidad())
-                .documentos(paciente.getDocumentos() != null ? 
-                        paciente.getDocumentos().stream()
-                                .filter(d -> d.getActivo())
-                                .map(d -> new DocumentoDTO(d.getId(), d.getUrl(), d.getNombre()))
-                                .collect(Collectors.toList()) : Collections.emptyList())
+                .documentos(paciente.getDocumentos() != null ? paciente.getDocumentos().stream()
+                        .filter(d -> d.getActivo())
+                        .map(d -> new DocumentoDTO(d.getId(), d.getUrl(), d.getNombre()))
+                        .collect(Collectors.toList()) : Collections.emptyList())
                 .build();
     }
 
@@ -237,10 +255,14 @@ public class PacienteService {
         log.info("Obteniendo resumen de fichas para paciente ID: {}", id);
         List<String> nombres = new java.util.ArrayList<>();
 
-        if (fichaMedicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Ficha Médica");
-        if (fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Fonoaudiología");
-        if (psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Clínica");
-        if (psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true) != null) nombres.add("Psicología Educativa");
+        if (historiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null)
+            nombres.add("Historia Clínica");
+        if (fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true) != null)
+            nombres.add("Fonoaudiología");
+        if (psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null)
+            nombres.add("Psicología Clínica");
+        if (psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true) != null)
+            nombres.add("Psicología Educativa");
 
         return PacienteSummaryDTO.builder()
                 .totalFichas(nombres.size())
@@ -248,5 +270,3 @@ public class PacienteService {
                 .build();
     }
 }
-
-

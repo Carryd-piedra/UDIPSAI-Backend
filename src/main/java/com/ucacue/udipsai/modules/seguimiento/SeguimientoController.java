@@ -1,8 +1,11 @@
 package com.ucacue.udipsai.modules.seguimiento;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -16,6 +19,9 @@ public class SeguimientoController {
     @Autowired
     private SeguimientoService seguimientoService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @GetMapping
     public ResponseEntity<List<SeguimientoDTO>> listarSeguimientosActivos() {
         log.info("Petición GET para listar todos los seguimientos activos");
@@ -28,25 +34,32 @@ public class SeguimientoController {
         return ResponseEntity.ok(seguimientoService.listarSeguimientosPorPacienteId(pacienteId));
     }
 
-    @PostMapping
-    public ResponseEntity<SeguimientoDTO> crearSeguimiento(@RequestBody SeguimientoRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> crearSeguimiento(
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         log.info("Petición POST para crear seguimiento");
         try {
-            return ResponseEntity.ok(seguimientoService.crearSeguimiento(request));
+            SeguimientoRequest request = objectMapper.readValue(dataJson, SeguimientoRequest.class);
+            return ResponseEntity.ok(seguimientoService.crearSeguimiento(request, file));
         } catch (Exception e) {
             log.error("Error al crear seguimiento: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<SeguimientoDTO> actualizarSeguimiento(@PathVariable Integer id, @RequestBody SeguimientoRequest request) {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> actualizarSeguimiento(
+            @PathVariable Integer id,
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         log.info("Petición PUT para actualizar seguimiento ID: {}", id);
         try {
-            return ResponseEntity.ok(seguimientoService.actualizarSeguimiento(id, request));
+            SeguimientoRequest request = objectMapper.readValue(dataJson, SeguimientoRequest.class);
+            return ResponseEntity.ok(seguimientoService.actualizarSeguimiento(id, request, file));
         } catch (Exception e) {
             log.error("Error al actualizar seguimiento ID {}: {}", id, e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

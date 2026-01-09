@@ -1,12 +1,9 @@
-package com.ucacue.udipsai.modules.fichamedica;
+package com.ucacue.udipsai.modules.historiaclinica;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface FichaMedicaRepository extends JpaRepository<FichaMedica, Integer> {
-    FichaMedica findByPacienteIdAndActivo(Integer idPaciente, boolean activo);
-    List<FichaMedica> findByActivo(boolean activo);
+public interface HistoriaClinicaRepository extends JpaRepository<HistoriaClinica, Integer> {
+    HistoriaClinica findByPacienteIdAndActivo(Integer idPaciente, boolean activo);
 }

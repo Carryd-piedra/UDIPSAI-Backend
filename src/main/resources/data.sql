@@ -38,7 +38,6 @@ VALUES
 
 -- Insertar Especialidad
 
-
 -- Insertar Jornada
 INSERT INTO Jornada (id, estado_jornada, nombre_jornada)
 VALUES

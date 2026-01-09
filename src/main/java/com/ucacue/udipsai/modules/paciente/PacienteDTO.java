@@ -48,9 +48,6 @@ public class PacienteDTO {
     
     private String nivelEducativo;
     private String anioEducacion;
-    private String anioUniversitario;
-    private String ciclo;
-    private String carrera;
     
     private Boolean perteneceInclusion;
     private Boolean tieneDiscapacidad;

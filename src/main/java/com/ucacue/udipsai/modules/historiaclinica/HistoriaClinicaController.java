@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.fichamedica;
+package com.ucacue.udipsai.modules.historiaclinica;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,48 +13,48 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ficha-medica")
+@RequestMapping("/api/historia-clinica")
 @CrossOrigin(origins = "*")
 @Slf4j
-public class FichaMedicaController {
+public class HistoriaClinicaController {
 
     @Autowired
-    private FichaMedicaService fichaMedicaService;
+    private HistoriaClinicaService historiaClinicaService;
 
     @GetMapping
-    public List<FichaMedicaDTO> listarFichasMedicas() {
-        log.info("Petición GET para listar todas las fichas médicas activas");
-        return fichaMedicaService.listarFichasMedicas();
+    public List<HistoriaClinicaDTO> listarHistoriasClinicas() {
+        log.info("Petición GET para listar todas las historias clínicas activas");
+        return historiaClinicaService.listarHistoriasClinicas();
     }
 
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<FichaMedicaDTO> obtenerFichaMedicaPorPacienteId(@PathVariable Integer pacienteId) {
-        log.info("Petición GET para obtener ficha médica del paciente ID: {}", pacienteId);
-        FichaMedicaDTO ficha = fichaMedicaService.obtenerFichaMedicaPorPacienteId(pacienteId);
-        if (ficha != null) {
-            return ResponseEntity.ok(ficha);
+    public ResponseEntity<HistoriaClinicaDTO> obtenerHistoriaClinicaPorPacienteId(@PathVariable Integer pacienteId) {
+        log.info("Petición GET para obtener historia clínica del paciente ID: {}", pacienteId);
+        HistoriaClinicaDTO historia = historiaClinicaService.obtenerHistoriaClinicaPorPacienteId(pacienteId);
+        if (historia != null) {
+            return ResponseEntity.ok(historia);
         }
-        log.warn("Ficha médica no encontrada para paciente ID: {}", pacienteId);
+        log.warn("Ficha clínica no encontrada para paciente ID: {}", pacienteId);
         return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<FichaMedicaDTO> guardarFichaMedica(
+    public ResponseEntity<HistoriaClinicaDTO> guardarHistoriaClinica(
             @RequestParam("data") String data,
             @RequestParam(value = "genograma", required = false) MultipartFile genograma) throws IOException {
         
-        log.info("Petición POST para guardar ficha médica. Data: {}", data);
+        log.info("Petición POST para guardar historia clínica. Data: {}", data);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules(); 
-            FichaMedicaRequest request = mapper.readValue(data, FichaMedicaRequest.class);
-            FichaMedicaDTO saved = fichaMedicaService.guardarFichaMedica(request, genograma);
+            HistoriaClinicaRequest request = mapper.readValue(data, HistoriaClinicaRequest.class);
+            HistoriaClinicaDTO saved = historiaClinicaService.guardarHistoriaClinica(request, genograma);
             return ResponseEntity.ok(saved);
         } catch (IOException e) {
-            log.error("Error al procesar JSON o Archivo en guardado de ficha médica: {}", e.getMessage());
+            log.error("Error al procesar JSON o Archivo en guardado de historia clínica: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Error al guardar ficha médica: {}", e.getMessage());
+            log.error("Error al guardar historia clínica: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
@@ -62,7 +62,7 @@ public class FichaMedicaController {
     @GetMapping("/paciente/{pacienteId}/genograma")
     public ResponseEntity<Resource> descargarGenograma(@PathVariable Integer pacienteId) {
         log.info("Petición GET para descargar genograma del paciente ID: {}", pacienteId);
-        Resource file = fichaMedicaService.cargarGenogramaComoRecurso(pacienteId);
+        Resource file = historiaClinicaService.cargarGenogramaComoRecurso(pacienteId);
         if (file == null) {
             log.warn("Genograma no encontrado para paciente ID: {}", pacienteId);
             return ResponseEntity.notFound().build();
@@ -73,9 +73,9 @@ public class FichaMedicaController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarFichaMedica(@PathVariable Integer id) {
-        log.info("Petición DELETE para eliminar ficha médica ID: {}", id);
-        fichaMedicaService.eliminarFichaMedica(id);
+    public ResponseEntity<Void> eliminarHistoriaClinica(@PathVariable Integer id) {
+        log.info("Petición DELETE para eliminar historia clínica ID: {}", id);
+        historiaClinicaService.eliminarHistoriaClinica(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -58,6 +58,7 @@ public class FileSystemStorageService implements StorageService {
             }
             return newFilename;
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to store file.", e);
         }
     }
