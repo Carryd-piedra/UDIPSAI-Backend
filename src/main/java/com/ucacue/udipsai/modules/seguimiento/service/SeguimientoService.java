@@ -15,7 +15,7 @@ import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoRequest;
 import com.ucacue.udipsai.modules.seguimiento.repository.SeguimientoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;

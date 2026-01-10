@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.storage;
+package com.ucacue.udipsai.infrastructure.storage;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;

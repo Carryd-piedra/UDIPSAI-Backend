@@ -4,7 +4,7 @@ import com.ucacue.udipsai.modules.documentos.domain.Documento;
 import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepositorio;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

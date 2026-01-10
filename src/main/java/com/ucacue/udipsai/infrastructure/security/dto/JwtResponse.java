@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.security.dto;
+package com.ucacue.udipsai.infrastructure.security.dto;
 
 import lombok.Data;
 import java.util.List;

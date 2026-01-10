@@ -1,11 +1,11 @@
-package com.ucacue.udipsai.controllers;
+package com.ucacue.udipsai.modules.auth;
 
-import com.ucacue.udipsai.security.JwtTokenProvider;
-import com.ucacue.udipsai.security.RefreshToken;
-import com.ucacue.udipsai.security.RefreshTokenService;
-import com.ucacue.udipsai.security.dto.JwtResponse;
-import com.ucacue.udipsai.security.dto.TokenRefreshRequest;
-import com.ucacue.udipsai.security.dto.TokenRefreshResponse;
+import com.ucacue.udipsai.infrastructure.security.JwtTokenProvider;
+import com.ucacue.udipsai.infrastructure.security.RefreshToken;
+import com.ucacue.udipsai.infrastructure.security.RefreshTokenService;
+import com.ucacue.udipsai.infrastructure.security.dto.JwtResponse;
+import com.ucacue.udipsai.infrastructure.security.dto.TokenRefreshRequest;
+import com.ucacue.udipsai.infrastructure.security.dto.TokenRefreshResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

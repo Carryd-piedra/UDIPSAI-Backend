@@ -7,7 +7,7 @@ import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;

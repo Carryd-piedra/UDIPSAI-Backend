@@ -10,7 +10,7 @@ import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;

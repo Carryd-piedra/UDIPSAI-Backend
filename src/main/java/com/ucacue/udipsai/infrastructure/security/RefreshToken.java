@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.security;
+package com.ucacue.udipsai.infrastructure.security;
 
 import jakarta.persistence.*;
 import lombok.Getter;

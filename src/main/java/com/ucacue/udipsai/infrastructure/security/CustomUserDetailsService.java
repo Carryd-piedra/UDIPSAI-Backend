@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.security;
+package com.ucacue.udipsai.infrastructure.security;
 
 import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
 import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;

@@ -9,7 +9,7 @@ import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepositor
 import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;

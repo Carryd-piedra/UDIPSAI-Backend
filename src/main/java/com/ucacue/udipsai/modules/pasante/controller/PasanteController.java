@@ -6,7 +6,7 @@ import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
 import com.ucacue.udipsai.modules.pasante.service.PasanteService;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.web.PageableDefault;

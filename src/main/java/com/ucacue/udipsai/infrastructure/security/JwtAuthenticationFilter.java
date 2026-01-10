@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.security;
+package com.ucacue.udipsai.infrastructure.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

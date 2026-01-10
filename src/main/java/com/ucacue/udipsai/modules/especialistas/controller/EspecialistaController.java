@@ -6,7 +6,7 @@ import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaRequest;
 import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaCriteriaDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

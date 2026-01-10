@@ -8,7 +8,7 @@ import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
 import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

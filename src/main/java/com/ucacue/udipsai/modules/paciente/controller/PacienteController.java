@@ -7,7 +7,7 @@ import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteRequest;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
-import com.ucacue.udipsai.modules.storage.StorageService;
+import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
