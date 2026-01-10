@@ -1,7 +1,12 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteCriteriaDTO;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteRequest;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
+import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

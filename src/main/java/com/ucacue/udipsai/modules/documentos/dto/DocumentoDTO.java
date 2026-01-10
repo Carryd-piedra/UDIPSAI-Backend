@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.documentos;
+package com.ucacue.udipsai.modules.documentos.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

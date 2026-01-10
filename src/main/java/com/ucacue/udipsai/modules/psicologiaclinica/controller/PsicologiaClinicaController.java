@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.psicologiaclinica;
+package com.ucacue.udipsai.modules.psicologiaclinica.controller;
 
+import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaDTO;
+import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaRequest;
+import com.ucacue.udipsai.modules.psicologiaclinica.service.PsicologiaClinicaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

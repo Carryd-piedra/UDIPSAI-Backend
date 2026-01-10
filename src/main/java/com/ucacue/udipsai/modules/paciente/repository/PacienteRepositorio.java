@@ -1,5 +1,6 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.repository;
 
+import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

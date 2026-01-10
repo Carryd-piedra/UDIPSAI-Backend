@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.asignacion;
 
-import com.ucacue.udipsai.modules.paciente.Paciente;
-import com.ucacue.udipsai.modules.pasante.Pasante;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.pasante.domain.Pasante;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

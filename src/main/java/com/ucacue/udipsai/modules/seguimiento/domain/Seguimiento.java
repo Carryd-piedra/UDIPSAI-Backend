@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.domain;
 
-import com.ucacue.udipsai.modules.documentos.Documento;
-import com.ucacue.udipsai.modules.especialistas.Especialista;
+import com.ucacue.udipsai.modules.documentos.domain.Documento;
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.historiaclinica.components;
+package com.ucacue.udipsai.modules.historiaclinica.domain.components;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

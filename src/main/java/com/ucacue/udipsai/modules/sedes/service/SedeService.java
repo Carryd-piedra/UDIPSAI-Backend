@@ -1,7 +1,8 @@
-package com.ucacue.udipsai.modules.sedes;
+package com.ucacue.udipsai.modules.sedes.service;
 
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import com.ucacue.udipsai.modules.sedes.dto.SedeCriteriaDTO;
+import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

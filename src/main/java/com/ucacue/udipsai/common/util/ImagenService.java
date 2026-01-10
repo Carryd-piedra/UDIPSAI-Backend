@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.common.util;
 
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.pasante;
+package com.ucacue.udipsai.modules.pasante.dto;
 
-import com.ucacue.udipsai.modules.especialistas.EspecialistaDTO;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

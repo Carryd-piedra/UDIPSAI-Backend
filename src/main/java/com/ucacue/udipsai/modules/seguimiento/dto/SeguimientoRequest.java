@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.dto;
 
 import lombok.Data;
 import java.time.LocalDate;

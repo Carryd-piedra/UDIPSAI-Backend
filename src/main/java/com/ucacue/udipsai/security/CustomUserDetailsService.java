@@ -1,9 +1,9 @@
 package com.ucacue.udipsai.security;
 
-import com.ucacue.udipsai.modules.especialistas.Especialista;
-import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
-import com.ucacue.udipsai.modules.pasante.Pasante;
-import com.ucacue.udipsai.modules.pasante.PasanteRepositorio;
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.pasante.domain.Pasante;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

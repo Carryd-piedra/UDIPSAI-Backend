@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.fonoaudiologia;
+package com.ucacue.udipsai.modules.fonoaudiologia.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.fonoaudiologia.components.*;
+import com.ucacue.udipsai.modules.fonoaudiologia.domain.components.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

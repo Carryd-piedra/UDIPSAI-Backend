@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.psicologiaclinica;
+package com.ucacue.udipsai.modules.psicologiaclinica.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.psicologiaclinica.components.*;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.components.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

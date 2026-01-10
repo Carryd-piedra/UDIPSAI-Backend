@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.pasante;
+package com.ucacue.udipsai.modules.pasante.dto;
 
 import lombok.Data;
 import java.time.LocalDate;

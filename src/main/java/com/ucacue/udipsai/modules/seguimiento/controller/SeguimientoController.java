@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.controller;
 
+import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoDTO;
+import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoRequest;
+import com.ucacue.udipsai.modules.seguimiento.service.SeguimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.psicologiaeducativa;
+package com.ucacue.udipsai.modules.psicologiaeducativa.controller;
 
+import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaDTO;
+import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaRequest;
+import com.ucacue.udipsai.modules.psicologiaeducativa.service.PsicologiaEducativaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

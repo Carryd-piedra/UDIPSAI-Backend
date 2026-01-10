@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.dto;
 
-import com.ucacue.udipsai.modules.paciente.Paciente.JornadaEnum;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente.JornadaEnum;
 import lombok.Data;
 import java.time.LocalDate;
 

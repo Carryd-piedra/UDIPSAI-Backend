@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.especialistas;
+package com.ucacue.udipsai.modules.especialistas.dto;
 
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 

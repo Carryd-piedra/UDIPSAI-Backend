@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.fonoaudiologia;
+package com.ucacue.udipsai.modules.fonoaudiologia.dto;
 
-import com.ucacue.udipsai.modules.fonoaudiologia.components.*;
+import com.ucacue.udipsai.modules.fonoaudiologia.domain.components.*;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.psicologiaclinica;
+package com.ucacue.udipsai.modules.psicologiaclinica.dto;
 
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
-import com.ucacue.udipsai.modules.psicologiaclinica.components.*;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.components.*;
 import lombok.Data;
 
 @Data

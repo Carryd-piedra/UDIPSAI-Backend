@@ -1,7 +1,11 @@
-package com.ucacue.udipsai.modules.pasante;
+package com.ucacue.udipsai.modules.pasante.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
+import com.ucacue.udipsai.modules.pasante.service.PasanteService;
 import com.ucacue.udipsai.modules.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

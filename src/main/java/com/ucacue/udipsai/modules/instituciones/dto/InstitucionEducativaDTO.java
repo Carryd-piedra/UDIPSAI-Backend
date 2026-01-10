@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.instituciones;
+package com.ucacue.udipsai.modules.instituciones.dto;
 
 import lombok.Builder;
 import lombok.Data;

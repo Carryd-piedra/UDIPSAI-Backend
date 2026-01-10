@@ -1,10 +1,10 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaDTO;
-import com.ucacue.udipsai.modules.paciente.Paciente.JornadaEnum;
-import com.ucacue.udipsai.modules.sedes.SedeDTO;
+import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
+import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente.JornadaEnum;
+import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

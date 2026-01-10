@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.fonoaudiologia;
+package com.ucacue.udipsai.modules.fonoaudiologia.service;
 
 import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia;
 import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaDTO;

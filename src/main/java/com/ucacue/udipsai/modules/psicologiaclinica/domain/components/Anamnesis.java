@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.psicologiaclinica.components;
+package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

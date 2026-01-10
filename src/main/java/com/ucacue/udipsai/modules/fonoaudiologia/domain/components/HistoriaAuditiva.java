@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.fonoaudiologia.components;
+package com.ucacue.udipsai.modules.fonoaudiologia.domain.components;
 
-import com.ucacue.udipsai.modules.fonoaudiologia.Fonoaudiologia.*;
+import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

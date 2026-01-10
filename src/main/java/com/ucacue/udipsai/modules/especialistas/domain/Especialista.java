@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.especialistas;
+package com.ucacue.udipsai.modules.especialistas.domain;
 
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;

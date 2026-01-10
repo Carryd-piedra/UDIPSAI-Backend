@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.fonoaudiologia.components;
+package com.ucacue.udipsai.modules.fonoaudiologia.domain.components;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

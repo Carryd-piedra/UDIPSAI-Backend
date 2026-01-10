@@ -1,5 +1,6 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.repository;
 
+import com.ucacue.udipsai.modules.seguimiento.domain.Seguimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

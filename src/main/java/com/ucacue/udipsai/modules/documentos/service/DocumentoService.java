@@ -1,5 +1,7 @@
-package com.ucacue.udipsai.modules.documentos;
+package com.ucacue.udipsai.modules.documentos.service;
 
+import com.ucacue.udipsai.modules.documentos.domain.Documento;
+import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepositorio;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;

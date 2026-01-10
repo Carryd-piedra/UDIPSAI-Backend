@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.historiaclinica;
+package com.ucacue.udipsai.modules.historiaclinica.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 

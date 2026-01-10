@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.asignacion;
 
-import com.ucacue.udipsai.modules.paciente.PacienteDTO;
-import com.ucacue.udipsai.modules.pasante.PasanteDTO;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import lombok.Builder;
 import lombok.Data;
 

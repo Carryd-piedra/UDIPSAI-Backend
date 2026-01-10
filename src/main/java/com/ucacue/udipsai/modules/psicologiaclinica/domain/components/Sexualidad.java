@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.psicologiaclinica.components;
+package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.*;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

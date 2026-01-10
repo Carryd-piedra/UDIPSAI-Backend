@@ -1,5 +1,12 @@
-package com.ucacue.udipsai.modules.especialistas;
+package com.ucacue.udipsai.modules.especialistas.service;
 
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialidadDTO;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaCriteriaDTO;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaRequest;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepositorio;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;

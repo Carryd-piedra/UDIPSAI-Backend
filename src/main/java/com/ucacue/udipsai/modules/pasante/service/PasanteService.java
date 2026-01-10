@@ -1,8 +1,13 @@
-package com.ucacue.udipsai.modules.pasante;
+package com.ucacue.udipsai.modules.pasante.service;
 
-import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
 
-import com.ucacue.udipsai.modules.especialistas.EspecialistaService;
+import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
+import com.ucacue.udipsai.modules.pasante.domain.Pasante;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;

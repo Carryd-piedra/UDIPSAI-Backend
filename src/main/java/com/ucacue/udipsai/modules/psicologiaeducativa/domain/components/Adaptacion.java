@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.psicologiaeducativa.components;
+package com.ucacue.udipsai.modules.psicologiaeducativa.domain.components;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

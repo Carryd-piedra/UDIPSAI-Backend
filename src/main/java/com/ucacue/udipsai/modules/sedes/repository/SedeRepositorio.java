@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.sedes;
+package com.ucacue.udipsai.modules.sedes.repository;
 
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import org.springframework.data.jpa.repository.JpaRepository;

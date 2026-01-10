@@ -1,5 +1,7 @@
-package com.ucacue.udipsai.modules.pasante;
+package com.ucacue.udipsai.modules.pasante.domain;
 
+import com.ucacue.udipsai.modules.especialistas.domain.Especialidad;
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,8 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.ucacue.udipsai.modules.especialistas.*;
-import com.ucacue.udipsai.modules.sedes.Sede;
+import com.ucacue.udipsai.modules.sedes.domain.Sede;
 
 @Entity
 @Table(name = "pasantes")

@@ -1,8 +1,8 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.domain;
 
-import com.ucacue.udipsai.modules.documentos.Documento;
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
-import com.ucacue.udipsai.modules.sedes.Sede;
+import com.ucacue.udipsai.modules.documentos.domain.Documento;
+import com.ucacue.udipsai.modules.instituciones.domain.InstitucionEducativa;
+import com.ucacue.udipsai.modules.sedes.domain.Sede;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

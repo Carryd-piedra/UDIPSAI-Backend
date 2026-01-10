@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.exceptions;
+package com.ucacue.udipsai.common.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;

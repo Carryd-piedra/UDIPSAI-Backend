@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.psicologiaclinica.components;
+package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.TipoHorarioDeSuenio;
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.CompaniaSuenio;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.TipoHorarioDeSuenio;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.CompaniaSuenio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

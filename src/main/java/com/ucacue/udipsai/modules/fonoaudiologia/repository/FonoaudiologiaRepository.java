@@ -1,5 +1,6 @@
-package com.ucacue.udipsai.modules.fonoaudiologia;
+package com.ucacue.udipsai.modules.fonoaudiologia.repository;
 
+import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

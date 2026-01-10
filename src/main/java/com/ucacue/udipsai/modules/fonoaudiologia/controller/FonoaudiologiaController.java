@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.fonoaudiologia;
+package com.ucacue.udipsai.modules.fonoaudiologia.controller;
 
+import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaDTO;
+import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaRequest;
+import com.ucacue.udipsai.modules.fonoaudiologia.service.FonoaudiologiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

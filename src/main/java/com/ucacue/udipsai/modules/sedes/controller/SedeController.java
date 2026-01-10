@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.sedes;
+package com.ucacue.udipsai.modules.sedes.controller;
 
+import com.ucacue.udipsai.modules.sedes.dto.SedeCriteriaDTO;
+import com.ucacue.udipsai.modules.sedes.service.SedeService;
+import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.dto;
 
-import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
-import com.ucacue.udipsai.modules.especialistas.EspecialistaDTO;
+import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
+import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

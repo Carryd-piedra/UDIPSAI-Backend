@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.documentos;
+package com.ucacue.udipsai.modules.documentos.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import jakarta.persistence.*;

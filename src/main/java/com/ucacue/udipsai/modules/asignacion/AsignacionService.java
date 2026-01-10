@@ -1,11 +1,11 @@
 package com.ucacue.udipsai.modules.asignacion;
 
-import com.ucacue.udipsai.modules.paciente.Paciente;
-import com.ucacue.udipsai.modules.paciente.PacienteRepositorio;
-import com.ucacue.udipsai.modules.paciente.PacienteService;
-import com.ucacue.udipsai.modules.pasante.Pasante;
-import com.ucacue.udipsai.modules.pasante.PasanteRepositorio;
-import com.ucacue.udipsai.modules.pasante.PasanteService;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.service.PacienteService;
+import com.ucacue.udipsai.modules.pasante.domain.Pasante;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
+import com.ucacue.udipsai.modules.pasante.service.PasanteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;

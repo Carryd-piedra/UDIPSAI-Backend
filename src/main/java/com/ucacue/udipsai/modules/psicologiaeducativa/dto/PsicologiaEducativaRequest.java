@@ -1,6 +1,6 @@
-package com.ucacue.udipsai.modules.psicologiaeducativa;
+package com.ucacue.udipsai.modules.psicologiaeducativa.dto;
 
-import com.ucacue.udipsai.modules.psicologiaeducativa.components.*;
+import com.ucacue.udipsai.modules.psicologiaeducativa.domain.components.*;
 import lombok.Data;
 
 @Data

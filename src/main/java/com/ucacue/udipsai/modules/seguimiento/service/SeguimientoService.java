@@ -1,21 +1,25 @@
-package com.ucacue.udipsai.modules.seguimiento;
+package com.ucacue.udipsai.modules.seguimiento.service;
 
-import com.ucacue.udipsai.modules.documentos.Documento;
+import com.ucacue.udipsai.modules.documentos.domain.Documento;
 
-import com.ucacue.udipsai.modules.documentos.DocumentoRepositorio;
-import com.ucacue.udipsai.modules.especialistas.Especialista;
-import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
-import com.ucacue.udipsai.modules.especialistas.EspecialistaService;
+import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepositorio;
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
+import com.ucacue.udipsai.modules.seguimiento.domain.Seguimiento;
+import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoDTO;
+import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoRequest;
+import com.ucacue.udipsai.modules.seguimiento.repository.SeguimientoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ucacue.udipsai.modules.storage.StorageService;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
+import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;

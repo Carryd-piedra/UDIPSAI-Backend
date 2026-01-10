@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.historiaclinica;
+package com.ucacue.udipsai.modules.historiaclinica.controller;
 
+import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
+import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
+import com.ucacue.udipsai.modules.historiaclinica.service.HistoriaClinicaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

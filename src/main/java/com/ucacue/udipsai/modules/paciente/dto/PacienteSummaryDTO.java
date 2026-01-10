@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

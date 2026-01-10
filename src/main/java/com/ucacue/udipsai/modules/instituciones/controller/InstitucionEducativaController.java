@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.instituciones;
+package com.ucacue.udipsai.modules.instituciones.controller;
 
+import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaCriteriaDTO;
+import com.ucacue.udipsai.modules.instituciones.service.InstitucionEducativaService;
+import com.ucacue.udipsai.modules.instituciones.domain.InstitucionEducativa;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;

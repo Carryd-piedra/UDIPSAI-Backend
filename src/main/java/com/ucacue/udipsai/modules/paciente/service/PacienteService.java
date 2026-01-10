@@ -1,9 +1,15 @@
-package com.ucacue.udipsai.modules.paciente;
+package com.ucacue.udipsai.modules.paciente.service;
 
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativa;
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaRepositorio;
-import com.ucacue.udipsai.modules.sedes.Sede;
-import com.ucacue.udipsai.modules.sedes.SedeRepositorio;
+import com.ucacue.udipsai.modules.instituciones.domain.InstitucionEducativa;
+import com.ucacue.udipsai.modules.instituciones.repository.InstitucionEducativaRepositorio;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteRequest;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteCriteriaDTO;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.sedes.domain.Sede;
+import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
 import com.ucacue.udipsai.modules.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import com.ucacue.udipsai.modules.instituciones.InstitucionEducativaDTO;
-import com.ucacue.udipsai.modules.sedes.SedeDTO;
+import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
+import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 
-import com.ucacue.udipsai.modules.documentos.DocumentoDTO;
-import com.ucacue.udipsai.modules.historiaclinica.HistoriaClinicaRepository;
-import com.ucacue.udipsai.modules.fonoaudiologia.FonoaudiologiaRepository;
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinicaRepository;
-import com.ucacue.udipsai.modules.psicologiaeducativa.PsicologiaEducativaRepository;
+import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
+import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
+import com.ucacue.udipsai.modules.fonoaudiologia.repository.FonoaudiologiaRepository;
+import com.ucacue.udipsai.modules.psicologiaclinica.repository.PsicologiaClinicaRepository;
+import com.ucacue.udipsai.modules.psicologiaeducativa.repository.PsicologiaEducativaRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,5 +1,6 @@
-package com.ucacue.udipsai.modules.psicologiaeducativa;
+package com.ucacue.udipsai.modules.psicologiaeducativa.repository;
 
+import com.ucacue.udipsai.modules.psicologiaeducativa.domain.PsicologiaEducativa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

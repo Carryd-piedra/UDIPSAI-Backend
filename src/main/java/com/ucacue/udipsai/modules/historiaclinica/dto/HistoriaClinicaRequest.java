@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.historiaclinica;
+package com.ucacue.udipsai.modules.historiaclinica.dto;
 
 import com.ucacue.udipsai.modules.historiaclinica.domain.components.*;
 import lombok.Data;

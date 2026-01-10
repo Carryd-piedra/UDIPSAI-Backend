@@ -1,5 +1,9 @@
-package com.ucacue.udipsai.modules.historiaclinica;
+package com.ucacue.udipsai.modules.historiaclinica.service;
 
+import com.ucacue.udipsai.modules.historiaclinica.domain.HistoriaClinica;
+import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
+import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
+import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;

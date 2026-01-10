@@ -1,5 +1,6 @@
-package com.ucacue.udipsai.modules.psicologiaclinica;
+package com.ucacue.udipsai.modules.psicologiaclinica.repository;
 
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,9 +1,9 @@
-package com.ucacue.udipsai.modules.psicologiaclinica.components;
+package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.Desorientacion;
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.Espacio;
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.RespectoAOtrasPersonas;
-import com.ucacue.udipsai.modules.psicologiaclinica.PsicologiaClinica.RespectoASiMismo;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.Desorientacion;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.Espacio;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.RespectoAOtrasPersonas;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.RespectoASiMismo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;

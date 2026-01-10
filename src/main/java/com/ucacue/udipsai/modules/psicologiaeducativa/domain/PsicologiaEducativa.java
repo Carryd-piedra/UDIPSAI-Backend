@@ -1,7 +1,7 @@
-package com.ucacue.udipsai.modules.psicologiaeducativa;
+package com.ucacue.udipsai.modules.psicologiaeducativa.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.psicologiaeducativa.components.*;
+import com.ucacue.udipsai.modules.psicologiaeducativa.domain.components.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

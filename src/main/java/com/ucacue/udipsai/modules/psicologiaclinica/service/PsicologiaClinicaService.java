@@ -1,8 +1,12 @@
-package com.ucacue.udipsai.modules.psicologiaclinica;
+package com.ucacue.udipsai.modules.psicologiaclinica.service;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
+import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica;
+import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaDTO;
+import com.ucacue.udipsai.modules.psicologiaclinica.repository.PsicologiaClinicaRepository;
+import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

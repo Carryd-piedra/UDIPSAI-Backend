@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.sedes;
+package com.ucacue.udipsai.modules.sedes.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

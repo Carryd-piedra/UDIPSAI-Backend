@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.config;
 
-import com.ucacue.udipsai.modules.especialistas.Especialista;
-import com.ucacue.udipsai.modules.especialistas.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

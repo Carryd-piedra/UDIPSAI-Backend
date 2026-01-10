@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.instituciones;
+package com.ucacue.udipsai.modules.instituciones.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
