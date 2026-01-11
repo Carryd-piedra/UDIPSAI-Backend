@@ -1,12 +1,13 @@
 package com.ucacue.udipsai.modules.especialistas.service;
 
+import com.ucacue.udipsai.modules.especialidad.dto.EspecialidadDTO;
+import com.ucacue.udipsai.modules.especialidad.repository.EspecialidadRepository;
 import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
-import com.ucacue.udipsai.modules.especialistas.dto.EspecialidadDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaCriteriaDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaRequest;
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepository;
 import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepository;
+import com.ucacue.udipsai.modules.permisos.Permisos;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
@@ -103,6 +104,15 @@ public class EspecialistaService {
         Especialista especialista = new Especialista();
         mapearRequestAEntidad(request, especialista);
         especialista.setActivo(true);
+        
+        if (request.getPermisos() != null) {
+            especialista.setPermisos(request.getPermisos());
+        } else {
+            Permisos permisos = new Permisos();
+            permisos.setPacientes(true);
+            permisos.setHistoriaClinica(true);
+            especialista.setPermisos(permisos);
+        }
 
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
@@ -131,6 +141,27 @@ public class EspecialistaService {
                 });
 
         mapearRequestAEntidad(request, especialista);
+        
+        if (request.getPermisos() != null) {
+             if (especialista.getPermisos() != null) {
+                 Permisos p = especialista.getPermisos();
+                 Permisos newP = request.getPermisos();
+                 p.setPacientes(newP.getPacientes());
+                 p.setPasantes(newP.getPasantes());
+                 p.setSedes(newP.getSedes());
+                 p.setEspecialistas(newP.getEspecialistas());
+                 p.setEspecialidades(newP.getEspecialidades());
+                 p.setAsignaciones(newP.getAsignaciones());
+                 p.setRecursos(newP.getRecursos());
+                 p.setInstitucionesEducativas(newP.getInstitucionesEducativas());
+                 p.setHistoriaClinica(newP.getHistoriaClinica());
+                 p.setFonoAudiologia(newP.getFonoAudiologia());
+                 p.setPsicologiaClinica(newP.getPsicologiaClinica());
+                 p.setPsicologiaEducativa(newP.getPsicologiaEducativa());
+             } else {
+                 especialista.setPermisos(request.getPermisos());
+             }
+        }
 
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
@@ -143,7 +174,7 @@ public class EspecialistaService {
 
         return convertirADTO(saved);
     }
-
+    
     public void eliminarEspecialista(Integer id) {
         if (id == null)
             return;
@@ -185,6 +216,7 @@ public class EspecialistaService {
                 .sede(especialista.getSede() != null ? new SedeDTO(
                     especialista.getSede().getId(), especialista.getSede().getNombre()) : null)
                 .activo(especialista.getActivo())
+                .permisos(especialista.getPermisos())
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.ucacue.udipsai.modules.pasante.service;
 
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepository;
+import com.ucacue.udipsai.modules.especialidad.dto.EspecialidadDTO;
+import com.ucacue.udipsai.modules.especialidad.repository.EspecialidadRepository;
 import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepository;
 
 import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
@@ -9,6 +10,8 @@ import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
 import com.ucacue.udipsai.modules.pasante.repository.PasanteRepository;
+import com.ucacue.udipsai.modules.permisos.Permisos;
+import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,6 +123,14 @@ public class PasanteService {
         mapearRequestAEntidad(request, pasante);
         pasante.setActivo(true);
 
+        if (request.getPermisos() != null) {
+            pasante.setPermisos(request.getPermisos());
+        } else {
+            Permisos permisos = new Permisos();
+            permisos.setPasantes(true);
+            pasante.setPermisos(permisos);
+        }
+
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
             pasante.setFotoUrl(filename);
@@ -144,6 +155,27 @@ public class PasanteService {
 
         mapearRequestAEntidad(request, pasante);
 
+        if (request.getPermisos() != null) {
+            if (pasante.getPermisos() != null) {
+                Permisos p = pasante.getPermisos();
+                Permisos newP = request.getPermisos();
+                p.setPacientes(newP.getPacientes());
+                p.setPasantes(newP.getPasantes());
+                p.setSedes(newP.getSedes());
+                p.setEspecialistas(newP.getEspecialistas());
+                p.setEspecialidades(newP.getEspecialidades());
+                p.setAsignaciones(newP.getAsignaciones());
+                p.setRecursos(newP.getRecursos());
+                p.setInstitucionesEducativas(newP.getInstitucionesEducativas());
+                p.setHistoriaClinica(newP.getHistoriaClinica());
+                p.setFonoAudiologia(newP.getFonoAudiologia());
+                p.setPsicologiaClinica(newP.getPsicologiaClinica());
+                p.setPsicologiaEducativa(newP.getPsicologiaEducativa());
+            } else {
+                pasante.setPermisos(request.getPermisos());
+            }
+        }
+
         if (foto != null && !foto.isEmpty()) {
             String filename = storageService.store(foto);
             pasante.setFotoUrl(filename);
@@ -152,6 +184,7 @@ public class PasanteService {
 
         Pasante saved = pasanteRepository.save(pasante);
         log.info("Pasante actualizado exitosamente ID: {}", saved.getId());
+
         return convertirADTO(saved);
     }
 
@@ -233,9 +266,17 @@ public class PasanteService {
                 .fotoUrl(pasante.getFotoUrl())
                 .inicioPasantia(pasante.getInicioPasantia())
                 .finPasantia(pasante.getFinPasantia())
-                .especialista(pasante.getEspecialista() != null ? especialistaService.convertirADTO(pasante.getEspecialista())
+                .especialista(
+                        pasante.getEspecialista() != null ? especialistaService.convertirADTO(pasante.getEspecialista())
+                                : null)
+                .sede(pasante.getSede() != null ? new SedeDTO(
+                        pasante.getSede().getId(), pasante.getSede().getNombre())
+                        : null)
+                .especialidad(pasante.getEspecialidad() != null ? new EspecialidadDTO(
+                        pasante.getEspecialidad().getId(), pasante.getEspecialidad().getArea(), null)
                         : null)
                 .activo(pasante.getActivo())
+                .permisos(pasante.getPermisos())
                 .build();
     }
 }

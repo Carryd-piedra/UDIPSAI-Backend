@@ -1,4 +1,6 @@
-package com.ucacue.udipsai.modules.especialistas.dto;
+package com.ucacue.udipsai.modules.especialidad.dto;
+
+import com.ucacue.udipsai.modules.permisos.PermisosDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

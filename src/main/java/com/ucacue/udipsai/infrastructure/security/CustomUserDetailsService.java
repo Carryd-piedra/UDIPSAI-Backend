@@ -12,7 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,14 +29,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Especialista> especialista = especialistaRepository.findByCedula(username);
         if (especialista.isPresent()) {
-            return new User(especialista.get().getCedula(), especialista.get().getContrasenia(),
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_ESPECIALISTA")));
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_ESPECIALISTA"));
+            if (especialista.get().getPermisos() != null) {
+                authorities.addAll(especialista.get().getPermisos().getAuthorities());
+            }
+            return new User(especialista.get().getCedula(), especialista.get().getContrasenia(), authorities);
         }
 
         Optional<Pasante> pasante = pasanteRepository.findByCedula(username);
         if (pasante.isPresent()) {
-            return new User(pasante.get().getCedula(), pasante.get().getContrasenia(),
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_PASANTE")));
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_PASANTE"));
+             if (pasante.get().getPermisos() != null) {
+                authorities.addAll(pasante.get().getPermisos().getAuthorities());
+            }
+            return new User(pasante.get().getCedula(), pasante.get().getContrasenia(), authorities);
         }
 
         throw new UsernameNotFoundException("Usuario no encontrado con cédula: " + username);

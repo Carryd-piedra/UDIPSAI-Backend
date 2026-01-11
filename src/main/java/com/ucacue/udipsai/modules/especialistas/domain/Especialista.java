@@ -1,6 +1,8 @@
 package com.ucacue.udipsai.modules.especialistas.domain;
 
+import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;
+import com.ucacue.udipsai.modules.permisos.Permisos;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,4 +48,8 @@ public class Especialista {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "permisos_id")
+    private Permisos permisos;
 }

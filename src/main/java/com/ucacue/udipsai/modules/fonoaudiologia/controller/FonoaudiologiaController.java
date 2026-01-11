@@ -5,6 +5,7 @@ import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaRequest;
 import com.ucacue.udipsai.modules.fonoaudiologia.service.FonoaudiologiaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/fonoaudiologia")
-@CrossOrigin(origins = "*")
 @Slf4j
 public class FonoaudiologiaController {
 
@@ -20,12 +20,14 @@ public class FonoaudiologiaController {
     private FonoaudiologiaService fonoaudiologiaService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA')")
     public List<FonoaudiologiaDTO> listarFichasFonoaudiologia() {
         log.info("Petición GET para listar todas las fichas de fonoaudiología activas");
         return fonoaudiologiaService.listarFichasFonoaudiologia();
     }
 
     @GetMapping("/paciente/{pacienteId}")
+    @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA') and @asignacionSecurity.checkPasanteAcceso(#pacienteId)")
     public ResponseEntity<FonoaudiologiaDTO> obtenerFichaFonoaudiologiaPorPacienteId(@PathVariable Integer pacienteId) {
         log.info("Petición GET para obtener ficha de fonoaudiología del paciente ID: {}", pacienteId);
         FonoaudiologiaDTO ficha = fonoaudiologiaService.obtenerFichaFonoaudiologiaPorPacienteId(pacienteId);
@@ -37,6 +39,7 @@ public class FonoaudiologiaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
     public ResponseEntity<FonoaudiologiaDTO> guardarFichaFonoaudiologia(@RequestBody FonoaudiologiaRequest request) {
         log.info("Petición POST para guardar ficha de fonoaudiología para Paciente ID: {}", request.getPacienteId());
         try {
@@ -51,6 +54,7 @@ public class FonoaudiologiaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA')")
     public ResponseEntity<Void> eliminarFichaFonoaudiologia(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar ficha fonoaudiología ID: {}", id);
         fonoaudiologiaService.eliminarFichaFonoaudiologia(id);

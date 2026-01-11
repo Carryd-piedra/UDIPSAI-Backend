@@ -6,7 +6,6 @@ import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,17 +27,12 @@ public class SedeService {
         log.info("Consultando sedes activas paginadas");
         return sedeRepository.findByActivoTrue(pageable);
     }
-    
-    public List<Sede> listarSedesActivas() {
-        log.info("Consultando listas de sedes activas");
-        return sedeRepository.findByActivoTrue();
-    }
 
     public Optional<Sede> obtenerSedePorId(Integer id) {
         log.debug("Buscando sede con ID: {}", id);
         return sedeRepository.findById(id);
     }
-    
+
     public Page<Sede> filtrarSedes(SedeCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando sedes con criterios: {}", criteria);
         Specification<Sede> spec = (root, query, cb) -> {
@@ -86,7 +80,6 @@ public class SedeService {
                     sede.setActivo(false);
                     sedeRepository.save(sede);
                 },
-                () -> log.warn("Intento de eliminar sede inexistente ID: {}", id)
-        );
+                () -> log.warn("Intento de eliminar sede inexistente ID: {}", id));
     }
 }

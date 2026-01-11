@@ -3,6 +3,8 @@ package com.ucacue.udipsai.modules.pasante.dto;
 import lombok.Data;
 import java.time.LocalDate;
 
+import com.ucacue.udipsai.modules.permisos.Permisos;
+
 @Data
 public class PasanteRequest {
     private String cedula;
@@ -20,4 +22,5 @@ public class PasanteRequest {
     private Integer especialidadId;
     private Integer especialistaId;
     private String contrasenia;
+    private Permisos permisos;
 }

@@ -12,4 +12,5 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Long>, J
     List<Asignacion> findByActivoTrue();
     List<Asignacion> findByPasanteIdAndActivoTrue(Integer pasanteId);
     List<Asignacion> findByPacienteIdAndActivoTrue(Integer pacienteId);
+    boolean existsByPasanteIdAndPacienteIdAndActivoTrue(Integer pasanteId, Integer pacienteId);
 }

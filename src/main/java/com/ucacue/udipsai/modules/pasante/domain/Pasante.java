@@ -1,7 +1,9 @@
 package com.ucacue.udipsai.modules.pasante.domain;
 
-import com.ucacue.udipsai.modules.especialistas.domain.Especialidad;
+import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
 import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.permisos.Permisos;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -76,4 +78,8 @@ public class Pasante {
 
     @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "permisos_id")
+    private Permisos permisos;
 }

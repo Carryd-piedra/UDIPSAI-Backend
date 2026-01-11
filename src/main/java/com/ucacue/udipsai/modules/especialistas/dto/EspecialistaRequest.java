@@ -1,5 +1,6 @@
 package com.ucacue.udipsai.modules.especialistas.dto;
 
+import com.ucacue.udipsai.modules.permisos.Permisos;
 import lombok.Data;
 
 @Data
@@ -10,4 +11,5 @@ public class EspecialistaRequest {
     private Integer especialidadId;
     private Integer sedeId;
     private Boolean activo;
+    private Permisos permisos;
 }

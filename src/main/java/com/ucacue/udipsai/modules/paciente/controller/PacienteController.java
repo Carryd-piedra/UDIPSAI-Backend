@@ -2,29 +2,21 @@ package com.ucacue.udipsai.modules.paciente.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ucacue.udipsai.modules.paciente.dto.PacienteCriteriaDTO;
-import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
-import com.ucacue.udipsai.modules.paciente.dto.PacienteRequest;
-import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
+import com.ucacue.udipsai.modules.paciente.dto.*;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/pacientes")
-@CrossOrigin(origins = "*")
 @Slf4j
 public class PacienteController {
 
@@ -39,6 +31,7 @@ public class PacienteController {
 
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<Page<PacienteDTO>> listarPacientesActivos(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Petición GET para listar pacientes activos paginados");
@@ -46,6 +39,7 @@ public class PacienteController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<Page<PacienteDTO>> filtrarPacientes(
             PacienteCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -54,6 +48,7 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<PacienteDTO> obtenerPacientePorId(@PathVariable Integer id) {
         log.info("Petición GET para obtener paciente ID: {}", id);
         PacienteDTO dto = pacienteService.obtenerPacientePorId(id);
@@ -66,6 +61,7 @@ public class PacienteController {
 
     @GetMapping("/foto/{filename:.+}")
     @ResponseBody
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<Resource> obtenerFotoPaciente(@PathVariable String filename) {
         log.debug("Solicitando foto de paciente: {}", filename);
         Resource file = storageService.loadAsResource(filename);
@@ -79,6 +75,7 @@ public class PacienteController {
     }
 
     @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<?> crearPaciente(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -99,6 +96,7 @@ public class PacienteController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
     public ResponseEntity<?> actualizarPaciente(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
@@ -119,6 +117,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
     public ResponseEntity<?> eliminarPaciente(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar paciente ID: {}", id);
         try {
@@ -131,6 +130,7 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}/resumen-fichas")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
     public ResponseEntity<PacienteSummaryDTO> obtenerResumenFichas(@PathVariable Integer id) {
 
         log.info("Petición GET para obtener resumen de fichas del paciente ID: {}", id);

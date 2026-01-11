@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.especialistas.domain;
+package com.ucacue.udipsai.modules.especialidad.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,10 +19,6 @@ public class Especialidad {
     @Column(name = "area", nullable = false)
     private String area;
 
-    @ManyToOne
-    @JoinColumn(name = "permiso_id")
-    private Permisos permisos;
-    
     @Column(name = "activo")
     private Boolean activo = true;
 }

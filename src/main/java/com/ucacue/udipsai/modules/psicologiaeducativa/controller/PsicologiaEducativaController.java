@@ -5,6 +5,7 @@ import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaReq
 import com.ucacue.udipsai.modules.psicologiaeducativa.service.PsicologiaEducativaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/psicologia-educativa")
-@CrossOrigin(origins = "*")
 @Slf4j
 public class PsicologiaEducativaController {
 
@@ -20,12 +20,14 @@ public class PsicologiaEducativaController {
     private PsicologiaEducativaService service;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA')")
     public ResponseEntity<List<PsicologiaEducativaDTO>> listarFichasPsicologiaEducativa() {
         log.info("Petición GET para listar todas las fichas de psicología educativa activas");
         return ResponseEntity.ok(service.listarFichasPsicologiaEducativa());
     }
 
     @GetMapping("/paciente/{pacienteId}")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA') and @asignacionSecurity.checkPasanteAcceso(#pacienteId)")
     public ResponseEntity<PsicologiaEducativaDTO> obtenerFichaPsicologiaEducativaPorPacienteId(@PathVariable Integer pacienteId) {
         log.info("Petición GET para obtener ficha de psicología educativa por paciente ID: {}", pacienteId);
         PsicologiaEducativaDTO ficha = service.obtenerFichaPsicologiaEducativaPorPacienteId(pacienteId);
@@ -37,6 +39,7 @@ public class PsicologiaEducativaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
     public ResponseEntity<PsicologiaEducativaDTO> guardarFichaPsicologiaEducativa(@RequestBody PsicologiaEducativaRequest request) {
         log.info("Petición POST para guardar/actualizar ficha de psicología educativa para paciente ID: {}", request.getPacienteId());
         try {
@@ -48,6 +51,7 @@ public class PsicologiaEducativaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA')")
     public ResponseEntity<Void> eliminarFichaPsicologiaEducativa(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar ficha de psicología educativa ID: {}", id);
         service.eliminarFichaPsicologiaEducativa(id);
