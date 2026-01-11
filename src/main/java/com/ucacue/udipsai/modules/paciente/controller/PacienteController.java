@@ -75,7 +75,7 @@ public class PacienteController {
     }
 
     @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES_CREAR')")
     public ResponseEntity<?> crearPaciente(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -96,7 +96,7 @@ public class PacienteController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES_EDITAR') and @asignacionSecurity.checkPasanteAcceso(#id)")
     public ResponseEntity<?> actualizarPaciente(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
@@ -117,7 +117,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES_ELIMINAR') and @asignacionSecurity.checkPasanteAcceso(#id)")
     public ResponseEntity<?> eliminarPaciente(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar paciente ID: {}", id);
         try {

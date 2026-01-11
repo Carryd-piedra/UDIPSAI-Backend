@@ -63,27 +63,55 @@ public class HistoriaClinicaService {
     }
 
     @Transactional
-    public HistoriaClinicaDTO guardarHistoriaClinica(HistoriaClinicaRequest request, MultipartFile genogramaFile) {
-        log.info("Iniciando guardado de historia clínica para Paciente ID: {}", request.getPacienteId());
+    public HistoriaClinicaDTO crearHistoriaClinica(HistoriaClinicaRequest request, MultipartFile genogramaFile) {
+        log.info("Iniciando creación de historia clínica para Paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             log.error("El ID del paciente es requerido");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        HistoriaClinica historia = historiaClinicaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
-
-        if (historia == null) {
-            log.info("Creando nueva historia clínica para Paciente ID: {}", request.getPacienteId());
-            historia = new HistoriaClinica();
-            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                    .orElseThrow(() -> {
-                        log.error("Error al guardar historia: Paciente ID {} no encontrado", request.getPacienteId());
-                        return new RuntimeException("Paciente no encontrado");
-                    });
-            historia.setPaciente(paciente);
-        } else {
-            log.info("Actualizando historia clínica existente ID: {}", historia.getId());
+        
+        HistoriaClinica existing = historiaClinicaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        if (existing != null) {
+             throw new IllegalStateException("Ya existe una historia clínica para este paciente");
         }
 
+        HistoriaClinica historia = new HistoriaClinica();
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
+                .orElseThrow(() -> {
+                    log.error("Error al guardar historia: Paciente ID {} no encontrado", request.getPacienteId());
+                    return new RuntimeException("Paciente no encontrado");
+                });
+        historia.setPaciente(paciente);
+        historia.setActivo(true);
+        
+        mapRequestToEntity(request, historia);
+        handleGenograma(historia, genogramaFile);
+
+        HistoriaClinica saved = historiaClinicaRepository.save(historia);
+        log.info("Historia clínica creada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public HistoriaClinicaDTO actualizarHistoriaClinica(Integer id, HistoriaClinicaRequest request, MultipartFile genogramaFile) {
+        log.info("Iniciando actualización de historia clínica ID: {}", id);
+        
+        HistoriaClinica historia = historiaClinicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Historia clínica no encontrada"));
+                
+        if (!historia.getActivo()) {
+            throw new RuntimeException("No se puede editar una historia clínica inactiva");
+        }
+
+        mapRequestToEntity(request, historia);
+        handleGenograma(historia, genogramaFile);
+
+        HistoriaClinica saved = historiaClinicaRepository.save(historia);
+        log.info("Historia clínica actualizada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    private void mapRequestToEntity(HistoriaClinicaRequest request, HistoriaClinica historia) {
         if (request.getDatosFamiliares() != null)
             historia.setDatosFamiliares(request.getDatosFamiliares());
         if (request.getHistoriaPrenatal() != null)
@@ -98,18 +126,14 @@ public class HistoriaClinicaService {
             historia.setAlimentacion(request.getAlimentacion());
         if (request.getAntecedentesMedicos() != null)
             historia.setAntecedentesMedicos(request.getAntecedentesMedicos());
+    }
 
-        historia.setActivo(true);
-
+    private void handleGenograma(HistoriaClinica historia, MultipartFile genogramaFile) {
         if (genogramaFile != null && !genogramaFile.isEmpty()) {
             String filename = storageService.store(genogramaFile);
             log.info("Genograma almacenado: {}", filename);
             historia.setGenogramaUrl(filename);
         }
-
-        HistoriaClinica saved = historiaClinicaRepository.save(historia);
-        log.info("Historia clínica guardada exitosamente ID: {}", saved.getId());
-        return convertirADTO(saved);
     }
 
     public Resource cargarGenogramaComoRecurso(Integer pacienteId) {

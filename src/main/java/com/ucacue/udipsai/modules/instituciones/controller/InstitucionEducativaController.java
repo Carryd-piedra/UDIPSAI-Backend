@@ -1,5 +1,7 @@
 package com.ucacue.udipsai.modules.instituciones.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaCriteriaDTO;
 import com.ucacue.udipsai.modules.instituciones.service.InstitucionEducativaService;
 import com.ucacue.udipsai.modules.instituciones.domain.InstitucionEducativa;
@@ -26,12 +28,14 @@ public class InstitucionEducativaController {
     }
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS')")
     public ResponseEntity<Page<InstitucionEducativa>> listarInstitucionesActivas(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(institucionEducativaService.listarInstitucionesActivas(pageable));
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS')")
     public ResponseEntity<Page<InstitucionEducativa>> filtrarInstituciones(
             InstitucionEducativaCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -39,6 +43,7 @@ public class InstitucionEducativaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS')")
     public ResponseEntity<InstitucionEducativa> obtenerInstitucionPorId(@PathVariable Integer id) {
         log.info("Petición GET para obtener institución educativa ID: {}", id);
         Optional<InstitucionEducativa> institucionOpt = institucionEducativaService.obtenerInstitucionPorId(id);
@@ -50,6 +55,7 @@ public class InstitucionEducativaController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS_CREAR')")
     public ResponseEntity<InstitucionEducativa> crearInstitucion(@RequestBody InstitucionEducativa institucionEducativa) {
         log.info("Petición POST para crear institución educativa: {}", institucionEducativa.getNombre());
         try {
@@ -62,6 +68,7 @@ public class InstitucionEducativaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS_EDITAR')")
     public ResponseEntity<InstitucionEducativa> actualizarInstitucion(@PathVariable Integer id, @RequestBody InstitucionEducativa nuevaInstitucion) {
         log.info("Petición PUT para actualizar institución educativa ID: {}", id);
         try {
@@ -74,6 +81,7 @@ public class InstitucionEducativaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_INSTITUCIONES_EDUCATIVAS_ELIMINAR')")
     public ResponseEntity<Void> eliminarInstitucion(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar institución educativa ID: {}", id);
         institucionEducativaService.eliminarInstitucion(id);

@@ -1,5 +1,7 @@
 package com.ucacue.udipsai.modules.especialistas.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaRequest;
@@ -37,12 +39,14 @@ public class EspecialistaController {
     private ObjectMapper objectMapper;
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS')")
     public ResponseEntity<Page<EspecialistaDTO>> listarEspecialistasActivos(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(especialistaService.listarEspecialistasActivos(pageable));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS')")
     public ResponseEntity<EspecialistaDTO> obtenerEspecialistaPorId(@PathVariable Integer id) {
         EspecialistaDTO especialista = especialistaService.obtenerEspecialistaPorId(id);
         if (especialista != null) {
@@ -52,6 +56,7 @@ public class EspecialistaController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS')")
     public ResponseEntity<Page<EspecialistaDTO>> filtrarEspecialistas(
             EspecialistaCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -61,6 +66,7 @@ public class EspecialistaController {
 
     @GetMapping("/foto/{filename:.+}")
     @ResponseBody
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS')")
     public ResponseEntity<Resource> obtenerFotoEspecialista(@PathVariable String filename) {
         log.debug("Solicitud para obtener foto: {}", filename);
         Resource file = storageService.loadAsResource(filename);
@@ -74,6 +80,7 @@ public class EspecialistaController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS_CREAR')")
     public ResponseEntity<?> crearEspecialista(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -92,6 +99,7 @@ public class EspecialistaController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS_EDITAR')")
     public ResponseEntity<?> actualizarEspecialista(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
@@ -111,6 +119,7 @@ public class EspecialistaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS_ELIMINAR')")
     public ResponseEntity<Void> eliminarEspecialista(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar especialista ID: {}", id);
         especialistaService.eliminarEspecialista(id);

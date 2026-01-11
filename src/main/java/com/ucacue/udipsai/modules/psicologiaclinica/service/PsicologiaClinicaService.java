@@ -55,27 +55,53 @@ public class PsicologiaClinicaService {
     }
 
     @Transactional
-    public PsicologiaClinicaDTO guardarFichaPsicologiaClinica(PsicologiaClinicaRequest request) {
-        log.info("Iniciando guardado de ficha psicología clínica para paciente ID: {}", request.getPacienteId());
+    public PsicologiaClinicaDTO crearFichaPsicologiaClinica(PsicologiaClinicaRequest request) {
+        log.info("Iniciando creación de ficha psicología clínica para paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             log.error("ID de paciente nulo en request");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        PsicologiaClinica ficha = repository.findByPacienteIdAndActivo(request.getPacienteId(), true);
         
-        if (ficha == null) {
-            log.info("Creando nueva ficha para paciente ID: {}", request.getPacienteId());
-            ficha = new PsicologiaClinica();
-            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                .orElseThrow(() -> {
-                    log.error("Paciente ID {} no encontrado", request.getPacienteId());
-                    return new RuntimeException("Paciente no encontrado");
-                });
-            ficha.setPaciente(paciente);
-        } else {
-            log.info("Actualizando ficha existente ID: {}", ficha.getId());
+        PsicologiaClinica existing = repository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        if (existing != null) {
+            throw new IllegalStateException("Ya existe una ficha de psicología clínica para este paciente");
         }
 
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
+            .orElseThrow(() -> {
+                log.error("Paciente ID {} no encontrado", request.getPacienteId());
+                return new RuntimeException("Paciente no encontrado");
+            });
+
+        PsicologiaClinica ficha = new PsicologiaClinica();
+        ficha.setPaciente(paciente);
+        ficha.setActivo(true);
+        mapRequestToEntity(request, ficha);
+        
+        PsicologiaClinica saved = repository.save(ficha);
+        log.info("Ficha creada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public PsicologiaClinicaDTO actualizarFichaPsicologiaClinica(Integer id, PsicologiaClinicaRequest request) {
+        log.info("Iniciando actualización de ficha psicología clínica ID: {}", id);
+        
+        PsicologiaClinica ficha = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ficha no encontrada"));
+            
+        if (!ficha.getActivo()) {
+            throw new RuntimeException("No se puede editar una ficha inactiva");
+        }
+
+        mapRequestToEntity(request, ficha);
+        
+        PsicologiaClinica saved = repository.save(ficha);
+        log.info("Ficha actualizada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    private void mapRequestToEntity(PsicologiaClinicaRequest request, PsicologiaClinica ficha) {
         if (request.getAnamnesis() != null) ficha.setAnamnesis(request.getAnamnesis());
         if (request.getSuenio() != null) ficha.setSuenio(request.getSuenio());
         if (request.getConducta() != null) ficha.setConducta(request.getConducta());
@@ -85,11 +111,6 @@ public class PsicologiaClinicaService {
         if (request.getEvaluacionCognitiva() != null) ficha.setEvaluacionCognitiva(request.getEvaluacionCognitiva());
         if (request.getEvaluacionPensamiento() != null) ficha.setEvaluacionPensamiento(request.getEvaluacionPensamiento());
         if (request.getDiagnostico() != null) ficha.setDiagnostico(request.getDiagnostico());
-        
-        ficha.setActivo(true);
-        PsicologiaClinica saved = repository.save(ficha);
-        log.info("Ficha guardada exitosamente ID: {}", saved.getId());
-        return convertirADTO(saved);
     }
 
     public void eliminarFichaPsicologiaClinica(Integer id) {

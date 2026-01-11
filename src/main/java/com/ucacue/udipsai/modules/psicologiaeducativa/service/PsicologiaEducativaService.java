@@ -54,28 +54,53 @@ public class PsicologiaEducativaService {
     }
 
     @Transactional
-    public PsicologiaEducativaDTO guardarFichaPsicologiaEducativa(PsicologiaEducativaRequest request) {
-        log.info("Iniciando guardado de ficha psicología educativa para paciente ID: {}", request.getPacienteId());
+    public PsicologiaEducativaDTO crearFichaPsicologiaEducativa(PsicologiaEducativaRequest request) {
+        log.info("Iniciando creación de ficha psicología educativa para paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             log.error("El ID del paciente es requerido");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        PsicologiaEducativa ficha = psicologiaEducativaRepository.findByPacienteIdAndActivo(request.getPacienteId(),
-                true);
-
-        if (ficha == null) {
-            log.info("Creando nueva ficha psicología educativa para paciente ID: {}", request.getPacienteId());
-            ficha = new PsicologiaEducativa();
-            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                    .orElseThrow(() -> {
-                        log.error("Paciente ID {} no encontrado", request.getPacienteId());
-                        throw new RuntimeException("Paciente no encontrado");
-                    });
-            ficha.setPaciente(paciente);
-        } else {
-            log.info("Actualizando ficha psicología educativa existente ID: {}", ficha.getId());
+        
+        PsicologiaEducativa existing = psicologiaEducativaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        if (existing != null) {
+             throw new IllegalStateException("Ya existe una ficha de psicología educativa para este paciente");
         }
 
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
+                .orElseThrow(() -> {
+                    log.error("Paciente ID {} no encontrado", request.getPacienteId());
+                    throw new RuntimeException("Paciente no encontrado");
+                });
+
+        PsicologiaEducativa ficha = new PsicologiaEducativa();
+        ficha.setPaciente(paciente);
+        ficha.setActivo(true);
+        mapRequestToEntity(request, ficha);
+
+        PsicologiaEducativa saved = psicologiaEducativaRepository.save(ficha);
+        log.info("Ficha psicología educativa creada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public PsicologiaEducativaDTO actualizarFichaPsicologiaEducativa(Integer id, PsicologiaEducativaRequest request) {
+        log.info("Iniciando actualización de ficha psicología educativa ID: {}", id);
+        
+        PsicologiaEducativa ficha = psicologiaEducativaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ficha no encontrada"));
+                
+        if (!ficha.getActivo()) {
+            throw new RuntimeException("No se puede editar una ficha inactiva");
+        }
+
+        mapRequestToEntity(request, ficha);
+
+        PsicologiaEducativa saved = psicologiaEducativaRepository.save(ficha);
+        log.info("Ficha psicología educativa actualizada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    private void mapRequestToEntity(PsicologiaEducativaRequest request, PsicologiaEducativa ficha) {
         if (request.getHistoriaEscolar() != null)
             ficha.setHistoriaEscolar(request.getHistoriaEscolar());
         if (request.getDesarrollo() != null)
@@ -84,11 +109,6 @@ public class PsicologiaEducativaService {
             ficha.setAdaptacion(request.getAdaptacion());
         if (request.getEstadoGeneral() != null)
             ficha.setEstadoGeneral(request.getEstadoGeneral());
-
-        ficha.setActivo(true);
-        PsicologiaEducativa saved = psicologiaEducativaRepository.save(ficha);
-        log.info("Ficha psicología educativa guardada exitosamente ID: {}", saved.getId());
-        return convertirADTO(saved);
     }
 
     public void eliminarFichaPsicologiaEducativa(Integer id) {

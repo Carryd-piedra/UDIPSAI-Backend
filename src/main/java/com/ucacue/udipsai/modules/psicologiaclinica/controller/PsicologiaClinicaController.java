@@ -39,19 +39,34 @@ public class PsicologiaClinicaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
-    public ResponseEntity<PsicologiaClinicaDTO> guardarFichaPsicologiaClinica(@RequestBody PsicologiaClinicaRequest request) {
-        log.info("Petición POST para guardar/actualizar ficha de psicología clínica para paciente ID: {}", request.getPacienteId());
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA_CREAR') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
+    public ResponseEntity<PsicologiaClinicaDTO> crearFichaPsicologiaClinica(@RequestBody PsicologiaClinicaRequest request) {
+        log.info("Petición POST para crear ficha de psicología clínica para paciente ID: {}", request.getPacienteId());
         try {
-            return ResponseEntity.ok(service.guardarFichaPsicologiaClinica(request));
+            return ResponseEntity.ok(service.crearFichaPsicologiaClinica(request));
+        } catch (IllegalStateException e) {
+             log.warn("Intento de crear ficha duplicada: {}", e.getMessage());
+             return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            log.error("Error al guardar ficha de psicología clínica: {}", e.getMessage());
+            log.error("Error al crear ficha de psicología clínica: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA_EDITAR')")
+    public ResponseEntity<PsicologiaClinicaDTO> actualizarFichaPsicologiaClinica(@PathVariable Integer id, @RequestBody PsicologiaClinicaRequest request) {
+        log.info("Petición PUT para actualizar ficha de psicología clínica ID: {}", id);
+        try {
+             return ResponseEntity.ok(service.actualizarFichaPsicologiaClinica(id, request));
+        } catch (Exception e) {
+            log.error("Error al actualizar ficha de psicología clínica: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA')")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA_ELIMINAR')")
     public ResponseEntity<Void> eliminarFichaPsicologiaClinica(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar ficha de psicología clínica ID: {}", id);
         service.eliminarFichaPsicologiaClinica(id);

@@ -46,30 +46,79 @@ public class HistoriaClinicaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PERM_HISTORIA_CLINICA')")
-    public ResponseEntity<HistoriaClinicaDTO> guardarHistoriaClinica(
+    public ResponseEntity<HistoriaClinicaDTO> crearHistoriaClinica(
             @RequestParam("data") String data,
             @RequestParam(value = "genograma", required = false) MultipartFile genograma) throws IOException {
         
-        log.info("Petición POST para guardar historia clínica. Data: {}", data);
+        log.info("Petición POST para crear historia clínica.");
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules(); 
             HistoriaClinicaRequest request = mapper.readValue(data, HistoriaClinicaRequest.class);
             
-            // Manual Security Check due to Multipart
+            // Manual Security Checks
             if (!asignacionSecurity.checkPasanteAcceso(request.getPacienteId())) {
-                 log.warn("Acceso denegado al guardar historia clínica para paciente ID: {}", request.getPacienteId());
+                 log.warn("Acceso denegado al crear historia clínica para paciente ID: {}", request.getPacienteId());
                  return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
             }
 
-            HistoriaClinicaDTO saved = historiaClinicaService.guardarHistoriaClinica(request, genograma);
-            return ResponseEntity.ok(saved);
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            boolean canCreate = auth.getAuthorities().contains(new org.springframework.security.core.authority.SimpleGrantedAuthority("PERM_HISTORIA_CLINICA_CREAR"));
+
+            if (!canCreate) {
+                log.warn("User {} does not have PERM_HISTORIA_CLINICA_CREAR", auth.getName());
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
+            }
+
+            return ResponseEntity.ok(historiaClinicaService.crearHistoriaClinica(request, genograma));
+        } catch (IllegalStateException e) {
+             log.warn("Ficha duplicada: {}", e.getMessage());
+             return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT).build();
         } catch (IOException e) {
-            log.error("Error al procesar JSON o Archivo en guardado de historia clínica: {}", e.getMessage());
+            log.error("Error I/O: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Error al guardar historia clínica: {}", e.getMessage());
+            log.error("Error al crear historia clínica: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<HistoriaClinicaDTO> actualizarHistoriaClinica(
+            @PathVariable Integer id,
+            @RequestParam("data") String data,
+            @RequestParam(value = "genograma", required = false) MultipartFile genograma) throws IOException {
+        
+        log.info("Petición PUT para actualizar historia clínica ID: {}", id);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules(); 
+            HistoriaClinicaRequest request = mapper.readValue(data, HistoriaClinicaRequest.class);
+            
+            // Manual Security Checks (Need Paciente ID for Pasante check)
+            // Even if request body has pacienteId, we should verify it matches the entity or just trust the body 
+            // and verify Pasante access to THAT patient.
+            if (request.getPacienteId() != null) {
+                if (!asignacionSecurity.checkPasanteAcceso(request.getPacienteId())) {
+                     log.warn("Acceso denegado (Pasante) para paciente ID: {}", request.getPacienteId());
+                     return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
+                }
+            }
+
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            boolean canEdit = auth.getAuthorities().contains(new org.springframework.security.core.authority.SimpleGrantedAuthority("PERM_HISTORIA_CLINICA_EDITAR"));
+
+            if (!canEdit) {
+                 log.warn("User {} does not have PERM_HISTORIA_CLINICA_EDITAR", auth.getName());
+                 return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
+            }
+
+            return ResponseEntity.ok(historiaClinicaService.actualizarHistoriaClinica(id, request, genograma));
+        } catch (IOException e) {
+            log.error("Error I/O: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al actualizar historia clínica: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
@@ -89,7 +138,7 @@ public class HistoriaClinicaController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_HISTORIA_CLINICA')")
+    @PreAuthorize("hasAuthority('PERM_HISTORIA_CLINICA_ELIMINAR')")
     public ResponseEntity<Void> eliminarHistoriaClinica(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar historia clínica ID: {}", id);
         historiaClinicaService.eliminarHistoriaClinica(id);

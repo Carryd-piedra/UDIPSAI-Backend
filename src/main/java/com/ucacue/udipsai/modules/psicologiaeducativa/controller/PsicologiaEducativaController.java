@@ -39,19 +39,34 @@ public class PsicologiaEducativaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
-    public ResponseEntity<PsicologiaEducativaDTO> guardarFichaPsicologiaEducativa(@RequestBody PsicologiaEducativaRequest request) {
-        log.info("Petición POST para guardar/actualizar ficha de psicología educativa para paciente ID: {}", request.getPacienteId());
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA_CREAR') and @asignacionSecurity.checkPasanteAcceso(#request.pacienteId)")
+    public ResponseEntity<PsicologiaEducativaDTO> crearFichaPsicologiaEducativa(@RequestBody PsicologiaEducativaRequest request) {
+        log.info("Petición POST para crear ficha de psicología educativa para paciente ID: {}", request.getPacienteId());
         try {
-            return ResponseEntity.ok(service.guardarFichaPsicologiaEducativa(request));
+            return ResponseEntity.ok(service.crearFichaPsicologiaEducativa(request));
+        } catch (IllegalStateException e) {
+             log.warn("Intento de crear ficha duplicada: {}", e.getMessage());
+             return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            log.error("Error al guardar ficha de psicología educativa: {}", e.getMessage());
+            log.error("Error al crear ficha de psicología educativa: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA_EDITAR')")
+    public ResponseEntity<PsicologiaEducativaDTO> actualizarFichaPsicologiaEducativa(@PathVariable Integer id, @RequestBody PsicologiaEducativaRequest request) {
+        log.info("Petición PUT para actualizar ficha de psicología educativa ID: {}", id);
+        try {
+            return ResponseEntity.ok(service.actualizarFichaPsicologiaEducativa(id, request));
+        } catch (Exception e) {
+            log.error("Error al actualizar ficha de psicología educativa: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA')")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA_ELIMINAR')")
     public ResponseEntity<Void> eliminarFichaPsicologiaEducativa(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar ficha de psicología educativa ID: {}", id);
         service.eliminarFichaPsicologiaEducativa(id);

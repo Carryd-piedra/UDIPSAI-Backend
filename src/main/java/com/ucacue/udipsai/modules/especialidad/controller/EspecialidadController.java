@@ -1,5 +1,7 @@
 package com.ucacue.udipsai.modules.especialidad.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
 import com.ucacue.udipsai.modules.especialidad.dto.EspecialidadCriteriaDTO;
 import com.ucacue.udipsai.modules.especialidad.service.EspecialidadService;
@@ -23,12 +25,14 @@ public class EspecialidadController {
     }
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES')")
     public ResponseEntity<Page<Especialidad>> listarEspecialidadesActivas(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(especialidadService.listarEspecialidadesActivas(pageable));
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES')")
     public ResponseEntity<Page<Especialidad>> filtrarEspecialidades(
             EspecialidadCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -36,6 +40,7 @@ public class EspecialidadController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES')")
     public ResponseEntity<Especialidad> obtenerPorId(@PathVariable Integer id) {
         return especialidadService.obtenerEspecialidadPorId(id)
                 .map(ResponseEntity::ok)
@@ -46,11 +51,13 @@ public class EspecialidadController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES_CREAR')")
     public ResponseEntity<Especialidad> crearEspecialidad(@RequestBody Especialidad especialidad) {
         return ResponseEntity.ok(especialidadService.crearEspecialidad(especialidad));
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES_EDITAR')")
     public ResponseEntity<Especialidad> actualizarEspecialidad(@PathVariable Integer id, @RequestBody Especialidad especialidad) {
         try {
             return ResponseEntity.ok(especialidadService.actualizarEspecialidad(id, especialidad));
@@ -60,6 +67,7 @@ public class EspecialidadController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALIDADES_ELIMINAR')")
     public ResponseEntity<Void> eliminarEspecialidad(@PathVariable Integer id) {
         especialidadService.eliminarEspecialidad(id);
         return ResponseEntity.noContent().build();

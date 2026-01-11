@@ -55,37 +55,55 @@ public class FonoaudiologiaService {
     }
 
     @Transactional
-    public FonoaudiologiaDTO guardarFichaFonoaudiologia(FonoaudiologiaRequest request) {
-        log.info("Iniciando guardado de ficha fonoaudiología para Paciente ID: {}", request.getPacienteId());
+    public FonoaudiologiaDTO crearFichaFonoaudiologia(FonoaudiologiaRequest request) {
+        log.info("Iniciando creación de ficha fonoaudiología para Paciente ID: {}", request.getPacienteId());
         if (request.getPacienteId() == null) {
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        Fonoaudiologia ficha = fonoaudiologiaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
         
-        if (ficha == null) {
-            log.info("Creando nueva ficha de fonoaudiología para Paciente ID: {}", request.getPacienteId());
-            ficha = new Fonoaudiologia();
-            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                .orElseThrow(() -> {
-                    log.error("Error al guardar ficha: Paciente ID {} no encontrado", request.getPacienteId());
-                    return new RuntimeException("Paciente no encontrado");
-                });
-            ficha.setPaciente(paciente);
-        } else {
-             log.info("Actualizando ficha de fonoaudiología existente ID: {}", ficha.getId());
+        Fonoaudiologia existing = fonoaudiologiaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+        if (existing != null) {
+            throw new IllegalStateException("Ya existe una ficha de fonoaudiología para este paciente");
         }
 
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
+            .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+        Fonoaudiologia ficha = new Fonoaudiologia();
+        ficha.setPaciente(paciente);
+        ficha.setActivo(true);
+        
+        mapRequestToEntity(request, ficha);
+        
+        Fonoaudiologia saved = fonoaudiologiaRepository.save(ficha);
+        log.info("Ficha de fonoaudiología creada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    @Transactional
+    public FonoaudiologiaDTO actualizarFichaFonoaudiologia(Integer id, FonoaudiologiaRequest request) {
+        log.info("Iniciando actualización de ficha fonoaudiología ID: {}", id);
+        Fonoaudiologia ficha = fonoaudiologiaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ficha no encontrada"));
+
+        if (!ficha.getActivo()) {
+             throw new RuntimeException("No se puede editar una ficha inactiva");
+        }
+
+        mapRequestToEntity(request, ficha);
+        
+        Fonoaudiologia saved = fonoaudiologiaRepository.save(ficha);
+        log.info("Ficha de fonoaudiología actualizada exitosamente ID: {}", saved.getId());
+        return convertirADTO(saved);
+    }
+
+    private void mapRequestToEntity(FonoaudiologiaRequest request, Fonoaudiologia ficha) {
         if (request.getHabla() != null) ficha.setHabla(request.getHabla());
         if (request.getAudicion() != null) ficha.setAudicion(request.getAudicion());
         if (request.getFonacion() != null) ficha.setFonacion(request.getFonacion());
         if (request.getHistoriaAuditiva() != null) ficha.setHistoriaAuditiva(request.getHistoriaAuditiva());
         if (request.getVestibular() != null) ficha.setVestibular(request.getVestibular());
         if (request.getOtoscopia() != null) ficha.setOtoscopia(request.getOtoscopia());
-        
-        ficha.setActivo(true);
-        Fonoaudiologia saved = fonoaudiologiaRepository.save(ficha);
-        log.info("Ficha de fonoaudiología guardada exitosamente ID: {}", saved.getId());
-        return convertirADTO(saved);
     }
 
     public void eliminarFichaFonoaudiologia(Integer id) {

@@ -1,5 +1,7 @@
 package com.ucacue.udipsai.modules.sedes.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.ucacue.udipsai.modules.sedes.dto.SedeCriteriaDTO;
 import com.ucacue.udipsai.modules.sedes.service.SedeService;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
@@ -25,12 +27,14 @@ public class SedeController {
     }
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_SEDES')")
     public ResponseEntity<Page<Sede>> listarSedesActivas(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(sedeService.listarSedesActivas(pageable));
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_SEDES')")
     public ResponseEntity<Page<Sede>> filtrarSedes(
             SedeCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -38,6 +42,7 @@ public class SedeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_SEDES')")
     public ResponseEntity<Sede> obtenerSedePorId(@PathVariable Integer id) {
         return sedeService.obtenerSedePorId(id)
                 .map(ResponseEntity::ok)
@@ -48,12 +53,14 @@ public class SedeController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('PERM_SEDES_CREAR')")
     public ResponseEntity<Sede> crearSede(@RequestBody Sede request) {
         Sede nuevaSede = sedeService.crearSede(request);
         return new ResponseEntity<>(nuevaSede, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_SEDES_EDITAR')")
     public ResponseEntity<Sede> actualizarSede(@PathVariable Integer id, @RequestBody Sede nuevaSede) {
         try {
             return ResponseEntity.ok(sedeService.actualizarSede(id, nuevaSede));
@@ -63,6 +70,7 @@ public class SedeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_SEDES_ELIMINAR')")
     public ResponseEntity<Void> eliminarSede(@PathVariable Integer id) {
         log.info("Petición DELETE para desactivar sede ID: {}", id);
         sedeService.eliminarSede(id);

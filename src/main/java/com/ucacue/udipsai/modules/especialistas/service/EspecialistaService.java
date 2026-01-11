@@ -144,20 +144,7 @@ public class EspecialistaService {
         
         if (request.getPermisos() != null) {
              if (especialista.getPermisos() != null) {
-                 Permisos p = especialista.getPermisos();
-                 Permisos newP = request.getPermisos();
-                 p.setPacientes(newP.getPacientes());
-                 p.setPasantes(newP.getPasantes());
-                 p.setSedes(newP.getSedes());
-                 p.setEspecialistas(newP.getEspecialistas());
-                 p.setEspecialidades(newP.getEspecialidades());
-                 p.setAsignaciones(newP.getAsignaciones());
-                 p.setRecursos(newP.getRecursos());
-                 p.setInstitucionesEducativas(newP.getInstitucionesEducativas());
-                 p.setHistoriaClinica(newP.getHistoriaClinica());
-                 p.setFonoAudiologia(newP.getFonoAudiologia());
-                 p.setPsicologiaClinica(newP.getPsicologiaClinica());
-                 p.setPsicologiaEducativa(newP.getPsicologiaEducativa());
+                 especialista.getPermisos().updateFrom(request.getPermisos());
              } else {
                  especialista.setPermisos(request.getPermisos());
              }

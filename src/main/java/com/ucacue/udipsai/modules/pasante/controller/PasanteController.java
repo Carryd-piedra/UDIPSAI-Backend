@@ -1,5 +1,7 @@
 package com.ucacue.udipsai.modules.pasante.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
@@ -38,12 +40,14 @@ public class PasanteController {
     private ObjectMapper objectMapper;
 
     @GetMapping("/activos")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
     public ResponseEntity<Page<PasanteDTO>> listarPasantesActivos(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(pasanteService.listarPasantesActivos(pageable));
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
     public ResponseEntity<Page<PasanteDTO>> filtrarPasantes(
             PasanteCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -51,6 +55,7 @@ public class PasanteController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
     public ResponseEntity<PasanteDTO> obtenerPasantePorId(@PathVariable Integer id) {
         PasanteDTO pasante = pasanteService.obtenerPasantePorId(id);
         if (pasante != null) {
@@ -60,6 +65,7 @@ public class PasanteController {
     }
 
     @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
     public ResponseEntity<List<PasanteDTO>> buscarPasantes(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer especialistaId) {
@@ -68,6 +74,7 @@ public class PasanteController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_PASANTES_CREAR')")
     public ResponseEntity<?> crearPasante(
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -86,6 +93,7 @@ public class PasanteController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_PASANTES_EDITAR')")
     public ResponseEntity<?> actualizarPasante(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
@@ -105,6 +113,7 @@ public class PasanteController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PASANTES_ELIMINAR')")
     public ResponseEntity<Void> eliminarPasante(@PathVariable Integer id) {
         log.info("Petición DELETE para eliminar pasante ID: {}", id);
         pasanteService.eliminarPasante(id);
