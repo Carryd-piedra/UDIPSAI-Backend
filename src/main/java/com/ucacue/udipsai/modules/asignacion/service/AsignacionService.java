@@ -1,10 +1,10 @@
 package com.ucacue.udipsai.modules.asignacion;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;
-import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepository;
 import com.ucacue.udipsai.modules.pasante.service.PasanteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ public class AsignacionService {
     private AsignacionRepositorio asignacionRepositorio;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
-    private PasanteRepositorio pasanteRepositorio;
+    private PasanteRepository pasanteRepository;
 
     @Autowired
     private PacienteService pacienteService;
@@ -50,12 +50,12 @@ public class AsignacionService {
             throw new IllegalArgumentException("Pasante ID requerido");
         }
 
-        Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
+        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
                 .orElseThrow(() -> {
                     log.error("Error al crear asignación: Paciente con ID {} no encontrado", request.getPacienteId());
                     return new RuntimeException("Paciente no encontrado");
                 });
-        Pasante pasante = pasanteRepositorio.findById(request.getPasanteId())
+        Pasante pasante = pasanteRepository.findById(request.getPasanteId())
                 .orElseThrow(() -> {
                     log.error("Error al crear asignación: Pasante con ID {} no encontrado", request.getPasanteId());
                     return new RuntimeException("Pasante no encontrado");
