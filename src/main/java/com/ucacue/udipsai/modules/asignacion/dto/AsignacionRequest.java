@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.asignacion;
+package com.ucacue.udipsai.modules.asignacion.dto;
 
 import lombok.Data;
 

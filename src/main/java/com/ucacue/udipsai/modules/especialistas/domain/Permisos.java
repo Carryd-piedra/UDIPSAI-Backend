@@ -16,7 +16,26 @@ public class Permisos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "pacientes")
+    private Boolean pacientes = false;
+
+    @Column(name = "pasantes")
+    private Boolean pasantes = false;
+    
+    @Column(name = "sedes")
+    private Boolean sedes = false;
+
+    @Column(name = "especialistas")
     private Boolean especialistas = false;
+
+    @Column(name = "especialidades")
+    private Boolean especialidades = false;
+
+    @Column(name = "asignaciones")
+    private Boolean asignaciones = false;
+    
+    @Column(name = "recursos")
+    private Boolean recursos = false;
     
     @Column(name = "instituciones_educativas")
     private Boolean institucionesEducativas = false;
@@ -32,8 +51,4 @@ public class Permisos {
     
     @Column(name = "psicologia_educativa")
     private Boolean psicologiaEducativa = false;
-    
-    private Boolean pacientes = false;
-    
-    private Boolean sede = false;
 }

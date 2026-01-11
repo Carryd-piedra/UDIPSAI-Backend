@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SedeRepositorio extends JpaRepository<Sede, Integer>, JpaSpecificationExecutor<Sede> {
+public interface SedeRepository extends JpaRepository<Sede, Integer>, JpaSpecificationExecutor<Sede> {
     List<Sede> findByActivoTrue();
     Page<Sede> findByActivoTrue(Pageable pageable);
     Optional<Sede> findByNombre(String nombre);

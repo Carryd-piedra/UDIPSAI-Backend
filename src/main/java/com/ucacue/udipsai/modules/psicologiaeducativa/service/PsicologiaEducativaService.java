@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.psicologiaeducativa.service;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaRequest;
 import com.ucacue.udipsai.modules.psicologiaeducativa.domain.PsicologiaEducativa;
@@ -23,7 +23,7 @@ public class PsicologiaEducativaService {
     private PsicologiaEducativaRepository psicologiaEducativaRepository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
     private PacienteService pacienteService;
@@ -66,7 +66,7 @@ public class PsicologiaEducativaService {
         if (ficha == null) {
             log.info("Creando nueva ficha psicología educativa para paciente ID: {}", request.getPacienteId());
             ficha = new PsicologiaEducativa();
-            Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
+            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
                     .orElseThrow(() -> {
                         log.error("Paciente ID {} no encontrado", request.getPacienteId());
                         throw new RuntimeException("Paciente no encontrado");

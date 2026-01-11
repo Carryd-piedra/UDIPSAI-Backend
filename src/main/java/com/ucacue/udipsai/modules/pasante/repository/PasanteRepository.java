@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PasanteRepositorio extends JpaRepository<Pasante, Integer>, JpaSpecificationExecutor<Pasante> {
+public interface PasanteRepository extends JpaRepository<Pasante, Integer>, JpaSpecificationExecutor<Pasante> {
     Optional<Pasante> findByCedula(String cedula);
     boolean existsByCedula(String cedula);
     List<Pasante> findByActivoTrue();

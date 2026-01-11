@@ -39,18 +39,15 @@ public class EspecialistaController {
     @GetMapping("/activos")
     public ResponseEntity<Page<EspecialistaDTO>> listarEspecialistasActivos(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para listar todos los especialistas activos paginados");
         return ResponseEntity.ok(especialistaService.listarEspecialistasActivos(pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EspecialistaDTO> obtenerEspecialistaPorId(@PathVariable Integer id) {
-        log.info("Petición GET para obtener especialista por ID: {}", id);
         EspecialistaDTO especialista = especialistaService.obtenerEspecialistaPorId(id);
         if (especialista != null) {
             return ResponseEntity.ok(especialista);
         }
-        log.warn("Especialista ID {} no encontrado", id);
         return ResponseEntity.notFound().build();
     }
 
@@ -58,7 +55,6 @@ public class EspecialistaController {
     public ResponseEntity<Page<EspecialistaDTO>> filtrarEspecialistas(
             EspecialistaCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para filtrar especialistas. Criteria: {}", criteria);
         return ResponseEntity.ok(especialistaService.filtrarEspecialistas(criteria, pageable));
     }
 

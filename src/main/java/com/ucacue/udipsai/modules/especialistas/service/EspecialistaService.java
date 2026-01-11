@@ -5,10 +5,10 @@ import com.ucacue.udipsai.modules.especialistas.dto.EspecialidadDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaCriteriaDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaDTO;
 import com.ucacue.udipsai.modules.especialistas.dto.EspecialistaRequest;
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepositorio;
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepository;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepository;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
-import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
+import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,35 +33,30 @@ public class EspecialistaService {
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Autowired
-    private EspecialistaRepositorio especialistaRepositorio;
+    private EspecialistaRepository especialistaRepository;
 
     @Autowired
-    private EspecialidadRepositorio especialidadRepositorio;
+    private EspecialidadRepository especialidadRepository;
 
     @Autowired
-    private SedeRepositorio sedeRepositorio;
+    private SedeRepository sedeRepository;
 
     @Autowired
     private StorageService storageService;
 
     @Transactional(readOnly = true)
     public Page<EspecialistaDTO> listarEspecialistasActivos(Pageable pageable) {
-        log.info("Consultando todos los especialistas activos paginados");
-        return especialistaRepositorio.findByActivoTrue(pageable)
+        return especialistaRepository.findByActivoTrue(pageable)
                 .map(this::convertirADTO);
     }
 
     @Transactional(readOnly = true)
     public EspecialistaDTO obtenerEspecialistaPorId(Integer id) {
-        log.debug("Buscando especialista ID: {}", id);
         if (id == null)
             return null;
-        return especialistaRepositorio.findById(id)
+        return especialistaRepository.findById(id)
                 .map(this::convertirADTO)
-                .orElseThrow(() -> {
-                    log.warn("Especialista ID {} no encontrado", id);
-                    return new RuntimeException("Especialista no encontrado");
-                });
+                .orElseThrow(() -> new RuntimeException("Especialista con ID " + id + " no encontrado"));
     }
 
     @Transactional(readOnly = true)
@@ -94,13 +89,13 @@ public class EspecialistaService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return especialistaRepositorio.findAll(spec, pageable).map(this::convertirADTO);
+        return especialistaRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional
     public EspecialistaDTO crearEspecialista(EspecialistaRequest request, MultipartFile foto) {
         log.info("Iniciando creación de especialista. Cédula: {}", request.getCedula());
-        if (especialistaRepositorio.existsByCedula(request.getCedula())) {
+        if (especialistaRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un especialista con la cédula: {}", request.getCedula());
             throw new RuntimeException("Ya existe un especialista con la cédula: " + request.getCedula());
         }
@@ -119,7 +114,7 @@ public class EspecialistaService {
             throw new RuntimeException("La contraseña es obligatoria");
         }
 
-        Especialista saved = especialistaRepositorio.save(especialista);
+        Especialista saved = especialistaRepository.save(especialista);
         log.info("Especialista creado exitosamente ID: {}", saved.getId());
         return convertirADTO(saved);
     }
@@ -129,7 +124,7 @@ public class EspecialistaService {
         log.info("Iniciando actualización de especialista ID: {}", id);
         if (id == null)
             throw new IllegalArgumentException("ID requerido para actualizar");
-        Especialista especialista = especialistaRepositorio.findById(id)
+        Especialista especialista = especialistaRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Error al actualizar: Especialista no encontrado ID: {}", id);
                     return new RuntimeException("Especialista no encontrado");
@@ -143,8 +138,8 @@ public class EspecialistaService {
             log.info("Foto guardada para especialista ID: {}", id);
         }
 
-        Especialista saved = especialistaRepositorio.save(especialista);
-        log.info("Especialista actualizado exitosamente ID: {}", saved.getId());
+        Especialista saved = especialistaRepository.save(especialista);
+        log.info("Especialista actualizado exitosamente con cédula: {}", saved.getCedula());
 
         return convertirADTO(saved);
     }
@@ -152,10 +147,10 @@ public class EspecialistaService {
     public void eliminarEspecialista(Integer id) {
         if (id == null)
             return;
-        especialistaRepositorio.findById(id).ifPresentOrElse(e -> {
+        especialistaRepository.findById(id).ifPresentOrElse(e -> {
             log.info("Desactivando especialista ID: {}", id);
             e.setActivo(false);
-            especialistaRepositorio.save(e);
+            especialistaRepository.save(e);
         }, () -> log.warn("Intento de eliminar especialista inexistente ID: {}", id));
     }
 
@@ -167,11 +162,11 @@ public class EspecialistaService {
         }
 
         if (request.getEspecialidadId() != null) {
-            especialista.setEspecialidad(especialidadRepositorio.findById(request.getEspecialidadId()).orElse(null));
+            especialista.setEspecialidad(especialidadRepository.findById(request.getEspecialidadId()).orElse(null));
         }
 
         if (request.getSedeId() != null) {
-            especialista.setSede(sedeRepositorio.findById(request.getSedeId()).orElse(null));
+            especialista.setSede(sedeRepository.findById(request.getSedeId()).orElse(null));
         }
 
         if (request.getActivo() != null) {

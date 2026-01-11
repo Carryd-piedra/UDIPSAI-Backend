@@ -1,15 +1,15 @@
 package com.ucacue.udipsai.modules.paciente.service;
 
 import com.ucacue.udipsai.modules.instituciones.domain.InstitucionEducativa;
-import com.ucacue.udipsai.modules.instituciones.repository.InstitucionEducativaRepositorio;
+import com.ucacue.udipsai.modules.instituciones.repository.InstitucionEducativaRepository;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteRequest;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteCriteriaDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
-import com.ucacue.udipsai.modules.sedes.repository.SedeRepositorio;
+import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +42,13 @@ import java.util.stream.Collectors;
 public class PacienteService {
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
-    private InstitucionEducativaRepositorio institucionEducativaRepositorio;
+    private InstitucionEducativaRepository institucionEducativaRepository;
 
     @Autowired
-    private SedeRepositorio sedeRepositorio;
+    private SedeRepository sedeRepository;
 
     @Autowired
     private StorageService storageService;
@@ -67,20 +67,15 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public Page<PacienteDTO> listarPacientesActivos(Pageable pageable) {
-        log.info("Consultando todos los pacientes activos paginados");
-        return pacienteRepositorio.findByActivoTrue(pageable)
+        return pacienteRepository.findByActivoTrue(pageable)
                 .map(this::convertirADTO);
     }
 
     @Transactional(readOnly = true)
     public PacienteDTO obtenerPacientePorId(Integer id) {
-        log.info("Consultando paciente por ID: {}", id);
-        return pacienteRepositorio.findById(id)
+        return pacienteRepository.findById(id)
                 .map(this::convertirADTO)
-                .orElseThrow(() -> {
-                    log.error("Error al obtener paciente: Paciente no encontrado ID: {}", id);
-                    return new RuntimeException("Paciente no encontrado");
-                });
+                .orElseThrow(() -> new RuntimeException("Paciente con ID " + id + " no encontrado"));
     }
 
     @Transactional(readOnly = true)
@@ -116,13 +111,13 @@ public class PacienteService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return pacienteRepositorio.findAll(spec, pageable).map(this::convertirADTO);
+        return pacienteRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional
     public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto) {
         log.info("Iniciando creación de paciente: {}", request.getNombresApellidos());
-        if (pacienteRepositorio.existsByCedula(request.getCedula())) {
+        if (pacienteRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un paciente con la cédula: {}", request.getCedula());
             throw new RuntimeException("Ya existe un paciente con la cédula: " + request.getCedula());
         }
@@ -138,15 +133,15 @@ public class PacienteService {
             log.debug("Foto guardada para paciente ID: {}", paciente.getId());
         }
 
-        Paciente saved = pacienteRepositorio.save(paciente);
-        log.info("Paciente creado exitosamente ID: {}", saved.getId());
+        Paciente saved = pacienteRepository.save(paciente);
+        log.info("Paciente creado exitosamente con cédula: {}", saved.getCedula());
         return convertirADTO(saved);
     }
 
     @Transactional
     public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto) {
         log.info("Iniciando actualización de paciente ID: {}", id);
-        Paciente paciente = pacienteRepositorio.findById(id)
+        Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Error al actualizar: Paciente no encontrado ID: {}", id);
                     return new RuntimeException("Paciente no encontrado");
@@ -160,7 +155,7 @@ public class PacienteService {
             log.debug("Foto actualizada para paciente ID: {}", id);
         }
 
-        Paciente saved = pacienteRepositorio.save(paciente);
+        Paciente saved = pacienteRepository.save(paciente);
         log.info("Paciente actualizado exitosamente ID: {}", saved.getId());
 
         return convertirADTO(saved);
@@ -169,13 +164,13 @@ public class PacienteService {
     @Transactional
     public void eliminarPaciente(Integer id) {
         log.info("Iniciando eliminación de paciente ID: {}", id);
-        Paciente paciente = pacienteRepositorio.findById(id)
+        Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Intento de eliminar paciente inexistente ID: {}", id);
                     return new RuntimeException("Paciente no encontrado");
                 });
         paciente.setActivo(false);
-        pacienteRepositorio.save(paciente);
+        pacienteRepository.save(paciente);
         log.info("Paciente ID {} desactivado", id);
     }
 
@@ -203,13 +198,13 @@ public class PacienteService {
         paciente.setPorcentajeDiscapacidad(request.getPorcentajeDiscapacidad());
 
         if (request.getInstitucionEducativaId() != null) {
-            InstitucionEducativa ie = institucionEducativaRepositorio.findById(request.getInstitucionEducativaId())
+            InstitucionEducativa ie = institucionEducativaRepository.findById(request.getInstitucionEducativaId())
                     .orElseThrow(() -> new RuntimeException("Institucion Educativa not found"));
             paciente.setInstitucionEducativa(ie);
         }
 
         if (request.getSedeId() != null) {
-            Sede sede = sedeRepositorio.findById(request.getSedeId())
+            Sede sede = sedeRepository.findById(request.getSedeId())
                     .orElseThrow(() -> new RuntimeException("Sede not found"));
             paciente.setSede(sede);
         }

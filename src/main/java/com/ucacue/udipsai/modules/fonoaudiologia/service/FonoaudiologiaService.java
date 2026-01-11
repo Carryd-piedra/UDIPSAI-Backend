@@ -5,7 +5,7 @@ import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaDTO;
 import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaRequest;
 import com.ucacue.udipsai.modules.fonoaudiologia.repository.FonoaudiologiaRepository;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class FonoaudiologiaService {
     private FonoaudiologiaRepository fonoaudiologiaRepository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
     
     @Autowired
     private PacienteService pacienteService;
@@ -65,7 +65,7 @@ public class FonoaudiologiaService {
         if (ficha == null) {
             log.info("Creando nueva ficha de fonoaudiología para Paciente ID: {}", request.getPacienteId());
             ficha = new Fonoaudiologia();
-            Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
+            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
                 .orElseThrow(() -> {
                     log.error("Error al guardar ficha: Paciente ID {} no encontrado", request.getPacienteId());
                     return new RuntimeException("Paciente no encontrado");

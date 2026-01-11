@@ -1,5 +1,9 @@
-package com.ucacue.udipsai.modules.asignacion;
+package com.ucacue.udipsai.modules.asignacion.service;
 
+import com.ucacue.udipsai.modules.asignacion.domain.Asignacion;
+import com.ucacue.udipsai.modules.asignacion.dto.AsignacionDTO;
+import com.ucacue.udipsai.modules.asignacion.dto.AsignacionRequest;
+import com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 public class AsignacionService {
 
     @Autowired
-    private AsignacionRepositorio asignacionRepositorio;
+    private AsignacionRepository asignacionRepository;
 
     @Autowired
     private PacienteRepository pacienteRepository;
@@ -34,7 +38,7 @@ public class AsignacionService {
 
     public List<AsignacionDTO> listarAsignaciones() {
         log.info("Consultando todas las asignaciones activas");
-        return asignacionRepositorio.findByActivoTrue().stream()
+        return asignacionRepository.findByActivoTrue().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -66,7 +70,7 @@ public class AsignacionService {
         asignacion.setPasante(pasante);
         asignacion.setActivo(true);
         
-        Asignacion asignacionGuardada = asignacionRepositorio.save(asignacion);
+        Asignacion asignacionGuardada = asignacionRepository.save(asignacion);
         log.info("Asignación creada exitosamente con ID: {}", asignacionGuardada.getId());
 
         return convertirADTO(asignacionGuardada);
@@ -74,7 +78,7 @@ public class AsignacionService {
     
     public List<AsignacionDTO> listarAsignacionesPorPasanteId(Integer pasanteId) {
         log.info("Consultando asignaciones activas para el pasante ID: {}", pasanteId);
-        return asignacionRepositorio.findByPasanteIdAndActivoTrue(pasanteId).stream()
+        return asignacionRepository.findByPasanteIdAndActivoTrue(pasanteId).stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -84,10 +88,10 @@ public class AsignacionService {
             log.warn("Intento de eliminar asignación con ID nulo");
             return;
         }
-        asignacionRepositorio.findById(id).ifPresentOrElse(a -> {
+        asignacionRepository.findById(id).ifPresentOrElse(a -> {
             log.info("Eliminando (desactivando) asignación ID: {}", id);
             a.setActivo(false);
-            asignacionRepositorio.save(a);
+            asignacionRepository.save(a);
         }, () -> log.warn("Intento de eliminar asignación inexistente ID: {}", id));
     }
 

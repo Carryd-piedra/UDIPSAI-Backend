@@ -2,17 +2,17 @@ package com.ucacue.udipsai.modules.seguimiento.service;
 
 import com.ucacue.udipsai.modules.documentos.domain.Documento;
 
-import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepositorio;
+import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepository;
 import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepository;
 import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.seguimiento.domain.Seguimiento;
 import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoDTO;
 import com.ucacue.udipsai.modules.seguimiento.dto.SeguimientoRequest;
-import com.ucacue.udipsai.modules.seguimiento.repository.SeguimientoRepositorio;
+import com.ucacue.udipsai.modules.seguimiento.repository.SeguimientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
@@ -29,16 +29,16 @@ import java.util.stream.Collectors;
 public class SeguimientoService {
 
     @Autowired
-    private SeguimientoRepositorio seguimientoRepository;
+    private SeguimientoRepository seguimientoRepository;
 
     @Autowired
-    private EspecialistaRepositorio especialistaRepositorio;
+    private EspecialistaRepository especialistaRepository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
-    private DocumentoRepositorio documentoRepositorio;
+    private DocumentoRepository documentoRepository;
 
     @Autowired
     private StorageService storageService;
@@ -115,11 +115,11 @@ public class SeguimientoService {
 
     private void mapearRequestAEntidad(SeguimientoRequest request, Seguimiento seguimiento) {
         if (request.getEspecialistaId() != null) {
-            Especialista esp = especialistaRepositorio.findById(request.getEspecialistaId()).orElse(null);
+            Especialista esp = especialistaRepository.findById(request.getEspecialistaId()).orElse(null);
             seguimiento.setEspecialista(esp);
         }
         if (request.getPacienteId() != null) {
-            Paciente pac = pacienteRepositorio.findById(request.getPacienteId()).orElse(null);
+            Paciente pac = pacienteRepository.findById(request.getPacienteId()).orElse(null);
             seguimiento.setPaciente(pac);
         }
         seguimiento.setFecha(request.getFecha());
@@ -128,7 +128,7 @@ public class SeguimientoService {
             seguimiento.setActivo(request.getActivo());
 
         if (request.getDocumentoId() != null) {
-            Documento doc = documentoRepositorio.findById(request.getDocumentoId()).orElse(null);
+            Documento doc = documentoRepository.findById(request.getDocumentoId()).orElse(null);
             seguimiento.setDocumento(doc);
         }
     }
@@ -145,7 +145,7 @@ public class SeguimientoService {
             doc.setPaciente(seguimiento.getPaciente());
         }
 
-        documentoRepositorio.save(doc);
+        documentoRepository.save(doc);
         seguimiento.setDocumento(doc);
     }
 

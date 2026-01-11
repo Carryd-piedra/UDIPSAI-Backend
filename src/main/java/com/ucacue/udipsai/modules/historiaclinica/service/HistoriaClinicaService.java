@@ -5,7 +5,7 @@ import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
 import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class HistoriaClinicaService {
     private HistoriaClinicaRepository historiaClinicaRepository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
     private PacienteService pacienteService;
@@ -74,7 +74,7 @@ public class HistoriaClinicaService {
         if (historia == null) {
             log.info("Creando nueva historia clínica para Paciente ID: {}", request.getPacienteId());
             historia = new HistoriaClinica();
-            Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
+            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
                     .orElseThrow(() -> {
                         log.error("Error al guardar historia: Paciente ID {} no encontrado", request.getPacienteId());
                         return new RuntimeException("Paciente no encontrado");

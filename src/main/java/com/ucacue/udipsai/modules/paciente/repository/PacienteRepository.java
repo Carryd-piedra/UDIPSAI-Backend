@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface PacienteRepositorio extends JpaRepository<Paciente, Integer>, JpaSpecificationExecutor<Paciente> {
+public interface PacienteRepository extends JpaRepository<Paciente, Integer>, JpaSpecificationExecutor<Paciente> {
 
         List<Paciente> findByActivoTrue();
 

@@ -40,7 +40,6 @@ public class PasanteController {
     @GetMapping("/activos")
     public ResponseEntity<Page<PasanteDTO>> listarPasantesActivos(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para listar pasantes activos paginados");
         return ResponseEntity.ok(pasanteService.listarPasantesActivos(pageable));
     }
 
@@ -48,18 +47,15 @@ public class PasanteController {
     public ResponseEntity<Page<PasanteDTO>> filtrarPasantes(
             PasanteCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para filtrar pasantes");
         return ResponseEntity.ok(pasanteService.filtrarPasantes(criteria, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PasanteDTO> obtenerPasantePorId(@PathVariable Integer id) {
-        log.info("Petición GET para obtener pasante ID: {}", id);
         PasanteDTO pasante = pasanteService.obtenerPasantePorId(id);
         if (pasante != null) {
             return ResponseEntity.ok(pasante);
         }
-        log.warn("Pasante no encontrado ID: {}", id);
         return ResponseEntity.notFound().build();
     }
 

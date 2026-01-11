@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EspecialidadRepositorio extends JpaRepository<Especialidad, Integer> {
+public interface EspecialidadRepository extends JpaRepository<Especialidad, Integer> {
     List<Especialidad> findByActivoTrue();
 }

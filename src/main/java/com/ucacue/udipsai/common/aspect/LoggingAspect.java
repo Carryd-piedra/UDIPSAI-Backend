@@ -7,40 +7,80 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 @Aspect
 @Component
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *) || " +
-              "within(@org.springframework.stereotype.Service *) || " +
-              "within(com.ucacue.udipsai.modules..*)")
-    public void springBeanPointcut() {
+    // ANSI Escape Codes for Colors
+    private static final String RESET = "\u001B[0m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String RED = "\u001B[31m";
+    private static final String MAGENTA = "\u001B[35m";
+
+    /**
+     * Pointcut that matches all Spring Controllers.
+     */
+    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
+    public void controllerPointcut() {
     }
 
-    @Pointcut("execution(* com.ucacue.udipsai..*(..))")
+    /**
+     * Pointcut that matches all Spring Services.
+     */
+    @Pointcut("within(@org.springframework.stereotype.Service *)")
+    public void servicePointcut() {
+    }
+
+    /**
+     * Pointcut that matches all beans in the application's main packages.
+     */
+    @Pointcut("within(com.ucacue.udipsai.modules..*) || within(com.ucacue.udipsai.infrastructure..*)")
     public void applicationPackagePointcut() {
     }
 
-    @Around("springBeanPointcut() && applicationPackagePointcut()")
-    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (log.isDebugEnabled()) {
-            log.debug("Enter: {}.{}() with argument[s] = {}", joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
-        }
+    /**
+     * Around advice for Controllers: LOG INFO on Entry/Exit with execution time.
+     */
+    @Around("controllerPointcut() && applicationPackagePointcut()")
+    public Object logControllerAccess(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+
+        log.info("{}>>> API Request: {}.{}{}", CYAN, className, methodName, RESET);
 
         try {
             Object result = joinPoint.proceed();
-            if (log.isDebugEnabled()) {
-                log.debug("Exit: {}.{}() with result = {}", joinPoint.getSignature().getDeclaringTypeName(),
-                        joinPoint.getSignature().getName(), result);
-            }
+            long executionTime = System.currentTimeMillis() - start;
+            log.info("{}<<< API Response: {}.{} executed in {}ms{}", CYAN, className, methodName, executionTime, RESET);
             return result;
-        } catch (IllegalArgumentException e) {
-            log.error("Illegal argument: {} in {}.{}()", Arrays.toString(joinPoint.getArgs()),
-                    joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
+        } catch (Exception e) {
+            log.error("{}!!! API Error in {}.{}: {}{}", RED, className, methodName, e.getMessage(), RESET);
+            throw e;
+        }
+    }
+
+    /**
+     * Around advice for Services: LOG DEBUG on Entry/Exit.
+     */
+    @Around("servicePointcut() && applicationPackagePointcut()")
+    public Object logServiceAccess(ProceedingJoinPoint joinPoint) throws Throwable {
+        if (!log.isDebugEnabled()) {
+            return joinPoint.proceed();
+        }
+
+        String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+
+        log.debug("{}[Service] Enter: {}.{}{}", GREEN, className, methodName, RESET);
+        try {
+            Object result = joinPoint.proceed();
+            log.debug("{}[Service] Exit: {}.{}{}", GREEN, className, methodName, RESET);
+            return result;
+        } catch (Throwable e) {
+            log.debug("{}[Service] Exception in {}.{}: {}{}", MAGENTA, className, methodName, e.getMessage(), RESET);
             throw e;
         }
     }

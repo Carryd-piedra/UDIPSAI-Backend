@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.recurso.service;
 
 import com.ucacue.udipsai.modules.recurso.domain.Recurso;
-import com.ucacue.udipsai.modules.recurso.repository.RecursoRepositorio;
+import com.ucacue.udipsai.modules.recurso.repository.RecursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 public class RecursoService {
     @Autowired
-    private RecursoRepositorio recursoRepositorio;
+    private RecursoRepository recursoRepository;
 
     // Carpeta donde se guardan los archivos
     private final Path rootLocation;
@@ -43,7 +43,7 @@ public class RecursoService {
 
     // 1. LISTAR TODOS
     public List<Recurso> listarTodos() {
-        return recursoRepositorio.findAll();
+        return recursoRepository.findAll();
     }
 
     // 2. GUARDAR CON ARCHIVO
@@ -54,12 +54,12 @@ public class RecursoService {
         recurso.setArchivoNombre(archivo.getOriginalFilename());
         recurso.setArchivoUrl(nombreUnico);
 
-        return recursoRepositorio.save(recurso);
+        return recursoRepository.save(recurso);
     }
 
     // 3. REEMPLAZAR ARCHIVO
     public Recurso reemplazarArchivo(Long id, MultipartFile nuevoArchivo) throws IOException {
-        Recurso recurso = recursoRepositorio.findById(id)
+        Recurso recurso = recursoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
 
         if (recurso.getArchivoUrl() != null) {
@@ -78,18 +78,18 @@ public class RecursoService {
         recurso.setArchivoNombre(nuevoArchivo.getOriginalFilename());
         recurso.setArchivoUrl(nombreUnico);
 
-        return recursoRepositorio.save(recurso);
+        return recursoRepository.save(recurso);
     }
 
     // 4. ELIMINAR
     public void eliminar(Long id) {
-        Recurso r = recursoRepositorio.findById(id).orElse(null);
+        Recurso r = recursoRepository.findById(id).orElse(null);
         if (r != null && r.getArchivoUrl() != null) {
             try {
                 Files.deleteIfExists(this.rootLocation.resolve(r.getArchivoUrl()));
             } catch (IOException e) {
             }
         }
-        recursoRepositorio.deleteById(id);
+        recursoRepository.deleteById(id);
     }
 }

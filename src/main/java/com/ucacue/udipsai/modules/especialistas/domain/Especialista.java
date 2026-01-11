@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,7 @@ public class Especialista {
     private Sede sede;
     
     @OneToMany(mappedBy = "especialista", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Pasante> pasantesAsignados;
 
     @Column(name = "activo", nullable = false)

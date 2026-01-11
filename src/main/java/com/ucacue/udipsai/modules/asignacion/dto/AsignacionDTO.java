@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.asignacion;
+package com.ucacue.udipsai.modules.asignacion.dto;
 
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;

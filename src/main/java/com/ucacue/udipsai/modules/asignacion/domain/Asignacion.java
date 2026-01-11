@@ -1,4 +1,4 @@
-package com.ucacue.udipsai.modules.asignacion;
+package com.ucacue.udipsai.modules.asignacion.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;

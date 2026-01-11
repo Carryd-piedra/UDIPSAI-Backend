@@ -27,7 +27,6 @@ public class SedeController {
     @GetMapping("/activos")
     public ResponseEntity<Page<Sede>> listarSedesActivas(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para listar todas las sedes paginadas");
         return ResponseEntity.ok(sedeService.listarSedesActivas(pageable));
     }
 
@@ -35,7 +34,6 @@ public class SedeController {
     public ResponseEntity<Page<Sede>> filtrarSedes(
             SedeCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para filtrar sedes con criteria: {}", criteria);
         return ResponseEntity.ok(sedeService.filtrarSedes(criteria, pageable));
     }
 
@@ -51,7 +49,6 @@ public class SedeController {
 
     @PostMapping()
     public ResponseEntity<Sede> crearSede(@RequestBody Sede request) {
-        log.info("Petición POST para crear sede: {}", request.getNombre());
         Sede nuevaSede = sedeService.crearSede(request);
         return new ResponseEntity<>(nuevaSede, HttpStatus.CREATED);
     }
@@ -59,7 +56,6 @@ public class SedeController {
     @PutMapping("/{id}")
     public ResponseEntity<Sede> actualizarSede(@PathVariable Integer id, @RequestBody Sede nuevaSede) {
         try {
-            log.info("Petición PUT para actualizar la sede ID: {}", id);
             return ResponseEntity.ok(sedeService.actualizarSede(id, nuevaSede));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

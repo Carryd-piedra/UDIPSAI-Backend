@@ -1,9 +1,9 @@
 package com.ucacue.udipsai.modules.documentos.service;
 
 import com.ucacue.udipsai.modules.documentos.domain.Documento;
-import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepositorio;
+import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepository;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,22 +19,22 @@ import java.util.Optional;
 public class DocumentoService {
 
     @Autowired
-    private DocumentoRepositorio documentoRepositorio;
+    private DocumentoRepository documentoRepository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
 
     @Autowired
     private StorageService storageService;
 
     public Optional<Documento> obtenerDocumentoPorId(Integer id) {
         log.debug("Buscando documento por ID: {}", id);
-        return documentoRepositorio.findById(id);
+        return documentoRepository.findById(id);
     }
 
     public Documento crearDocumento(MultipartFile file, Integer pacienteId, String nombre) {
         log.info("Iniciando creación de documento para Paciente ID: {}, Nombre: {}", pacienteId, nombre);
-        Paciente paciente = pacienteRepositorio.findById(pacienteId)
+        Paciente paciente = pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> {
                     log.error("Error al crear documento: Paciente ID {} no encontrado", pacienteId);
                     return new RuntimeException("Paciente no encontrado con ID: " + pacienteId);
@@ -48,7 +48,7 @@ public class DocumentoService {
         documento.setNombre(nombre != null ? nombre : file.getOriginalFilename());
         documento.setPaciente(paciente);
         documento.setActivo(true);
-        Documento savedDoc = documentoRepositorio.save(documento);
+        Documento savedDoc = documentoRepository.save(documento);
         log.info("Documento guardado en base de datos con ID: {}", savedDoc.getId());
 
         return savedDoc;
@@ -57,7 +57,7 @@ public class DocumentoService {
 
     public Resource cargarDocumentoComoRecurso(Integer id) {
         log.info("Cargando recurso de documento ID: {}", id);
-        Documento documento = documentoRepositorio.findById(id)
+        Documento documento = documentoRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Error al cargar recurso: Documento ID {} no encontrado", id);
                     return new RuntimeException("Documento no encontrado con ID: " + id);
@@ -68,14 +68,14 @@ public class DocumentoService {
     @Transactional
     public void eliminarDocumento(Integer id) {
         log.info("Solicitud para eliminar documento ID: {}", id);
-        Documento documento = documentoRepositorio.findById(id)
+        Documento documento = documentoRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Error al eliminar: Documento ID {} no encontrado", id);
                     return new RuntimeException("Documento no encontrado con ID: " + id);
                 });
 
         documento.setActivo(false);
-        documentoRepositorio.save(documento);
+        documentoRepository.save(documento);
         log.info("Documento ID {} marcado como inactivo (eliminado)", id);
     }
 }

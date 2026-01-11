@@ -1,7 +1,7 @@
 package com.ucacue.udipsai.modules.psicologiaclinica.service;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
-import com.ucacue.udipsai.modules.paciente.repository.PacienteRepositorio;
+import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica;
 import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaDTO;
@@ -24,7 +24,7 @@ public class PsicologiaClinicaService {
     private PsicologiaClinicaRepository repository;
 
     @Autowired
-    private PacienteRepositorio pacienteRepositorio;
+    private PacienteRepository pacienteRepository;
     
     @Autowired
     private PacienteService pacienteService;
@@ -66,7 +66,7 @@ public class PsicologiaClinicaService {
         if (ficha == null) {
             log.info("Creando nueva ficha para paciente ID: {}", request.getPacienteId());
             ficha = new PsicologiaClinica();
-            Paciente paciente = pacienteRepositorio.findById(request.getPacienteId())
+            Paciente paciente = pacienteRepository.findById(request.getPacienteId())
                 .orElseThrow(() -> {
                     log.error("Paciente ID {} no encontrado", request.getPacienteId());
                     return new RuntimeException("Paciente no encontrado");

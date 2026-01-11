@@ -1,13 +1,15 @@
 package com.ucacue.udipsai.modules.pasante.service;
 
-import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepositorio;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialidadRepository;
+import com.ucacue.udipsai.modules.especialistas.repository.EspecialistaRepository;
 
 import com.ucacue.udipsai.modules.especialistas.service.EspecialistaService;
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
-import com.ucacue.udipsai.modules.pasante.repository.PasanteRepositorio;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepository;
+import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -34,30 +36,34 @@ public class PasanteService {
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasanteRepositorio pasanteRepositorio;
+    private PasanteRepository pasanteRepository;
 
     @Autowired
-    private EspecialistaRepositorio especialistaRepositorio;
+    private EspecialistaRepository especialistaRepository;
 
     @Autowired
     private EspecialistaService especialistaService;
+
+    @Autowired
+    private EspecialidadRepository especialidadRepository;
+
+    @Autowired
+    private SedeRepository sedeRepository;
 
     @Autowired
     private StorageService storageService;
 
     @Transactional(readOnly = true)
     public Page<PasanteDTO> listarPasantesActivos(Pageable pageable) {
-        log.info("Consultando todos los pasantes activos paginados");
-        return pasanteRepositorio.findByActivoTrue(pageable)
+        return pasanteRepository.findByActivoTrue(pageable)
                 .map(this::convertirADTO);
     }
 
     @Transactional(readOnly = true)
     public PasanteDTO obtenerPasantePorId(Integer id) {
-        log.info("Consultando pasante por ID: {}", id);
         if (id == null)
             return null;
-        return pasanteRepositorio.findById(id)
+        return pasanteRepository.findById(id)
                 .map(this::convertirADTO)
                 .orElse(null);
     }
@@ -99,13 +105,13 @@ public class PasanteService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return pasanteRepositorio.findAll(spec, pageable).map(this::convertirADTO);
+        return pasanteRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional
     public PasanteDTO crearPasante(PasanteRequest request, MultipartFile foto) {
         log.info("Iniciando creación de pasante: {}", request.getCedula());
-        if (pasanteRepositorio.existsByCedula(request.getCedula())) {
+        if (pasanteRepository.existsByCedula(request.getCedula())) {
             log.error("Intento de crear pasante duplicado. Cédula: {}", request.getCedula());
             throw new RuntimeException("Pasante con cédula " + request.getCedula() + " ya existe");
         }
@@ -120,8 +126,8 @@ public class PasanteService {
             log.debug("Foto guardada para pasante: {}", filename);
         }
 
-        Pasante saved = pasanteRepositorio.save(pasante);
-        log.info("Pasante creado exitosamente ID: {}", saved.getId());
+        Pasante saved = pasanteRepository.save(pasante);
+        log.info("Pasante creado exitosamente con cédula: {}", saved.getCedula());
         return convertirADTO(saved);
     }
 
@@ -130,7 +136,7 @@ public class PasanteService {
         log.info("Iniciando actualización de pasante ID: {}", id);
         if (id == null)
             throw new IllegalArgumentException("ID requerido para actualizar");
-        Pasante pasante = pasanteRepositorio.findById(id)
+        Pasante pasante = pasanteRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Pasante ID {} no encontrado para actualización", id);
                     return new RuntimeException("Pasante no encontrado");
@@ -144,7 +150,7 @@ public class PasanteService {
             log.debug("Foto actualizada para pasante ID: {}", id);
         }
 
-        Pasante saved = pasanteRepositorio.save(pasante);
+        Pasante saved = pasanteRepository.save(pasante);
         log.info("Pasante actualizado exitosamente ID: {}", saved.getId());
         return convertirADTO(saved);
     }
@@ -153,9 +159,9 @@ public class PasanteService {
         log.info("Iniciando eliminación de pasante ID: {}", id);
         if (id == null)
             return;
-        pasanteRepositorio.findById(id).ifPresent(p -> {
+        pasanteRepository.findById(id).ifPresent(p -> {
             p.setActivo(false);
-            pasanteRepositorio.save(p);
+            pasanteRepository.save(p);
             log.info("Pasante ID {} desactivado", id);
         });
     }
@@ -179,7 +185,7 @@ public class PasanteService {
 
         spec = spec.and((root, query, cb) -> cb.equal(root.get("activo"), true));
 
-        return pasanteRepositorio.findAll(spec).stream()
+        return pasanteRepository.findAll(spec).stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -188,9 +194,6 @@ public class PasanteService {
         pasante.setCedula(request.getCedula());
         pasante.setNombresApellidos(request.getNombresApellidos());
         pasante.setEmail(request.getEmail());
-        if (request.getContrasenia() != null && !request.getContrasenia().isEmpty()) {
-            pasante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-        }
         pasante.setInicioPasantia(request.getInicioPasantia());
         pasante.setFinPasantia(request.getFinPasantia());
         pasante.setCiudad(request.getCiudad());
@@ -200,11 +203,19 @@ public class PasanteService {
         pasante.setNumeroCelular(request.getNumeroCelular());
 
         if (request.getEspecialistaId() != null) {
-            pasante.setEspecialista(especialistaRepositorio.findById(request.getEspecialistaId()).orElse(null));
+            pasante.setEspecialista(especialistaRepository.findById(request.getEspecialistaId()).orElse(null));
         }
 
-        if (request.getActivo() != null) {
-            pasante.setActivo(request.getActivo());
+        if (request.getEspecialidadId() != null) {
+            pasante.setEspecialidad(especialidadRepository.findById(request.getEspecialidadId()).orElse(null));
+        }
+
+        if (request.getSedeId() != null) {
+            pasante.setSede(sedeRepository.findById(request.getSedeId()).orElse(null));
+        }
+
+        if (request.getContrasenia() != null && !request.getContrasenia().isEmpty()) {
+            pasante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
         }
     }
 

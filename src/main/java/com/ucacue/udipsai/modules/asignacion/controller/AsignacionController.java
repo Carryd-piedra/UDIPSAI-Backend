@@ -1,5 +1,8 @@
-package com.ucacue.udipsai.modules.asignacion;
+package com.ucacue.udipsai.modules.asignacion.controller;
 
+import com.ucacue.udipsai.modules.asignacion.dto.AsignacionDTO;
+import com.ucacue.udipsai.modules.asignacion.dto.AsignacionRequest;
+import com.ucacue.udipsai.modules.asignacion.service.AsignacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

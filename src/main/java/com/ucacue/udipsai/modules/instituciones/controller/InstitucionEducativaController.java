@@ -28,7 +28,6 @@ public class InstitucionEducativaController {
     @GetMapping("/activos")
     public ResponseEntity<Page<InstitucionEducativa>> listarInstitucionesActivas(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para listar todas las instituciones educativas activas paginadas");
         return ResponseEntity.ok(institucionEducativaService.listarInstitucionesActivas(pageable));
     }
 
@@ -36,7 +35,6 @@ public class InstitucionEducativaController {
     public ResponseEntity<Page<InstitucionEducativa>> filtrarInstituciones(
             InstitucionEducativaCriteriaDTO criteria,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        log.info("Petición GET para filtrar instituciones con criteria: {}", criteria);
         return ResponseEntity.ok(institucionEducativaService.filtrarInstituciones(criteria, pageable));
     }
 
