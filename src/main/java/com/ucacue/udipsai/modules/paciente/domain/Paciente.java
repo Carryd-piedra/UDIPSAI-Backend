@@ -52,6 +52,9 @@ public class Paciente {
     @Column(columnDefinition = "TEXT")
     private String domicilio;
 
+    @Column(name = "barrio")
+    private String barrio;
+
     @Column(name = "foto_url")
     private String fotoUrl;
 

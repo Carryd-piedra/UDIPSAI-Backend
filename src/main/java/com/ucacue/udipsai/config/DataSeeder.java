@@ -33,6 +33,7 @@ public class DataSeeder implements CommandLineRunner {
             adminPermisos.setFonoAudiologia(true);
             adminPermisos.setPsicologiaClinica(true);
             adminPermisos.setPsicologiaEducativa(true);
+            
 
             Especialista admin = new Especialista();
             admin.setCedula("0101010101");

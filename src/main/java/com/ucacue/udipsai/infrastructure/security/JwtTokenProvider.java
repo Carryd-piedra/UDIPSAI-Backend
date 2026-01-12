@@ -30,7 +30,8 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(Authentication authentication) {
-        String username = authentication.getName();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal(); // Cast to UserPrincipal
+        String username = userPrincipal.getUsername(); // Use username from Principal
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
@@ -41,7 +42,8 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("authorities", authorities) // Add authorities to payload
+                .claim("authorities", authorities)
+                .claim("name", userPrincipal.getFullName()) // Add Full Name to token
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)

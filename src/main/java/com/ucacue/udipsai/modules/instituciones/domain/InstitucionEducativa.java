@@ -22,6 +22,9 @@ public class InstitucionEducativa {
     @Column(name = "direccion")
     private String direccion;
 
+    @Column(name = "telefono")
+    private String telefono;
+
     @Column(name = "tipo")
     private String tipo;
 

@@ -34,7 +34,9 @@ import jakarta.persistence.criteria.Join;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -253,20 +255,23 @@ public class PacienteService {
     @Transactional(readOnly = true)
     public PacienteSummaryDTO obtenerResumenFichas(Integer id) {
         log.info("Obteniendo resumen de fichas para paciente ID: {}", id);
-        List<String> nombres = new java.util.ArrayList<>();
+        Map<String, Integer> fichasMap = new HashMap<>();
 
-        if (historiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null)
-            nombres.add("Historia Clínica");
-        if (fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true) != null)
-            nombres.add("Fonoaudiología");
-        if (psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true) != null)
-            nombres.add("Psicología Clínica");
-        if (psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true) != null)
-            nombres.add("Psicología Educativa");
+        var hc = historiaClinicaRepository.findByPacienteIdAndActivo(id, true);
+        if (hc != null) fichasMap.put("Historia Clínica", hc.getId());
+
+        var fono = fonoaudiologiaRepository.findByPacienteIdAndActivo(id, true);
+        if (fono != null) fichasMap.put("Fonoaudiología", fono.getId());
+
+        var pc = psicologiaClinicaRepository.findByPacienteIdAndActivo(id, true);
+        if (pc != null) fichasMap.put("Psicología Clínica", pc.getId());
+
+        var pe = psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true);
+        if (pe != null) fichasMap.put("Psicología Educativa", pe.getId());
 
         return PacienteSummaryDTO.builder()
-                .totalFichas(nombres.size())
-                .nombresFichas(nombres)
+                .totalFichas(fichasMap.size())
+                .fichas(fichasMap)
                 .build();
     }
 }
