@@ -13,9 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/*
- * Clase que representa una Cita en la capa de transferencia de datos.
-*/
 @Getter
 @Setter
 @NoArgsConstructor

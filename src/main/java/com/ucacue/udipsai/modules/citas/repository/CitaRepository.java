@@ -13,25 +13,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-/*
- * Repositorio de la entidad Cita.
-*/
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 @Repository
-public interface CitaRepository extends JpaRepository<Cita, Integer> {
+public interface CitaRepository extends JpaRepository<Cita, Integer>, JpaSpecificationExecutor<Cita> {
         
     boolean existsByEstadoAndFechaAndHoraInicioAndIdPaciente(Cita.Estado estado, LocalDate fecha, LocalTime hora, Integer idPaciente);
 
     boolean existsByEstadoAndFechaAndHoraInicioAndIdProfesional(Cita.Estado estado, LocalDate fecha, LocalTime hora, Integer idProfesional);
 
     Page<Cita> findAllByIdPaciente(Integer idPaciente, Pageable pageable);
-
-    Page<Cita> findAllByIdProfesional(Integer idProfesional, Pageable pageable);
-
-    Page<Cita> findAllByEspecialidad_Id(Integer especialidadId, Pageable pageable);
-
-    Page<Cita> findAllByEstado(Cita.Estado estado, Pageable pageable);
-
-    Page<Cita> findAllByFecha(LocalDate fecha, Pageable pageable);
 
     @Query("SELECT c FROM Cita c WHERE " +
             "(:id IS NULL OR c.id = :id) AND " +

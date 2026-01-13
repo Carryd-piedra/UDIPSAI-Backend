@@ -1,10 +1,7 @@
 package com.ucacue.udipsai.modules.citas.service;
 
 import com.ucacue.udipsai.modules.citas.domain.Cita;
-import com.ucacue.udipsai.modules.citas.dto.CitaDTO;
-import com.ucacue.udipsai.modules.citas.dto.RegistrarCitaDTO;
-import com.ucacue.udipsai.modules.citas.dto.ReporteCitaDTO;
-import com.ucacue.udipsai.modules.citas.dto.ReporteCitaRespuestaDTO;
+import com.ucacue.udipsai.modules.citas.dto.*;
 import com.ucacue.udipsai.modules.citas.repository.CitaRepository;
 import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
 import com.ucacue.udipsai.modules.especialidad.dto.EspecialidadDTO;
@@ -17,15 +14,17 @@ import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 @Service
 public class CitaService {
@@ -86,17 +86,50 @@ public class CitaService {
         return mapearDTO(cita, paciente, especialista, especialidad);
     }
 
-    // Obtener todas las Citas.
-    public Page<CitaDTO> obtenerCitas(Pageable pageable) {
-        logger.info("Obteniendo todas las Citas");
-        Page<Cita> citas = citaRepo.findAll(pageable);
+    // Filtrar Citas (Unified Method)
+    public Page<CitaDTO> filtrarCitas(CitaCriteriaDTO criteria, Pageable pageable) {
+        logger.info("Filtrando citas con criterios: {}", criteria);
 
-        if (citas.isEmpty()) {
-            // throw new EntityNotFoundException("No existen citas registradas"); // Mejor retornar pagina vacia
-            return Page.empty(pageable);
-        }
+        Specification<Cita> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        return citas.map(this::construirCitaDTO);
+            if (StringUtils.hasText(criteria.getSearch())) {
+                String searchPattern = "%" + criteria.getSearch() + "%";
+                predicates.add(cb.like(root.get("idPaciente").as(String.class), searchPattern));
+            }
+
+            if (criteria.getId() != null) {
+                predicates.add(cb.equal(root.get("id"), criteria.getId()));
+            }
+
+            if (criteria.getIdPaciente() != null) {
+                predicates.add(cb.equal(root.get("idPaciente"), criteria.getIdPaciente()));
+            }
+
+            if (criteria.getIdProfesional() != null) {
+                predicates.add(cb.equal(root.get("idProfesional"), criteria.getIdProfesional()));
+            }
+
+            if (criteria.getIdEspecialidad() != null) {
+                predicates.add(cb.equal(root.get("especialidad").get("id"), criteria.getIdEspecialidad()));
+            }
+
+            if (criteria.getEspecialidades() != null && !criteria.getEspecialidades().isEmpty()) {
+                predicates.add(root.get("especialidad").get("id").in(criteria.getEspecialidades()));
+            }
+
+            if (criteria.getFecha() != null) {
+                predicates.add(cb.equal(root.get("fecha"), criteria.getFecha()));
+            }
+
+            if (criteria.getEstado() != null) {
+                predicates.add(cb.equal(root.get("estado"), criteria.getEstado()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return citaRepo.findAll(spec, pageable).map(this::construirCitaDTO);
     }
 
     // Obtener una Cita por Id.
@@ -179,27 +212,23 @@ public class CitaService {
             throw new IllegalArgumentException("Faltan datos para el reagendamiento de la cita");
         }
 
-        // Validaciones similares al registro
         if (!citaEncontrada.getIdPaciente().equals(dto.getIdPaciente())) {
-             // Si cambia el paciente, validar existencia
-             pacienteRepo.findById(dto.getIdPaciente())
-                .orElseThrow(() -> new EntityNotFoundException("Paciente no encontrado"));
+            pacienteRepo.findById(dto.getIdPaciente())
+                    .orElseThrow(() -> new EntityNotFoundException("Paciente no encontrado"));
         }
 
         Especialidad especialidadEntity = especialidadRepo.findById(dto.getIdEspecialidad())
                 .orElseThrow(() -> new EntityNotFoundException("Especialidad no encontrada"));
 
-         // Validar conflicto de horario paciente
-         if (citaRepo.existsByEstadoAndFechaAndHoraInicioAndIdPaciente(Cita.Estado.PENDIENTE, dto.getFecha(),
-                 dto.getHora(), dto.getIdPaciente())) {
-             throw new IllegalArgumentException("El paciente ya tiene una cita en ese horario");
-         }
+        if (citaRepo.existsByEstadoAndFechaAndHoraInicioAndIdPaciente(Cita.Estado.PENDIENTE, dto.getFecha(),
+                dto.getHora(), dto.getIdPaciente())) {
+            throw new IllegalArgumentException("El paciente ya tiene una cita en ese horario");
+        }
 
-          // Validar conflicto horario profesional
-          if (citaRepo.existsByEstadoAndFechaAndHoraInicioAndIdProfesional(Cita.Estado.PENDIENTE, dto.getFecha(),
-                  dto.getHora(), dto.getIdProfesional())) {
-              throw new IllegalArgumentException("El especialista ya tiene una cita en ese horario");
-          }
+        if (citaRepo.existsByEstadoAndFechaAndHoraInicioAndIdProfesional(Cita.Estado.PENDIENTE, dto.getFecha(),
+                dto.getHora(), dto.getIdProfesional())) {
+            throw new IllegalArgumentException("El especialista ya tiene una cita en ese horario");
+        }
 
         citaEncontrada.setFecha(dto.getFecha());
         citaEncontrada.setHoraInicio(dto.getHora());
@@ -211,26 +240,6 @@ public class CitaService {
 
         Cita citaGuardada = citaRepo.save(citaEncontrada);
         return construirCitaDTO(citaGuardada);
-    }
-
-    // Obtener todas las Citas por estado.
-    public Page<CitaDTO> obtenerCitasPorEstado(Cita.Estado estado, Pageable pageable) {
-        logger.info("Obteniendo todas las Citas con estado {}", estado);
-        Page<Cita> citas = citaRepo.findAllByEstado(estado, pageable);
-        return citas.map(this::construirCitaDTO);
-    }
-
-    // Obtener Citas por filtros.
-    public Page<CitaDTO> obtenerCitasPorFiltros(Integer id, Integer idPaciente, LocalDate fecha, Pageable pageable) {
-        logger.info("Obteniendo citas por filtro");
-        Page<Cita> citas;
-
-        if (fecha != null && id == null && idPaciente == null) {
-            citas = citaRepo.findAllByFecha(fecha, pageable);
-        } else {
-            citas = citaRepo.findCitasByFilter(id, idPaciente, pageable);
-        }
-        return citas.map(this::construirCitaDTO);
     }
 
     // Encontrar horas libres
@@ -285,10 +294,10 @@ public class CitaService {
     public void faltaJustificada(Integer id) {
         Cita cita = citaRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada"));
-        
+
         if (cita.getEstado() != Cita.Estado.PENDIENTE && cita.getEstado() != Cita.Estado.FALTA_INJUSTIFICADA
-            && cita.getEstado() != Cita.Estado.FALTA_JUSTIFICADA) {
-             throw new IllegalArgumentException("Estado incorrecto para cambiar a Falta Justificada");   
+                && cita.getEstado() != Cita.Estado.FALTA_JUSTIFICADA) {
+            throw new IllegalArgumentException("Estado incorrecto para cambiar a Falta Justificada");
         }
         cita.setEstado(Cita.Estado.FALTA_JUSTIFICADA);
         citaRepo.save(cita);
@@ -298,62 +307,16 @@ public class CitaService {
     public void faltaInjustificada(Integer id) {
         Cita cita = citaRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada"));
-        
+
         if (cita.getEstado() != Cita.Estado.PENDIENTE && cita.getEstado() != Cita.Estado.FALTA_INJUSTIFICADA
-            && cita.getEstado() != Cita.Estado.FALTA_JUSTIFICADA) {
-             throw new IllegalArgumentException("Estado incorrecto para cambiar a Falta Injustificada");   
+                && cita.getEstado() != Cita.Estado.FALTA_JUSTIFICADA) {
+            throw new IllegalArgumentException("Estado incorrecto para cambiar a Falta Injustificada");
         }
         cita.setEstado(Cita.Estado.FALTA_INJUSTIFICADA);
         citaRepo.save(cita);
     }
 
-    // Obtener citas filtro string
-    public Page<CitaDTO> obtenerCitasFiltro(String filtro, Pageable pageable) {
-         Page<Cita> citas = citaRepo.findCitasFiltro(filtro, pageable);
-         return citas.map(this::construirCitaDTO);
-    }
-
-    // Obtener citas por Profesional
-    public Page<CitaDTO> obtenerCitasPorProfesional(Integer idProfesional, Pageable pageable) {
-        Page<Cita> citas = citaRepo.findAllByIdProfesional(idProfesional, pageable);
-        return citas.map(this::construirCitaDTO);
-    }
-
-    // Obtener citas por Especialidad
-    public Page<CitaDTO> obtenerCitasPorEspecialidad(Integer idEspecialidad, Pageable pageable) {
-        Page<Cita> citas = citaRepo.findAllByEspecialidad_Id(idEspecialidad, pageable);
-        return citas.map(this::construirCitaDTO);
-    }
-
-    // Obtener citas por Especialidades
-    public Page<CitaDTO> obtenerCitasPorEspecialidades(List<Integer> especialidades, Pageable pageable) {
-        List<Cita> allCitas = new ArrayList<>();
-        for (Integer espId : especialidades) {
-            Page<Cita> citasEsp = citaRepo.findAllByEspecialidad_Id(espId, pageable);
-            allCitas.addAll(citasEsp.getContent());
-        }
-
-        if (allCitas.isEmpty()) {
-            return Page.empty(pageable);
-        }
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), allCitas.size());
-        if (start > allCitas.size()) {
-            return Page.empty(pageable);
-        }
-        List<Cita> paginatedList = allCitas.subList(start, end);
-        Page<Cita> pageCitas = new PageImpl<>(paginatedList, pageable, allCitas.size());
-        return pageCitas.map(this::construirCitaDTO);
-    }
-
-    // Obtener citas por Paciente (Completa / Reporte logic moved/merged here)
-    public Page<CitaDTO> obtenerCitasPorPaciente(Integer idPaciente, Pageable pageable) {
-        Page<Cita> citas = citaRepo.findAllByIdPaciente(idPaciente, pageable);
-        return citas.map(this::construirCitaDTO);
-    }
-
-    // Generar Reporte (Logic moved from ReporteCitaService)
+    // Generar Reporte
     public ReporteCitaRespuestaDTO generarReportePorPaciente(Integer idPaciente) {
         Pageable pageable = PageRequest.of(0, 15, Sort.by("fecha").descending());
         // Using standard repo instead of vista repo
@@ -361,7 +324,7 @@ public class CitaService {
         List<Cita> listaCitas = paginaCitas.getContent();
 
         ReporteCitaRespuestaDTO respuesta = new ReporteCitaRespuestaDTO();
-        
+
         String nombrePaciente = "Desconocido";
         if (idPaciente != null) {
             nombrePaciente = pacienteRepo.findById(idPaciente)
@@ -379,7 +342,8 @@ public class CitaService {
             String nombreProfesional = "Desconocido";
             if (cita.getIdProfesional() != null) {
                 EspecialistaDTO esp = especialistaService.obtenerEspecialistaPorId(cita.getIdProfesional());
-                if (esp != null) nombreProfesional = esp.getNombresApellidos();
+                if (esp != null)
+                    nombreProfesional = esp.getNombresApellidos();
             }
 
             return new ReporteCitaDTO(
