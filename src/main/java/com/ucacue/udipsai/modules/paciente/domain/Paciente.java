@@ -29,7 +29,7 @@ public class Paciente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, length = 15)
+    @Column(length = 15)
     private String cedula;
 
     @Builder.Default
@@ -135,6 +135,8 @@ public class Paciente {
     public enum JornadaEnum {
         MATUTINA,
         VESPERTINA,
+        DIURNA,
+        MATUTINA_VESPERTINA,
         NOCTURNA,
         INTEGRAL,
         INDEFINIDA,

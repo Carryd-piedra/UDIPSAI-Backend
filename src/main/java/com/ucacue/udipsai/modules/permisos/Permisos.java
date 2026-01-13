@@ -129,6 +129,15 @@ public class Permisos {
     @Column(name = "psicologia_educativa_eliminar")
     private Boolean psicologiaEducativaEliminar = false;
 
+    @Column(name = "citas")
+    private Boolean citas = false;
+    @Column(name = "citas_crear")
+    private Boolean citasCrear = false;
+    @Column(name = "citas_editar")
+    private Boolean citasEditar = false;
+    @Column(name = "citas_eliminar")
+    private Boolean citasEliminar = false;
+
     public List<SimpleGrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         
@@ -137,6 +146,12 @@ public class Permisos {
         if (Boolean.TRUE.equals(this.pacientesCrear)) authorities.add(new SimpleGrantedAuthority("PERM_PACIENTES_CREAR"));
         if (Boolean.TRUE.equals(this.pacientesEditar)) authorities.add(new SimpleGrantedAuthority("PERM_PACIENTES_EDITAR"));
         if (Boolean.TRUE.equals(this.pacientesEliminar)) authorities.add(new SimpleGrantedAuthority("PERM_PACIENTES_ELIMINAR"));
+
+        // Citas
+        if (Boolean.TRUE.equals(this.citas)) authorities.add(new SimpleGrantedAuthority("PERM_CITAS"));
+        if (Boolean.TRUE.equals(this.citasCrear)) authorities.add(new SimpleGrantedAuthority("PERM_CITAS_CREAR"));
+        if (Boolean.TRUE.equals(this.citasEditar)) authorities.add(new SimpleGrantedAuthority("PERM_CITAS_EDITAR"));
+        if (Boolean.TRUE.equals(this.citasEliminar)) authorities.add(new SimpleGrantedAuthority("PERM_CITAS_ELIMINAR"));
 
         // Pasantes
         if (Boolean.TRUE.equals(this.pasantes)) authorities.add(new SimpleGrantedAuthority("PERM_PASANTES"));
@@ -269,5 +284,11 @@ public class Permisos {
         this.psicologiaEducativaCrear = other.psicologiaEducativaCrear;
         this.psicologiaEducativaEditar = other.psicologiaEducativaEditar;
         this.psicologiaEducativaEliminar = other.psicologiaEducativaEliminar;
+        this.psicologiaEducativaEliminar = other.psicologiaEducativaEliminar;
+
+        this.citas = other.citas;
+        this.citasCrear = other.citasCrear;
+        this.citasEditar = other.citasEditar;
+        this.citasEliminar = other.citasEliminar;
     }
 }
