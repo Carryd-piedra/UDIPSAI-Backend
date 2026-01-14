@@ -17,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
@@ -67,17 +69,22 @@ public class PacienteService {
     @Autowired
     private PsicologiaEducativaRepository psicologiaEducativaRepository;
 
+    @Autowired
+    private com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository asignacionRepository;
+
+    @Autowired
+    private com.ucacue.udipsai.modules.pasante.repository.PasanteRepository pasanteRepository;
+
     @Transactional(readOnly = true)
     public Page<PacienteDTO> listarPacientesActivos(Pageable pageable) {
-        return pacienteRepository.findByActivoTrue(pageable)
-                .map(this::convertirADTO);
+        return filtrarPacientes(new PacienteCriteriaDTO(), pageable);
     }
 
     @Transactional(readOnly = true)
     public PacienteDTO obtenerPacientePorId(Integer id) {
-        return pacienteRepository.findById(id)
-                .map(this::convertirADTO)
-                .orElseThrow(() -> new RuntimeException("Paciente con ID " + id + " no encontrado"));
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Paciente con ID " + id + " no encontrado"));
+        return convertirADTO(paciente);
     }
 
     @Transactional(readOnly = true)
@@ -87,6 +94,27 @@ public class PacienteService {
         Specification<Paciente> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PASANTE"))) {
+                String cedula = auth.getName();
+                var pasanteOpt = pasanteRepository.findByCedula(cedula);
+                if (pasanteOpt.isPresent()) {
+                    Integer pasanteId = pasanteOpt.get().getId();
+                    List<Integer> assignedPatientIds = asignacionRepository.findByPasanteIdAndActivoTrue(pasanteId)
+                            .stream()
+                            .map(a -> a.getPaciente().getId())
+                            .collect(Collectors.toList());
+                    
+                    if (assignedPatientIds.isEmpty()) {
+                        predicates.add(cb.disjunction());
+                    } else {
+                        predicates.add(root.get("id").in(assignedPatientIds));
+                    }
+                } else {
+                    predicates.add(cb.disjunction());
+                }
+            }
+            
             if (StringUtils.hasText(criteria.getSearch())) {
                 String searchPattern = "%" + criteria.getSearch().toLowerCase() + "%";
                 predicates.add(cb.or(
@@ -98,9 +126,11 @@ public class PacienteService {
                 predicates.add(cb.like(cb.lower(root.get("ciudad")),
                         "%" + criteria.getCiudad().toLowerCase() + "%"));
             }
-            if (criteria.getActivo() != null) {
-                predicates.add(cb.equal(root.get("activo"), criteria.getActivo()));
-            }
+            
+            Boolean activeFilter = criteria.getActivo() != null ? criteria.getActivo() : true;
+            predicates.add(cb.equal(root.get("activo"), activeFilter));
+
+
             if (criteria.getSedeId() != null) {
                 Join<Object, Object> sedeJoin = root.join("sede");
                 predicates.add(cb.equal(sedeJoin.get("id"), criteria.getSedeId()));

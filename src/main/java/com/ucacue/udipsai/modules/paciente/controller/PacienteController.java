@@ -48,7 +48,7 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
     public ResponseEntity<PacienteDTO> obtenerPacientePorId(@PathVariable Integer id) {
         log.info("Petición GET para obtener paciente ID: {}", id);
         PacienteDTO dto = pacienteService.obtenerPacientePorId(id);

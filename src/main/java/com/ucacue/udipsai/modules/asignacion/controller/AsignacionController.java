@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
-
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,8 +26,8 @@ public class AsignacionController {
     }
 
     @PostMapping
-    public ResponseEntity<AsignacionDTO> crearAsignacion(@RequestBody AsignacionRequest request) {
-        log.info("Petición POST para crear asignación con Paciente ID: {} y Pasante ID: {}", request.getPacienteId(), request.getPasanteId());
+    public ResponseEntity<List<AsignacionDTO>> crearAsignacion(@RequestBody @Valid AsignacionRequest request) {
+        log.info("Petición POST para crear asignaciones para Pasante ID: {} con {} pacientes", request.getPasanteId(), request.getPacienteIds().size());
         return ResponseEntity.ok(asignacionService.crearAsignacion(request));
     }
     

@@ -5,15 +5,15 @@ import com.ucacue.udipsai.modules.asignacion.dto.AsignacionDTO;
 import com.ucacue.udipsai.modules.asignacion.dto.AsignacionRequest;
 import com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteAsignacionDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
-import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.pasante.domain.Pasante;
+import com.ucacue.udipsai.modules.pasante.dto.PasanteAsignacionDTO;
 import com.ucacue.udipsai.modules.pasante.repository.PasanteRepository;
-import com.ucacue.udipsai.modules.pasante.service.PasanteService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,12 +30,7 @@ public class AsignacionService {
     @Autowired
     private PasanteRepository pasanteRepository;
 
-    @Autowired
-    private PacienteService pacienteService;
-    
-    @Autowired
-    private PasanteService pasanteService;
-
+    @Transactional(readOnly = true)
     public List<AsignacionDTO> listarAsignaciones() {
         log.info("Consultando todas las asignaciones activas");
         return asignacionRepository.findByActivoTrue().stream()
@@ -43,39 +38,46 @@ public class AsignacionService {
                 .collect(Collectors.toList());
     }
 
-    public AsignacionDTO crearAsignacion(AsignacionRequest request) {
-        log.info("Creando asignación para Paciente ID: {} y Pasante ID: {}", request.getPacienteId(), request.getPasanteId());
-        if (request.getPacienteId() == null) {
-            log.error("Error al crear asignación: Paciente ID es nulo");
-            throw new IllegalArgumentException("Paciente ID requerido");
-        }
-        if (request.getPasanteId() == null) {
-            log.error("Error al crear asignación: Pasante ID es nulo");
-            throw new IllegalArgumentException("Pasante ID requerido");
-        }
+    @Transactional
+    public List<AsignacionDTO> crearAsignacion(AsignacionRequest request) {
+        log.info("Creando asignaciones para Pasante ID: {} con {} pacientes", request.getPasanteId(), request.getPacienteIds().size());
 
-        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                .orElseThrow(() -> {
-                    log.error("Error al crear asignación: Paciente con ID {} no encontrado", request.getPacienteId());
-                    return new RuntimeException("Paciente no encontrado");
-                });
         Pasante pasante = pasanteRepository.findById(request.getPasanteId())
                 .orElseThrow(() -> {
                     log.error("Error al crear asignación: Pasante con ID {} no encontrado", request.getPasanteId());
-                    return new RuntimeException("Pasante no encontrado");
+                    return new jakarta.persistence.EntityNotFoundException("Pasante no encontrado");
                 });
 
-        Asignacion asignacion = new Asignacion();
-        asignacion.setPaciente(paciente);
-        asignacion.setPasante(pasante);
-        asignacion.setActivo(true);
-        
-        Asignacion asignacionGuardada = asignacionRepository.save(asignacion);
-        log.info("Asignación creada exitosamente con ID: {}", asignacionGuardada.getId());
+        List<Asignacion> nuevasAsignaciones = request.getPacienteIds().stream().map(pacienteId -> {
+            Paciente paciente = pacienteRepository.findById(pacienteId)
+                    .orElseThrow(() -> {
+                        log.error("Error al crear asignación: Paciente con ID {} no encontrado", pacienteId);
+                        return new jakarta.persistence.EntityNotFoundException("Paciente con ID " + pacienteId + " no encontrado");
+                    });
 
-        return convertirADTO(asignacionGuardada);
+            if (asignacionRepository.existsByPasanteIdAndPacienteIdAndActivoTrue(pasante.getId(), paciente.getId())) {
+                log.warn("La asignación entre Pasante {} y Paciente {} ya existe. Omitiendo.", pasante.getId(), paciente.getId());
+                return null;
+            }
+
+            Asignacion asignacion = new Asignacion();
+            asignacion.setPaciente(paciente);
+            asignacion.setPasante(pasante);
+            asignacion.setActivo(true);
+            return asignacion;
+        }).filter(java.util.Objects::nonNull).collect(Collectors.toList());
+
+        if (nuevasAsignaciones.isEmpty()) {
+            throw new IllegalArgumentException("No se crearon nuevas asignaciones (posiblemente todos los pacientes ya estaban asignados)");
+        }
+
+        List<Asignacion> guardadas = asignacionRepository.saveAll(nuevasAsignaciones);
+        log.info("{} asignaciones creadas exitosamente", guardadas.size());
+
+        return guardadas.stream().map(this::convertirADTO).collect(Collectors.toList());
     }
     
+    @Transactional(readOnly = true)
     public List<AsignacionDTO> listarAsignacionesPorPasanteId(Integer pasanteId) {
         log.info("Consultando asignaciones activas para el pasante ID: {}", pasanteId);
         return asignacionRepository.findByPasanteIdAndActivoTrue(pasanteId).stream()
@@ -98,8 +100,16 @@ public class AsignacionService {
     public AsignacionDTO convertirADTO(Asignacion asignacion) {
         return AsignacionDTO.builder()
                 .id(asignacion.getId())
-                .paciente(pacienteService.convertirADTO(asignacion.getPaciente()))
-                .pasante(pasanteService.convertirADTO(asignacion.getPasante()))
+                .paciente(asignacion.getPaciente() != null ? new PacienteAsignacionDTO(
+                    asignacion.getPaciente().getId(),
+                    asignacion.getPaciente().getNombresApellidos(),
+                    asignacion.getPaciente().getCedula()
+                ) : null)
+                .pasante(asignacion.getPasante() != null ? new PasanteAsignacionDTO(
+                    asignacion.getPasante().getId(),
+                    asignacion.getPasante().getNombresApellidos(),
+                    asignacion.getPasante().getCedula()
+                ) : null)
                 .activo(asignacion.getActivo())
                 .build();
     }
