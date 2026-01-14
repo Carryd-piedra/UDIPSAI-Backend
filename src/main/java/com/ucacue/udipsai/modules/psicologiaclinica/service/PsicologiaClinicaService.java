@@ -48,12 +48,6 @@ public class PsicologiaClinicaService {
         return null;
     }
     
-    @Transactional(readOnly = true)
-    public PsicologiaClinica obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
-        log.debug("Consultando entidad ficha psicología clínica por paciente ID: {}", pacienteId);
-        return repository.findByPacienteIdAndActivo(pacienteId, true);
-    }
-
     @Transactional
     public PsicologiaClinicaDTO crearFichaPsicologiaClinica(PsicologiaClinicaRequest request) {
         log.info("Iniciando creación de ficha psicología clínica para paciente ID: {}", request.getPacienteId());

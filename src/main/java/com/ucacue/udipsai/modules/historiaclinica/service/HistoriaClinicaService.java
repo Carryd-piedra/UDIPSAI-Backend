@@ -55,13 +55,6 @@ public class HistoriaClinicaService {
         return null;
     }
 
-    @Transactional(readOnly = true)
-    public HistoriaClinica obtenerEntidadHistoriaPorIdPaciente(Integer pacienteId) {
-
-        log.debug("Consultando entidad HistoriaClinica por Paciente ID: {}", pacienteId);
-        return historiaClinicaRepository.findByPacienteIdAndActivo(pacienteId, true);
-    }
-
     @Transactional
     public HistoriaClinicaDTO crearHistoriaClinica(HistoriaClinicaRequest request, MultipartFile genogramaFile) {
         log.info("Iniciando creación de historia clínica para Paciente ID: {}", request.getPacienteId());

@@ -47,12 +47,6 @@ public class PsicologiaEducativaService {
         return null;
     }
 
-    @Transactional(readOnly = true)
-    public PsicologiaEducativa obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
-        log.debug("Consultando entidad ficha psicología educativa por paciente ID: {}", pacienteId);
-        return psicologiaEducativaRepository.findByPacienteIdAndActivo(pacienteId, true);
-    }
-
     @Transactional
     public PsicologiaEducativaDTO crearFichaPsicologiaEducativa(PsicologiaEducativaRequest request) {
         log.info("Iniciando creación de ficha psicología educativa para paciente ID: {}", request.getPacienteId());

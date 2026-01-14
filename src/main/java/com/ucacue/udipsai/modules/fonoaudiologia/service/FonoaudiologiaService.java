@@ -48,12 +48,6 @@ public class FonoaudiologiaService {
         return null;
     }
     
-    @Transactional(readOnly = true)
-    public Fonoaudiologia obtenerEntidadFichaPorIdPaciente(Integer pacienteId) {
-        log.debug("Consultando entidad Fonoaudiologia por Paciente ID: {}", pacienteId);
-        return fonoaudiologiaRepository.findByPacienteIdAndActivo(pacienteId, true);
-    }
-
     @Transactional
     public FonoaudiologiaDTO crearFichaFonoaudiologia(FonoaudiologiaRequest request) {
         log.info("Iniciando creación de ficha fonoaudiología para Paciente ID: {}", request.getPacienteId());
