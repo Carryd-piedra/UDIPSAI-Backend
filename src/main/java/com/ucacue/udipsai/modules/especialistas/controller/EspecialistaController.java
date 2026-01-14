@@ -125,4 +125,22 @@ public class EspecialistaController {
         especialistaService.eliminarEspecialista(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Autowired
+    private com.ucacue.udipsai.modules.especialistas.service.EspecialistaReportService especialistaReportService;
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_ESPECIALISTAS')")
+    public ResponseEntity<Resource> exportExcel(EspecialistaCriteriaDTO criteria) {
+        try {
+            Resource file = new org.springframework.core.io.InputStreamResource(especialistaReportService.exportarExcel(criteria));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=especialistas.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar Excel: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

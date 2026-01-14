@@ -72,10 +72,21 @@ public class PasanteService {
     }
 
     @Transactional(readOnly = true)
+    public List<PasanteDTO> listarPasantesSinPaginacion(PasanteCriteriaDTO criteria) {
+        log.info("Listando pasantes sin paginación para reportes con criterios: {}", criteria);
+        Specification<Pasante> spec = createSpecification(criteria);
+        return pasanteRepository.findAll(spec).stream().map(this::convertirADTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public Page<PasanteDTO> filtrarPasantes(PasanteCriteriaDTO criteria, Pageable pageable) {
         log.info("Consultando pasantes con criterios: {}", criteria);
+        Specification<Pasante> spec = createSpecification(criteria);
+        return pasanteRepository.findAll(spec, pageable).map(this::convertirADTO);
+    }
 
-        Specification<Pasante> spec = (root, query, cb) -> {
+    private Specification<Pasante> createSpecification(PasanteCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(criteria.getSearch())) {
@@ -108,7 +119,6 @@ public class PasanteService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return pasanteRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional

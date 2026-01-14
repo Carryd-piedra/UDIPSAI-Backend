@@ -33,9 +33,20 @@ public class SedeService {
         return sedeRepository.findById(id);
     }
 
+    public List<Sede> listarSedesSinPaginacion(SedeCriteriaDTO criteria) {
+        log.info("Listando sedes sin paginación para reportes con criterios: {}", criteria);
+        Specification<Sede> spec = createSpecification(criteria);
+        return sedeRepository.findAll(spec);
+    }
+
     public Page<Sede> filtrarSedes(SedeCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando sedes con criterios: {}", criteria);
-        Specification<Sede> spec = (root, query, cb) -> {
+        Specification<Sede> spec = createSpecification(criteria);
+        return sedeRepository.findAll(spec, pageable);
+    }
+
+    private Specification<Sede> createSpecification(SedeCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(criteria.getSearch())) {
@@ -49,7 +60,6 @@ public class SedeService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return sedeRepository.findAll(spec, pageable);
     }
 
     @Transactional

@@ -2,7 +2,9 @@ package com.ucacue.udipsai.modules.paciente.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.io.IOException;
 import com.ucacue.udipsai.modules.paciente.dto.*;
+import com.ucacue.udipsai.modules.paciente.service.PacienteReportService;
 import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class PacienteController {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private PacienteReportService pacienteReportService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -135,6 +140,39 @@ public class PacienteController {
 
         log.info("Petición GET para obtener resumen de fichas del paciente ID: {}", id);
         return ResponseEntity.ok(pacienteService.obtenerResumenFichas(id));
+    }
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
+    public ResponseEntity<Resource> exportExcel(PacienteCriteriaDTO criteria) {
+        try {
+            Resource file = new org.springframework.core.io.InputStreamResource(pacienteReportService.exportarExcel(criteria));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pacientes.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (IOException e) {
+            log.error("Error al exportar Excel: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Error inesperado al exportar Excel: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{id}/export/pdf")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES') and @asignacionSecurity.checkPasanteAcceso(#id)")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable Integer id) {
+        try {
+            byte[] pdf = pacienteReportService.exportarPdfDetalle(id);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=paciente_detalle.pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdf);
+        } catch (Exception e) {
+            log.error("Error al exportar PDF ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
 

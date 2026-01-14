@@ -61,9 +61,21 @@ public class EspecialistaService {
     }
 
     @Transactional(readOnly = true)
+    public List<EspecialistaDTO> listarEspecialistasSinPaginacion(EspecialistaCriteriaDTO criteria) {
+        log.info("Listando especialistas sin paginación para reportes con criterios: {}", criteria);
+        Specification<Especialista> spec = createSpecification(criteria);
+        return especialistaRepository.findAll(spec).stream().map(this::convertirADTO).toList();
+    }
+
+    @Transactional(readOnly = true)
     public Page<EspecialistaDTO> filtrarEspecialistas(EspecialistaCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando especialistas con criterios: {}", criteria);
-        Specification<Especialista> spec = (root, query, cb) -> {
+        Specification<Especialista> spec = createSpecification(criteria);
+        return especialistaRepository.findAll(spec, pageable).map(this::convertirADTO);
+    }
+
+    private Specification<Especialista> createSpecification(EspecialistaCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(criteria.getSearch())) {
@@ -89,8 +101,6 @@ public class EspecialistaService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
-        return especialistaRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional

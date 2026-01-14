@@ -30,9 +30,20 @@ public class InstitucionEducativaService {
         return institucionEducativaRepository.findByActivoTrue(pageable);
     }
     
+    public List<InstitucionEducativa> listarInstitucionesSinPaginacion(InstitucionEducativaCriteriaDTO criteria) {
+        log.info("Listando instituciones sin paginación para reportes con criteria: {}", criteria);
+        Specification<InstitucionEducativa> spec = createSpecification(criteria);
+        return institucionEducativaRepository.findAll(spec);
+    }
+
     public Page<InstitucionEducativa> filtrarInstituciones(InstitucionEducativaCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando instituciones con criteria: {}", criteria);
-        Specification<InstitucionEducativa> spec = (root, query, cb) -> {
+        Specification<InstitucionEducativa> spec = createSpecification(criteria);
+        return institucionEducativaRepository.findAll(spec, pageable);
+    }
+
+    private Specification<InstitucionEducativa> createSpecification(InstitucionEducativaCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(criteria.getSearch())) {
@@ -46,7 +57,6 @@ public class InstitucionEducativaService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return institucionEducativaRepository.findAll(spec, pageable);
     }
 
     public Optional<InstitucionEducativa> obtenerInstitucionPorId(Integer id) {

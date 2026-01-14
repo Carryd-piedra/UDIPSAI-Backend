@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteCriteriaDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteDTO;
 import com.ucacue.udipsai.modules.pasante.dto.PasanteRequest;
+import com.ucacue.udipsai.modules.pasante.service.PasanteReportService;
 import com.ucacue.udipsai.modules.pasante.service.PasanteService;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class PasanteController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private PasanteReportService pasanteReportService;
 
     @GetMapping("/activos")
     @PreAuthorize("hasAuthority('PERM_PASANTES')")
@@ -132,5 +136,35 @@ public class PasanteController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
                 .body(file);
+    }
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
+    public ResponseEntity<Resource> exportExcel(PasanteCriteriaDTO criteria) {
+        try {
+            Resource file = new org.springframework.core.io.InputStreamResource(pasanteReportService.exportarExcel(criteria));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pasantes.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar Excel: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{id}/export/pdf")
+    @PreAuthorize("hasAuthority('PERM_PASANTES')")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable Integer id) {
+        try {
+            byte[] pdf = pasanteReportService.exportarPdfDetalle(id);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pasante_detalle.pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdf);
+        } catch (Exception e) {
+            log.error("Error al exportar PDF ID {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

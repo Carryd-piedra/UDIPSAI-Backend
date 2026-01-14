@@ -88,10 +88,21 @@ public class PacienteService {
     }
 
     @Transactional(readOnly = true)
+    public List<PacienteDTO> listarPacientesSinPaginacion(PacienteCriteriaDTO criteria) {
+        log.info("Listando pacientes sin paginación para reportes con criterios: {}", criteria);
+        Specification<Paciente> spec = createSpecification(criteria);
+        return pacienteRepository.findAll(spec).stream().map(this::convertirADTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public Page<PacienteDTO> filtrarPacientes(PacienteCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando pacientes con criterios: {}", criteria);
+        Specification<Paciente> spec = createSpecification(criteria);
+        return pacienteRepository.findAll(spec, pageable).map(this::convertirADTO);
+    }
 
-        Specification<Paciente> spec = (root, query, cb) -> {
+    private Specification<Paciente> createSpecification(PacienteCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -130,7 +141,6 @@ public class PacienteService {
             Boolean activeFilter = criteria.getActivo() != null ? criteria.getActivo() : true;
             predicates.add(cb.equal(root.get("activo"), activeFilter));
 
-
             if (criteria.getSedeId() != null) {
                 Join<Object, Object> sedeJoin = root.join("sede");
                 predicates.add(cb.equal(sedeJoin.get("id"), criteria.getSedeId()));
@@ -142,8 +152,6 @@ public class PacienteService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
-        return pacienteRepository.findAll(spec, pageable).map(this::convertirADTO);
     }
 
     @Transactional

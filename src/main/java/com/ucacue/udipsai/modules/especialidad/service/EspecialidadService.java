@@ -33,9 +33,20 @@ public class EspecialidadService {
         return especialidadRepository.findById(id);
     }
 
+    public List<Especialidad> listarEspecialidadesSinPaginacion(EspecialidadCriteriaDTO criteria) {
+        log.info("Listando especialidades sin paginación para reportes con criterios: {}", criteria);
+        Specification<Especialidad> spec = createSpecification(criteria);
+        return especialidadRepository.findAll(spec);
+    }
+
     public Page<Especialidad> filtrarEspecialidades(EspecialidadCriteriaDTO criteria, Pageable pageable) {
         log.info("Filtrando especialidades con criterios: {}", criteria);
-        Specification<Especialidad> spec = (root, query, cb) -> {
+        Specification<Especialidad> spec = createSpecification(criteria);
+        return especialidadRepository.findAll(spec, pageable);
+    }
+
+    private Specification<Especialidad> createSpecification(EspecialidadCriteriaDTO criteria) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.hasText(criteria.getSearch())) {
@@ -49,7 +60,6 @@ public class EspecialidadService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return especialidadRepository.findAll(spec, pageable);
     }
 
     @Transactional

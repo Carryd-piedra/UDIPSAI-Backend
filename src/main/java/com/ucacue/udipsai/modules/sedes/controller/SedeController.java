@@ -76,4 +76,22 @@ public class SedeController {
         sedeService.eliminarSede(id);
         return ResponseEntity.noContent().build();
     }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.ucacue.udipsai.modules.sedes.service.SedeReportService sedeReportService;
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_SEDES')")
+    public ResponseEntity<org.springframework.core.io.Resource> exportExcel(SedeCriteriaDTO criteria) {
+        try {
+            org.springframework.core.io.Resource file = new org.springframework.core.io.InputStreamResource(sedeReportService.exportarExcel(criteria));
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sedes.xlsx")
+                    .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar Excel: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
