@@ -1,8 +1,8 @@
 package com.ucacue.udipsai.modules.psicologiaeducativa.service;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteFichaDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
-import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaRequest;
 import com.ucacue.udipsai.modules.psicologiaeducativa.domain.PsicologiaEducativa;
 import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaDTO;
@@ -24,9 +24,6 @@ public class PsicologiaEducativaService {
 
     @Autowired
     private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private PacienteService pacienteService;
 
     @Transactional(readOnly = true)
     public List<PsicologiaEducativaDTO> listarFichasPsicologiaEducativa() {
@@ -54,10 +51,11 @@ public class PsicologiaEducativaService {
             log.error("El ID del paciente es requerido");
             throw new IllegalArgumentException("El ID del paciente es requerido");
         }
-        
-        PsicologiaEducativa existing = psicologiaEducativaRepository.findByPacienteIdAndActivo(request.getPacienteId(), true);
+
+        PsicologiaEducativa existing = psicologiaEducativaRepository.findByPacienteIdAndActivo(request.getPacienteId(),
+                true);
         if (existing != null) {
-             throw new IllegalStateException("Ya existe una ficha de psicología educativa para este paciente");
+            throw new IllegalStateException("Ya existe una ficha de psicología educativa para este paciente");
         }
 
         Paciente paciente = pacienteRepository.findById(request.getPacienteId())
@@ -79,10 +77,10 @@ public class PsicologiaEducativaService {
     @Transactional
     public PsicologiaEducativaDTO actualizarFichaPsicologiaEducativa(Integer id, PsicologiaEducativaRequest request) {
         log.info("Iniciando actualización de ficha psicología educativa ID: {}", id);
-        
+
         PsicologiaEducativa ficha = psicologiaEducativaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ficha no encontrada"));
-                
+
         if (!ficha.getActivo()) {
             throw new RuntimeException("No se puede editar una ficha inactiva");
         }
@@ -119,7 +117,9 @@ public class PsicologiaEducativaService {
     private PsicologiaEducativaDTO convertirADTO(PsicologiaEducativa ficha) {
         PsicologiaEducativaDTO dto = new PsicologiaEducativaDTO();
         dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
+        dto.setPaciente(ficha.getPaciente() != null ? new PacienteFichaDTO(
+                ficha.getPaciente().getId(), ficha.getPaciente().getNombresApellidos(), ficha.getPaciente().getCedula())
+                : null);
         dto.setActivo(ficha.getActivo());
 
         dto.setHistoriaEscolar(ficha.getHistoriaEscolar());

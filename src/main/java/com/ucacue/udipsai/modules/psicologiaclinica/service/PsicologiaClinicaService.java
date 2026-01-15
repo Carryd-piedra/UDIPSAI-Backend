@@ -1,8 +1,8 @@
 package com.ucacue.udipsai.modules.psicologiaclinica.service;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteFichaDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
-import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica;
 import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaDTO;
 import com.ucacue.udipsai.modules.psicologiaclinica.repository.PsicologiaClinicaRepository;
@@ -25,9 +25,6 @@ public class PsicologiaClinicaService {
 
     @Autowired
     private PacienteRepository pacienteRepository;
-    
-    @Autowired
-    private PacienteService pacienteService;
 
     @Transactional(readOnly = true)
     public List<PsicologiaClinicaDTO> listarFichasPsicologiaClinica() {
@@ -120,7 +117,9 @@ public class PsicologiaClinicaService {
     private PsicologiaClinicaDTO convertirADTO(PsicologiaClinica ficha) {
         PsicologiaClinicaDTO dto = new PsicologiaClinicaDTO();
         dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
+        dto.setPaciente(ficha.getPaciente() != null ? new PacienteFichaDTO(
+                ficha.getPaciente().getId(), ficha.getPaciente().getNombresApellidos(), ficha.getPaciente().getCedula())
+                : null);
         dto.setActivo(ficha.getActivo());
         
         dto.setAnamnesis(ficha.getAnamnesis());

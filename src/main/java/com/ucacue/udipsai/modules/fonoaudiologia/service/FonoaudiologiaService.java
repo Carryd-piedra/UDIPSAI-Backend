@@ -5,8 +5,8 @@ import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaDTO;
 import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaRequest;
 import com.ucacue.udipsai.modules.fonoaudiologia.repository.FonoaudiologiaRepository;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteFichaDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
-import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +25,6 @@ public class FonoaudiologiaService {
 
     @Autowired
     private PacienteRepository pacienteRepository;
-    
-    @Autowired
-    private PacienteService pacienteService;
 
     @Transactional(readOnly = true)
     public List<FonoaudiologiaDTO> listarFichasFonoaudiologia() {
@@ -113,7 +110,9 @@ public class FonoaudiologiaService {
     private FonoaudiologiaDTO convertirADTO(Fonoaudiologia ficha) {
         FonoaudiologiaDTO dto = new FonoaudiologiaDTO();
         dto.setId(ficha.getId());
-        dto.setPaciente(pacienteService.convertirADTO(ficha.getPaciente()));
+        dto.setPaciente(ficha.getPaciente() != null ? new PacienteFichaDTO(
+                ficha.getPaciente().getId(), ficha.getPaciente().getNombresApellidos(), ficha.getPaciente().getCedula())
+                : null);
         dto.setActivo(ficha.getActivo());
         
         dto.setHabla(ficha.getHabla());

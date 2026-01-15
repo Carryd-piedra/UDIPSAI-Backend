@@ -5,8 +5,8 @@ import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
 import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.paciente.dto.PacienteFichaDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
-import com.ucacue.udipsai.modules.paciente.service.PacienteService;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -27,9 +27,6 @@ public class HistoriaClinicaService {
 
     @Autowired
     private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private PacienteService pacienteService;
 
     @Autowired
     private StorageService storageService;
@@ -155,7 +152,9 @@ public class HistoriaClinicaService {
     private HistoriaClinicaDTO convertirADTO(HistoriaClinica historia) {
         HistoriaClinicaDTO dto = new HistoriaClinicaDTO();
         dto.setId(historia.getId());
-        dto.setPaciente(pacienteService.convertirADTO(historia.getPaciente()));
+        dto.setPaciente(historia.getPaciente() != null ? new PacienteFichaDTO(
+                historia.getPaciente().getId(), historia.getPaciente().getNombresApellidos(), historia.getPaciente().getCedula())
+                : null);
         dto.setActivo(historia.getActivo());
         dto.setGenogramaUrl(historia.getGenogramaUrl());
 
