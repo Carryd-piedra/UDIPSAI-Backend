@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 
 import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
+import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepository;
 import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
 import com.ucacue.udipsai.modules.fonoaudiologia.repository.FonoaudiologiaRepository;
 import com.ucacue.udipsai.modules.psicologiaclinica.repository.PsicologiaClinicaRepository;
@@ -155,7 +157,7 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto) {
+    public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion) {
         log.info("Iniciando creación de paciente: {}", request.getNombresApellidos());
         if (pacienteRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un paciente con la cédula: {}", request.getCedula());
@@ -174,12 +176,19 @@ public class PacienteService {
         }
 
         Paciente saved = pacienteRepository.save(paciente);
+        
+        // Guardar documentos adicionales después de guardar el paciente (para tener el ID si fuera necesario, aunque JPA lo maneja)
+        guardarDocumentoSiExiste(saved, fichaCompromiso, "Ficha Compromiso");
+        guardarDocumentoSiExiste(saved, fichaDeteccion, "Ficha Detección");
+        
+        saved = pacienteRepository.save(saved); // Actualizar con los documentos
+
         log.info("Paciente creado exitosamente con cédula: {}", saved.getCedula());
         return convertirADTO(saved);
     }
 
     @Transactional
-    public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto) {
+    public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion) {
         log.info("Iniciando actualización de paciente ID: {}", id);
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> {
@@ -195,10 +204,37 @@ public class PacienteService {
             log.debug("Foto actualizada para paciente ID: {}", id);
         }
 
+        guardarDocumentoSiExiste(paciente, fichaCompromiso, "Ficha Compromiso");
+        guardarDocumentoSiExiste(paciente, fichaDeteccion, "Ficha Detección");
+
         Paciente saved = pacienteRepository.save(paciente);
         log.info("Paciente actualizado exitosamente ID: {}", saved.getId());
 
         return convertirADTO(saved);
+    }
+
+    private void guardarDocumentoSiExiste(Paciente paciente, MultipartFile file, String nombreDocumento) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                // Verificar si ya existe un documento con ese nombre y desactivarlo o actualizarlo
+                paciente.getDocumentos().stream()
+                    .filter(d -> d.getNombre().equals(nombreDocumento) && d.getActivo())
+                    .findFirst()
+                    .ifPresent(d -> d.setActivo(false));
+
+                String filename = storageService.store(file);
+                com.ucacue.udipsai.modules.documentos.domain.Documento doc = new com.ucacue.udipsai.modules.documentos.domain.Documento();
+                doc.setNombre(nombreDocumento);
+                doc.setUrl(filename);
+                doc.setPaciente(paciente);
+                doc.setActivo(true);
+                paciente.getDocumentos().add(doc);
+                log.debug("Documento '{}' guardado para paciente: {}", nombreDocumento, paciente.getNombresApellidos());
+            } catch (Exception e) {
+                log.error("Error al guardar documento '{}': {}", nombreDocumento, e.getMessage());
+                // No lanzamos excepción para no impedir guardar el paciente, pero logueamos error
+            }
+        }
     }
 
     @Transactional
@@ -290,6 +326,9 @@ public class PacienteService {
                 .build();
     }
 
+    @Autowired
+    private DocumentoRepository documentoRepository;
+
     @Transactional(readOnly = true)
     public PacienteSummaryDTO obtenerResumenFichas(Integer id) {
         log.info("Obteniendo resumen de fichas para paciente ID: {}", id);
@@ -307,9 +346,34 @@ public class PacienteService {
         var pe = psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true);
         if (pe != null) fichasMap.put("Psicología Educativa", pe.getId());
 
+        // Documentos adicionales (Ficha Compromiso, Ficha Detección)
+        pacienteRepository.findById(id).ifPresent(paciente -> {
+            paciente.getDocumentos().stream()
+                .filter(d -> Boolean.TRUE.equals(d.getActivo()))
+                .filter(d -> "Ficha Compromiso".equals(d.getNombre()) || "Ficha Detección".equals(d.getNombre()))
+                .forEach(d -> fichasMap.put(d.getNombre(), d.getId()));
+        });
+
         return PacienteSummaryDTO.builder()
                 .totalFichas(fichasMap.size())
                 .fichas(fichasMap)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Resource descargarDocumento(Integer id) {
+        var documento = documentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+        
+        return storageService.loadAsResource(documento.getUrl());
+    }
+
+    @Transactional
+    public void eliminarDocumento(Integer id) {
+        var documento = documentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+        documento.setActivo(false);
+        documentoRepository.save(documento);
+        log.info("Documento ID {} eliminado (lógicamente)", id);
     }
 }

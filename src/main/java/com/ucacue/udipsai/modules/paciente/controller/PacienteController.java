@@ -79,22 +79,22 @@ public class PacienteController {
             .body(file);
     }
 
-    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('PERM_PACIENTES_CREAR')")
     public ResponseEntity<?> crearPaciente(
             @RequestPart("data") String dataJson,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart(value = "fichaCompromiso", required = false) MultipartFile fichaCompromiso,
+            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion) {
         log.info("Petición POST para crear paciente. Data length: {}", dataJson.length());
         try {
-            
             PacienteRequest request = objectMapper.readValue(dataJson, PacienteRequest.class);
-            PacienteDTO created = pacienteService.crearPaciente(request, file);
+            PacienteDTO created = pacienteService.crearPaciente(request, file, fichaCompromiso, fichaDeteccion);
             return ResponseEntity.ok(created);
         } catch (JsonProcessingException e) {
             log.error("Error al parsear JSON en creación de paciente: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error parsing JSON: " + e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error al crear paciente: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error creating paciente: " + e.getMessage());
         }
@@ -105,17 +105,18 @@ public class PacienteController {
     public ResponseEntity<?> actualizarPaciente(
             @PathVariable Integer id,
             @RequestPart("data") String dataJson,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart(value = "fichaCompromiso", required = false) MultipartFile fichaCompromiso,
+            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion) {
         log.info("Petición PUT para actualizar paciente ID: {}", id);
         try {
             PacienteRequest request = objectMapper.readValue(dataJson, PacienteRequest.class);
-            PacienteDTO updated = pacienteService.actualizarPaciente(id, request, file);
+            PacienteDTO updated = pacienteService.actualizarPaciente(id, request, file, fichaCompromiso, fichaDeteccion);
             return ResponseEntity.ok(updated);
         } catch (JsonProcessingException e) {
             log.error("Error al parsear JSON en actualización de paciente: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error parsing JSON: " + e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error al actualizar paciente ID {}: {}", id, e.getMessage());
             return ResponseEntity.badRequest().body("Error updating paciente: " + e.getMessage());
         }
@@ -172,6 +173,32 @@ public class PacienteController {
         } catch (Exception e) {
             log.error("Error al exportar PDF ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/documentos/{id}")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES')")
+    public ResponseEntity<Resource> descargarDocumento(@PathVariable Integer id) {
+        log.info("Petición GET para descargar documento ID: {}", id);
+        Resource file = pacienteService.descargarDocumento(id);
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+            .body(file);
+    }
+
+    @DeleteMapping("/documentos/{id}")
+    @PreAuthorize("hasAuthority('PERM_PACIENTES_ELIMINAR')")
+    public ResponseEntity<?> eliminarDocumento(@PathVariable Integer id) {
+        log.info("Petición DELETE para eliminar documento ID: {}", id);
+        try {
+            pacienteService.eliminarDocumento(id);
+            return ResponseEntity.ok("Documento eliminado");
+        } catch (Exception e) {
+            log.error("Error al eliminar documento: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
