@@ -1,11 +1,7 @@
 package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.TipoHorarioDeSuenio;
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.CompaniaSuenio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Embeddable
@@ -18,13 +14,11 @@ public class Suenio {
     @Column(name = "fin_horario_de_suenio")
     private Integer finHorarioDeSuenio;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_horario_de_suenio")
-    private TipoHorarioDeSuenio tipoHorarioDeSuenio;
+    private String tipoHorarioDeSuenio;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "compania_suenio")
-    private CompaniaSuenio companiaSuenio;
+    private String companiaSuenio;
 
     @Column(name = "especificar_compania_suenio")
     private String especificarCompaniaSuenio;

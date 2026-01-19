@@ -29,29 +29,56 @@ public class Fonacion {
     @Column(name = "ronca")
     private Boolean ronca;
 
+    @Column(name = "ronca_desde_cuando")
+    private String roncaDesdeCuando;
+
     @Column(name = "juego_vocal")
     private Boolean juegoVocal;
+
+    @Column(name = "juego_vocal_desde_cuando")
+    private String juegoVocalDesdeCuando;
 
     @Column(name = "vocalizacion")
     private Boolean vocalizacion;
 
+    @Column(name = "vocalizacion_desde_cuando")
+    private String vocalizacionDesdeCuando;
+
     @Column(name = "balbuceo")
     private Boolean balbuceo;
+
+    @Column(name = "balbuceo_desde_cuando")
+    private String balbuceoDesdeCuando;
 
     @Column(name = "silabeo")
     private Boolean silabeo;
 
+    @Column(name = "silabeo_desde_cuando")
+    private String silabeoDesdeCuando;
+
     @Column(name = "primeras_palabras")
     private Boolean primerasPalabras;
+
+    @Column(name = "primeras_palabras_desde_cuando")
+    private String primerasPalabrasDesdeCuando;
 
     @Column(name = "oraciones_dos_palabras")
     private Boolean oracionesDosPalabras;
 
+    @Column(name = "oraciones_dos_palabras_desde_cuando")
+    private String oracionesDosPalabrasDesdeCuando;
+
     @Column(name = "oraciones_tres_palabras")
     private Boolean oracionesTresPalabras;
 
+    @Column(name = "oraciones_tres_palabras_desde_cuando")
+    private String oracionesTresPalabrasDesdeCuando;
+
     @Column(name = "formacion_linguistica_completa")
     private Boolean formacionLinguisticaCompleta;
+
+    @Column(name = "formacion_linguistica_completa_desde_cuando")
+    private String formacionLinguisticaCompletaDesdeCuando;
 
     @Column(name = "numero_total_palabras")
     private Integer numeroTotalPalabras;

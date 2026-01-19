@@ -1,10 +1,7 @@
 package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
 
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Embeddable
@@ -12,37 +9,29 @@ import lombok.Data;
 public class EvaluacionPensamiento {
 
     // Estructura
-    @Enumerated(EnumType.STRING)
     @Column(name = "incoherencia_estructura_del_pensamiento")
-    private Incoherencia incoherencia;
+    private String incoherencia;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "bloqueos")
-    private Bloqueos bloqueos;
+    private String bloqueos;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "preservacion")
-    private Preservacion preservacion;
+    private String preservacion;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "prolijidad")
-    private Prolijidad prolijidad;
+    private String prolijidad;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "desgragacion")
-    private Desgragacion desgragacion;
+    private String desgragacion;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "estereotipias_estructura_del_pensamiento")
-    private Estereotipias estereotipiasEstructuraDelPensamiento;
+    private String estereotipiasEstructuraDelPensamiento;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "neologismos")
-    private Neologismos neologismos;
+    private String neologismos;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "musitacion")
-    private Musitacion musitacion;
+    private String musitacion;
 
     // Curso
     @Column(name = "retardo")

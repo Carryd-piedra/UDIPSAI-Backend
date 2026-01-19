@@ -1,10 +1,7 @@
 package com.ucacue.udipsai.modules.fonoaudiologia.domain.components;
 
-import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 import java.util.Date;
 
@@ -18,6 +15,9 @@ public class Audicion {
     @Column(name = "perdida_auditiva_conductiva_neurosensorial")
     private Boolean perdidaAuditivaConductivaNeurosensorial;
 
+    @Column(name = "audicion_normal")
+    private Boolean audicionNormal;
+
     @Column(name = "hipoacusia_conductiva_bilateral")
     private Boolean hipoacusiaConductivaBilateral;
 
@@ -30,8 +30,8 @@ public class Audicion {
     @Column(name = "hipoacusia_neurosensorial_unilateral")
     private Boolean hipoacusiaNeurosensorialUnilateral;
 
-    @Column(name = "a_tenido_perdida_audicion_pasado")
-    private Boolean aTenidoPerdidaAudicionPasado;
+    @Column(name = "detalles_audicion")
+    private String detallesAudicion;
 
     @Column(name = "infecciones_oido_fuertes")
     private Boolean infeccionesOidoFuertes;
@@ -45,9 +45,6 @@ public class Audicion {
     @Column(name = "perdida_auditiva")
     private Boolean perdidaAuditiva;
 
-    @Column(name = "unilateral")
-    private Boolean unilateral;
-
     @Column(name = "oido_derecho")
     private Boolean oidoDerecho;
 
@@ -57,20 +54,17 @@ public class Audicion {
     @Column(name = "bilateral")
     private Boolean bilateral;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "grado_perdida")
-    private GradoPerdida gradoPerdida;
+    private String gradoPerdida;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "permanecia")
-    private Permanecia permanecia;
+    private String permanecia;
 
     @Column(name = "otitis")
     private Boolean otitis;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_otitis")
-    private TipoOtitis tipoOtitis;
+    private String tipoOtitis;
 
     @Column(name = "duracion_otitis_inicio")
     private Date duracionOtitisInicio;
@@ -84,12 +78,6 @@ public class Audicion {
     @Column(name = "exposision_ruidos")
     private Boolean exposisionRuidos;
 
-    @Column(name = "duracion_exposision_ruidos_inicio")
-    private Date duracionExposisionRuidosInicio;
-
-    @Column(name = "duracion_exposision_ruidos_fin")
-    private Date duracionExposisionRuidosFin;
-
     @Column(name = "ototoxicos")
     private Boolean ototoxicos;
 
@@ -99,15 +87,16 @@ public class Audicion {
     @Column(name = "uso_audifonos")
     private Boolean usoAudifonos;
 
-    @Column(name = "inicio_uso_audifonos")
-    private Date inicioUsoAudifonos;
-
-    @Column(name = "fin_uso_audifonos")
-    private Date finUsoAudifonos;
-
     @Column(name = "implante_coclear")
     private Boolean implanteCoclear;
 
-    @Column(name = "tratamiento_fonoaudiologico_previo")
-    private Boolean tratamientoFonoaudiologicoPrevio;
+    @Column(name = "vibrador_oseo")
+    private Boolean vibradorOseo;
+
+    @Column(name = "inicio_ayudas_auditivas")
+    private Date inicioAyudasAuditivas;
+
+    @Column(name = "fin_ayudas_auditivas")
+    private Date finAyudasAuditivas;
+
 }

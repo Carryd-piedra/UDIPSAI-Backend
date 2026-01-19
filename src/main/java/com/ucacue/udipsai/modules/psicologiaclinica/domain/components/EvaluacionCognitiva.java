@@ -1,13 +1,6 @@
 package com.ucacue.udipsai.modules.psicologiaclinica.domain.components;
-
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.Desorientacion;
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.Espacio;
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.RespectoAOtrasPersonas;
-import com.ucacue.udipsai.modules.psicologiaclinica.domain.PsicologiaClinica.RespectoASiMismo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Embeddable
@@ -112,19 +105,15 @@ public class EvaluacionCognitiva {
     private Boolean sinAlteracionMemoria;
 
     // Orientacion
-    @Enumerated(EnumType.STRING)
     @Column(name = "desorientacion_en_tiempo")
-    private Desorientacion desorientacionEnTiempo;
+    private String desorientacionEnTiempo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "espacio")
-    private Espacio espacio;
+    private String espacio;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "respecto_a_si_mismo")
-    private RespectoASiMismo respectoASiMismo;
+    private String respectoASiMismo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "respecto_a_otras_personas")
-    private RespectoAOtrasPersonas respectoAOtrasPersonas;
+    private String respectoAOtrasPersonas;
 }

@@ -1,10 +1,7 @@
 package com.ucacue.udipsai.modules.fonoaudiologia.domain.components;
 
-import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Embeddable
@@ -29,9 +26,8 @@ public class Habla {
     @Column(name = "reconoce_fuente_sonora")
     private Boolean reconoceFuenteSonora;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "comunicacion_preferentemente_forma")
-    private ComunicacionPreferentementeForma comunicacionPreferentementeForma;
+    private String comunicacionPreferentementeForma;
 
     @Column(name = "trastorno_especifico_pronunciacion")
     private Boolean trastornoEspecificoPronunciacion;

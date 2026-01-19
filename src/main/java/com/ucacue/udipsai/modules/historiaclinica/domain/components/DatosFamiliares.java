@@ -15,10 +15,10 @@ public class DatosFamiliares {
     private String procedenciaMadre;
 
     @Column(name = "edad_madre_al_nacimiento")
-    private String edadMadreAlNacimiento;
+    private Integer edadMadreAlNacimiento;
 
     @Column(name = "edad_padre_al_nacimiento")
-    private String edadPadreAlNacimiento;
+    private Integer edadPadreAlNacimiento;
 
     @Column(name = "consanguinidad")
     private Boolean consanguinidad;

@@ -1,10 +1,7 @@
 package com.ucacue.udipsai.modules.fonoaudiologia.domain.components;
 
-import com.ucacue.udipsai.modules.fonoaudiologia.domain.Fonoaudiologia.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Embeddable
@@ -32,9 +29,8 @@ public class HistoriaAuditiva {
     @Column(name = "permanencia_otalgia_intermitente")
     private Boolean permanenciaOtalgiaIntermitente;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "grado_permanencia_otalgia")
-    private GradoPermanenciaOtalgia gradoPermanenciaOtalgia;
+    private String gradoPermanenciaOtalgia;
 
     @Column(name = "asociada_otalgia_infeccion_respiratoria_alta")
     private Boolean asociadaOtalgiaInfeccionRespiratoriaAlta;
@@ -84,9 +80,8 @@ public class HistoriaAuditiva {
     @Column(name = "permanencia_otorrea_intermitente")
     private Boolean permanenciaOtorreaIntermitente;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "grado_permanencia_otorrea")
-    private GradoPermanenciaOtorrea gradoPermanenciaOtorrea;
+    private String gradoPermanenciaOtorrea;
 
     @Column(name = "aspecto_claro_otorrea")
     private Boolean aspectoClaroOtorrea;
@@ -184,11 +179,9 @@ public class HistoriaAuditiva {
     @Column(name = "percibe_sonido_igual_ambos_oidos")
     private Boolean percibeSonidoIgualAmbosOidos;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "con_que_oido_escucha_mejor")
-    private ConQueOidoEscuchaMejor conQueOidoEscuchaMejor;
+    private String conQueOidoEscuchaMejor;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "hace_cuanto_tiempo_presenta_sintomas_auditivos")
-    private HaceCuantoTiempoPresentaSintomasAuditivos haceCuantoTiempoPresentaSintomasAuditivos;
+    private String haceCuantoTiempoPresentaSintomasAuditivos;
 }

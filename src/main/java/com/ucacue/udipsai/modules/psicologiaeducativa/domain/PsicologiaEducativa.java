@@ -39,17 +39,4 @@ public class PsicologiaEducativa {
     @Embedded
     private EstadoGeneral estadoGeneral;
 
-    // --- Enums ---
-
-    public enum RelacionDocentes {
-        BUENA, MALA, REGULAR, DEFICIENTE
-    }
-
-    public enum RelacionConGrupo {
-        BUENA, MALA, REGULAR, DEFICIENTE
-    }
-
-    public enum AprovechamientoGeneral {
-        BUENO, MALO, REGULAR, DEFICIENTE
-    }
 }

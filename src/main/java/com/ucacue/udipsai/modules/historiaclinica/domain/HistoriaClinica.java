@@ -52,25 +52,4 @@ public class HistoriaClinica {
     @Embedded
     private AntecedentesMedicos antecedentesMedicos;
 
-    // --- Enums ---
-
-    public enum Parto {
-        NORMAL, CESÁREA
-    }
-
-    public enum LlantoAlNacer {
-        INMEDIATO, AL_ESTÍMULO, DEMORADO
-    }
-
-    public enum CordonOmbilical {
-        CUELLO, CUERPO, OTRO
-    }
-
-    public enum PresenciaIctericia {
-        SI, NO
-    }
-
-    public enum TransfucionSangre {
-        SI, NO
-    }
 }

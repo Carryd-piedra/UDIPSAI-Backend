@@ -38,6 +38,4 @@ public class Alimentacion {
     @Column(name = "se_viste_solo")
     private Boolean seVisteSolo;
 
-    @Column(name = "se_lanza_solo")
-    private Boolean seLanzaSolo;
 }
