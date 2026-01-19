@@ -2,10 +2,13 @@ package com.ucacue.udipsai.modules.historiaclinica.controller;
 
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
+import com.ucacue.udipsai.modules.historiaclinica.service.HistoriaClinicaReportService;
 import com.ucacue.udipsai.modules.historiaclinica.service.HistoriaClinicaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,6 +140,25 @@ public class HistoriaClinicaController {
                 .body(file);
     }
     
+    @Autowired
+    private HistoriaClinicaReportService reportService;
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_HISTORIA_CLINICA')")
+    public ResponseEntity<Resource> exportarExcel(@RequestParam(required = false) Integer pacienteId) {
+        try {
+            Resource file = new InputStreamResource(reportService.exportarExcel(pacienteId));
+            String filename = pacienteId != null ? "historia_clinica_" + pacienteId + ".xlsx" : "historias_clinicas.xlsx";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar historias clínicas: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('PERM_HISTORIA_CLINICA_ELIMINAR')")
     public ResponseEntity<Void> eliminarHistoriaClinica(@PathVariable Integer id) {

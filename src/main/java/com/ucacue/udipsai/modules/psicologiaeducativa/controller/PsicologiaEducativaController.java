@@ -2,8 +2,13 @@ package com.ucacue.udipsai.modules.psicologiaeducativa.controller;
 
 import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaDTO;
 import com.ucacue.udipsai.modules.psicologiaeducativa.dto.PsicologiaEducativaRequest;
+import com.ucacue.udipsai.modules.psicologiaeducativa.service.PsicologiaEducativaReportService;
 import com.ucacue.udipsai.modules.psicologiaeducativa.service.PsicologiaEducativaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +23,9 @@ public class PsicologiaEducativaController {
 
     @Autowired
     private PsicologiaEducativaService service;
+
+    @Autowired
+    private PsicologiaEducativaReportService reportService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA')")
@@ -61,6 +69,22 @@ public class PsicologiaEducativaController {
             return ResponseEntity.ok(service.actualizarFichaPsicologiaEducativa(id, request));
         } catch (Exception e) {
             log.error("Error al actualizar ficha de psicología educativa: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_EDUCATIVA')")
+    public ResponseEntity<Resource> exportarExcel(@RequestParam(required = false) Integer pacienteId) {
+        try {
+            Resource file = new InputStreamResource(reportService.exportarExcel(pacienteId));
+            String filename = pacienteId != null ? "ficha_psicologia_educativa_" + pacienteId + ".xlsx" : "fichas_psicologia_educativa.xlsx";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar fichas de psicología educativa: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

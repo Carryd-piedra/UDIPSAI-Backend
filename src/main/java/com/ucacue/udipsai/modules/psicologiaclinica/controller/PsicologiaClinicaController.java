@@ -2,8 +2,13 @@ package com.ucacue.udipsai.modules.psicologiaclinica.controller;
 
 import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaDTO;
 import com.ucacue.udipsai.modules.psicologiaclinica.dto.PsicologiaClinicaRequest;
+import com.ucacue.udipsai.modules.psicologiaclinica.service.PsicologiaClinicaReportService;
 import com.ucacue.udipsai.modules.psicologiaclinica.service.PsicologiaClinicaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +66,25 @@ public class PsicologiaClinicaController {
              return ResponseEntity.ok(service.actualizarFichaPsicologiaClinica(id, request));
         } catch (Exception e) {
             log.error("Error al actualizar ficha de psicología clínica: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Autowired
+    private PsicologiaClinicaReportService reportService;
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_PSICOLOGIA_CLINICA')")
+    public ResponseEntity<Resource> exportarExcel(@RequestParam(required = false) Integer pacienteId) {
+        try {
+            Resource file = new InputStreamResource(reportService.exportarExcel(pacienteId));
+            String filename = pacienteId != null ? "ficha_psicologia_clinica_" + pacienteId + ".xlsx" : "fichas_psicologia_clinica.xlsx";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar fichas de psicología clínica: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
