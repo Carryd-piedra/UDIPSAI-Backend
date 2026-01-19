@@ -8,30 +8,39 @@ import lombok.Data;
 @Data
 public class DesarrolloMotor {
 
-    @Column(name = "sostuvo_la_cabeza")
-    private Integer sostuvoLaCabeza;
+    @Column(name = "control_cefalico")
+    private String controlCefalico;
 
-    @Column(name = "se_sento_solo")
-    private Integer seSentoSolo;
+    @Column(name = "sedestacion")
+    private String sedestacion;
 
-    @Column(name = "se_paro_solo")
-    private Integer seParoSolo;
+    @Column(name = "hipedestacion")
+    private String hipedestacion;
 
-    @Column(name = "camino_solo")
-    private Integer caminoSolo;
+    @Column(name = "camina_con_apoyo")
+    private String caminaConApoyo;
 
-    @Column(name = "inicio_gateo")
-    private Integer inicioGateo;
+    @Column(name = "camina_solo")
+    private String caminaSolo;
 
-    @Column(name = "tipo_gateo")
-    private String tipoGateo;
+    @Column(name = "sube_escaleras")
+    private String subeEscaleras;
 
-    @Column(name = "edades_sonrisa_social")
-    private Integer edadesSonrisaSocial;
+    @Column(name = "control_esfinteres")
+    private String controlEsfinteres;
 
-    @Column(name = "edades_balbuceo")
-    private Integer edadesBalbuceo;
+    @Column(name = "salta")
+    private String salta;
 
-    @Column(name = "edades_primeras_frases")
-    private Integer edadesPrimerasFrases;
+    @Column(name = "corre")
+    private String corre;
+
+    @Column(name = "gateo")
+    private String gateo;
+
+    @Column(name = "prefiere_mano")
+    private String prefiereManoIzquierdaDerecha;
+
+    @Column(name = "cae_equilibrio")
+    private String caeOPerdeEquilibrioFacilmente;
 }

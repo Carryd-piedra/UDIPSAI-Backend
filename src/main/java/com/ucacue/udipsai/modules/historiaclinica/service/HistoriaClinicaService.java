@@ -4,6 +4,7 @@ import com.ucacue.udipsai.modules.historiaclinica.domain.HistoriaClinica;
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaDTO;
 import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
 import com.ucacue.udipsai.modules.historiaclinica.dto.HistoriaClinicaRequest;
+import com.ucacue.udipsai.modules.historiaclinica.domain.components.*;
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteFichaDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
@@ -102,6 +103,10 @@ public class HistoriaClinicaService {
     }
 
     private void mapRequestToEntity(HistoriaClinicaRequest request, HistoriaClinica historia) {
+        if (request.getFecha() != null)
+            historia.setFecha(request.getFecha());
+        if (request.getInformacionGeneral() != null)
+            historia.setInformacionGeneral(request.getInformacionGeneral());
         if (request.getDatosFamiliares() != null)
             historia.setDatosFamiliares(request.getDatosFamiliares());
         if (request.getHistoriaPrenatal() != null)
@@ -122,15 +127,18 @@ public class HistoriaClinicaService {
         if (genogramaFile != null && !genogramaFile.isEmpty()) {
             String filename = storageService.store(genogramaFile);
             log.info("Genograma almacenado: {}", filename);
-            historia.setGenogramaUrl(filename);
+            if (historia.getInformacionGeneral() == null) {
+                historia.setInformacionGeneral(new InformacionGeneral());
+            }
+            historia.getInformacionGeneral().setGenogramaUrl(filename);
         }
     }
 
     public Resource cargarGenogramaComoRecurso(Integer pacienteId) {
         log.info("Solicitando recurso genograma para paciente ID: {}", pacienteId);
         HistoriaClinica historia = historiaClinicaRepository.findByPacienteIdAndActivo(pacienteId, true);
-        if (historia != null && historia.getGenogramaUrl() != null) {
-            return storageService.loadAsResource(historia.getGenogramaUrl());
+        if (historia != null && historia.getInformacionGeneral() != null && historia.getInformacionGeneral().getGenogramaUrl() != null) {
+            return storageService.loadAsResource(historia.getInformacionGeneral().getGenogramaUrl());
         }
         log.warn("Genograma no encontrado o URL nula para paciente ID: {}", pacienteId);
         return null;
@@ -156,8 +164,9 @@ public class HistoriaClinicaService {
                 historia.getPaciente().getId(), historia.getPaciente().getNombresApellidos(), historia.getPaciente().getCedula())
                 : null);
         dto.setActivo(historia.getActivo());
-        dto.setGenogramaUrl(historia.getGenogramaUrl());
+        dto.setFecha(historia.getFecha());
 
+        dto.setInformacionGeneral(historia.getInformacionGeneral());
         dto.setDatosFamiliares(historia.getDatosFamiliares());
         dto.setHistoriaPrenatal(historia.getHistoriaPrenatal());
         dto.setHistoriaNatal(historia.getHistoriaNatal());

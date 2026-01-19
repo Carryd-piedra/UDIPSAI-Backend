@@ -1,6 +1,9 @@
 package com.ucacue.udipsai.modules.historiaclinica.dto;
 
 import com.ucacue.udipsai.modules.historiaclinica.domain.components.*;
+
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -9,6 +12,8 @@ import lombok.Data;
 public class HistoriaClinicaRequest {
     private Integer pacienteId;
     private Boolean activo;
+    private Date fecha;
+    private InformacionGeneral informacionGeneral;
     private DatosFamiliares datosFamiliares;
     private HistoriaPrenatal historiaPrenatal;
     private HistoriaNatal historiaNatal;

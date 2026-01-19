@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class HistoriaPostnatal {
 
+    @Column(name = "esquema_vacunacion_completo")
+    private Boolean esquemaVacunacionCompleto;
+
     @Column(name = "convulsiones")
     private Boolean convulsiones;
 

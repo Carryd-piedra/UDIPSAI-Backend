@@ -1,6 +1,7 @@
 package com.ucacue.udipsai.modules.historiaclinica.domain;
 
 import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import java.util.Date;
 
 import com.ucacue.udipsai.modules.historiaclinica.domain.components.*;
 import jakarta.persistence.*;
@@ -25,11 +26,14 @@ public class HistoriaClinica {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
-    
-    @Column(name = "genograma_url")
-    private String genogramaUrl;
+
+    @Column(name = "fecha")
+    private Date fecha;
 
     // --- Componentes @Embeddable ---
+
+    @Embedded
+    private InformacionGeneral informacionGeneral;
 
     @Embedded
     private DatosFamiliares datosFamiliares;
