@@ -2,8 +2,13 @@ package com.ucacue.udipsai.modules.fonoaudiologia.controller;
 
 import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaDTO;
 import com.ucacue.udipsai.modules.fonoaudiologia.dto.FonoaudiologiaRequest;
+import com.ucacue.udipsai.modules.fonoaudiologia.service.FonoaudiologiaReportService;
 import com.ucacue.udipsai.modules.fonoaudiologia.service.FonoaudiologiaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +23,9 @@ public class FonoaudiologiaController {
 
     @Autowired
     private FonoaudiologiaService fonoaudiologiaService;
+
+    @Autowired
+    private FonoaudiologiaReportService fonoaudiologiaReportService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA')")
@@ -79,5 +87,21 @@ public class FonoaudiologiaController {
         log.info("Petición DELETE para eliminar ficha fonoaudiología ID: {}", id);
         fonoaudiologiaService.eliminarFichaFonoaudiologia(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_FONOAUDIOLOGIA')")
+    public ResponseEntity<Resource> exportarExcel(@RequestParam(required = false) Integer pacienteId) {
+        try {
+            Resource file = new InputStreamResource(fonoaudiologiaReportService.exportarExcel(pacienteId));
+            String filename = pacienteId != null ? "ficha_fonoaudiologia_" + pacienteId + ".xlsx" : "fichas_fonoaudiologia.xlsx";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            log.error("Error al exportar fichas de fonoaudiología: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
