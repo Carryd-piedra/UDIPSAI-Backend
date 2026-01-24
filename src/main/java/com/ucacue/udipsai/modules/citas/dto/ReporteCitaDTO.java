@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDate;
 
-import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Getter
@@ -20,6 +19,9 @@ public class ReporteCitaDTO {
     private LocalDate fecha;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime hora;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime horaFin;
     private String profesional;
-    private Especialidad especialidad;
+    private String especialidad;
+    private String estado;
 }

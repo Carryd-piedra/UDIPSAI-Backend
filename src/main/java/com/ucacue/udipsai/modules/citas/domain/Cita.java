@@ -1,16 +1,18 @@
 package com.ucacue.udipsai.modules.citas.domain;
-import jakarta.persistence.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ucacue.udipsai.modules.especialidad.domain.Especialidad;
-
+import com.ucacue.udipsai.modules.especialistas.domain.Especialista;
+import com.ucacue.udipsai.modules.paciente.domain.Paciente;
+import com.ucacue.udipsai.modules.pasante.domain.Pasante;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -25,11 +27,17 @@ public class Cita {
     @Column(name = "id_cita", nullable = false, unique = true)
     private Integer id;
 
-    @Column(name = "ficha_paciente", nullable = false)
-    private Integer idPaciente;
+    @ManyToOne
+    @JoinColumn(name = "id_paciente", nullable = false)
+    private Paciente paciente;
 
-    @Column(name = "id_profesional", nullable = false)
-    private Integer idProfesional;
+    @ManyToOne
+    @JoinColumn(name = "id_pasante")
+    private Pasante pasante;
+
+    @ManyToOne
+    @JoinColumn(name = "id_especialista")
+    private Especialista especialista;
 
     @ManyToOne
     @JoinColumn(name = "id_especialidad", nullable = false)
@@ -39,10 +47,10 @@ public class Cita {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate fecha;
 
-    @Column(name = "horaInicio", nullable = false)
+    @Column(name = "hora_inicio", nullable = false)
     private LocalTime horaInicio;
 
-    @Column(name = "horaFin", nullable = false)
+    @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
     @Column(name = "estado", nullable = false)
@@ -56,7 +64,7 @@ public class Cita {
     private LocalDate fechaModificacion;
 
     public enum Estado {
-        PENDIENTE, FINALIZADA, CANCELADA, FALTA_JUSTIFICADA, FALTA_INJUSTIFICADA
+        PENDIENTE, FINALIZADA, CANCELADA, FALTA_INJUSTIFICADA, FALTA_JUSTIFICADA
     }
 
     @PrePersist

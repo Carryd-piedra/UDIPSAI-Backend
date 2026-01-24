@@ -1,31 +1,19 @@
 package com.ucacue.udipsai.modules.citas.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.ucacue.udipsai.modules.citas.dto.CitaCriteriaDTO;
-import com.ucacue.udipsai.modules.citas.dto.CitaDTO;
-import com.ucacue.udipsai.modules.citas.dto.RegistrarCitaDTO;
-import com.ucacue.udipsai.modules.citas.dto.ReporteCitaRespuestaDTO;
+import com.ucacue.udipsai.modules.citas.dto.*;
 import com.ucacue.udipsai.modules.citas.service.CitaService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -36,74 +24,83 @@ public class CitaController {
     @Autowired
     private CitaService citaServ;
 
-    @GetMapping("/filter")
+    @GetMapping
     @PreAuthorize("hasAuthority('PERM_CITAS')")
-    public ResponseEntity<Page<CitaDTO>> filtrarCitas(
-            CitaCriteriaDTO criteria,
-            @PageableDefault(page = 0, size = 5) Pageable pageable) {
-        log.info("GET /api/citas/filter with criteria: {}", criteria);
-        return ResponseEntity.ok(citaServ.filtrarCitas(criteria, pageable));
+    public ResponseEntity<Page<CitaDTO>> obtenerCitas(
+            @PageableDefault(page = 0, size = 5) Pageable pageable, HttpServletRequest request) {
+        return citaServ.obtenerCitas(pageable, request);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS')")
-    public ResponseEntity<CitaDTO> obtenerCita(@PathVariable Integer id) {
-        log.info("GET /api/citas/{}", id);
-        return ResponseEntity.ok(citaServ.obtenerCitaPorId(id));
+    @PreAuthorize("hasAuthority('PERM_CITAS') or hasRole('ROLE_ESPECIALISTA') or hasRole('ROLE_PASANTE')")
+    public ResponseEntity<?> obtenerCita(@PathVariable Integer id, HttpServletRequest request) {
+        return citaServ.obtenerCitaPorId(id, request);
     }
 
     @GetMapping("/horas-libres/{profesionalId}/")
-    @PreAuthorize("hasAuthority('PERM_CITAS')")
-    public ResponseEntity<List<String>> encontrarHorasLibresProfesional(@PathVariable Integer profesionalId,
-            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fecha) {
-        return ResponseEntity.ok(citaServ.encontrarHorasLibresProfesional(profesionalId, fecha));
+    @PreAuthorize("hasAuthority('PERM_CITAS') or hasRole('ROLE_ESPECIALISTA') or hasRole('ROLE_PASANTE')")
+    public ResponseEntity<?> encontrarHorasLibresProfesional(@PathVariable Integer profesionalId,
+            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fecha, HttpServletRequest request) {
+        return citaServ.encontrarHorasLibresProfesional(profesionalId, fecha, request);
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('PERM_CITAS_CREAR')")
-    public ResponseEntity<CitaDTO> registrarCita(@RequestBody RegistrarCitaDTO cita) {
-        log.info("POST /api/citas");
-        return ResponseEntity.ok(citaServ.registrarCita(cita));
+    public ResponseEntity<?> registrarCita(@RequestBody RegistrarCitaDTO cita, HttpServletRequest request) {
+        return citaServ.registrarCita(cita, request);
     }
 
     @PutMapping("/reagendar/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR')")
-    public ResponseEntity<CitaDTO> reagendarCita(@PathVariable Integer id, @RequestBody RegistrarCitaDTO cita) {
-        log.info("PUT /api/citas/reagendar/{}", id);
-        return ResponseEntity.ok(citaServ.reagendarCita(id, cita));
+    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR') or hasRole('ROLE_ESPECIALISTA')")
+    public ResponseEntity<?> reagendarCita(@PathVariable Integer id, @RequestBody RegistrarCitaDTO cita,
+            HttpServletRequest request) {
+        return citaServ.reagendarCita(id, cita, request);
     }
 
     @PatchMapping("/falta-justificada/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR')")
+    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR') or hasRole('ROLE_ESPECIALISTA')")
     public ResponseEntity<?> faltaJustificada(@PathVariable Integer id) {
-        citaServ.faltaJustificada(id);
-        return ResponseEntity.ok().body("Cita asignada como FALTA JUSTIFICADA correctamente");
+        return citaServ.faltaJustificadaResponseEntity(id);
     }
 
     @PatchMapping("/falta-injustificada/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR')")
+    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR') or hasRole('ROLE_ESPECIALISTA')")
     public ResponseEntity<?> faltaInjustificada(@PathVariable Integer id) {
-        citaServ.faltaInjustificada(id);
-        return ResponseEntity.ok().body("Cita asignada como FALTA INJUSTIFICADA correctamente");
+        return citaServ.faltaInjustificadaResponseEntity(id);
     }
 
     @PatchMapping("/finalizar/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR')")
+    @PreAuthorize("hasAuthority('PERM_CITAS_EDITAR') or hasRole('ROLE_ESPECIALISTA')")
     public ResponseEntity<?> finalizarCita(@PathVariable Integer id) {
-        citaServ.finalizarCita(id);
-        return ResponseEntity.ok().body("Cita finalizada correctamente");
+        return citaServ.finalizarCitaResponseEntity(id);
     }
 
     @PatchMapping("/cancelar/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS_ELIMINAR')")
+    @PreAuthorize("hasAuthority('PERM_CITAS_ELIMINAR') or hasRole('ROLE_ESPECIALISTA')")
     public ResponseEntity<?> cancelarCita(@PathVariable Integer id) {
-        citaServ.cancelarCita(id);
-        return ResponseEntity.ok().body("Cita cancelada correctamente");
+        return citaServ.cancelarCitaResponseEntity(id);
     }
 
-    @GetMapping("/reporte/paciente/{id}")
-    @PreAuthorize("hasAuthority('PERM_CITAS')")
-    public ResponseEntity<ReporteCitaRespuestaDTO> obtenerReportePorPaciente(@PathVariable Integer id) {
-        return ResponseEntity.ok(citaServ.generarReportePorPaciente(id));
+    @GetMapping("/profesional/{id}")
+    @PreAuthorize("hasAuthority('PERM_CITAS') or hasRole('ROLE_ESPECIALISTA') or hasRole('ROLE_PASANTE')")
+    public ResponseEntity<?> obtenerCitasPorProfesional(@PathVariable Integer id,
+            @RequestParam(required = false) String tipo,
+            @PageableDefault(page = 0, size = 5, sort = "estado") Pageable pageable, HttpServletRequest request) {
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("estado").descending());
+        return citaServ.obtenerCitasPorProfesional(id, pageable, tipo);
     }
+
+    @GetMapping("/especialidad/{id}")
+    @PreAuthorize("hasAuthority('PERM_CITAS')")
+    public ResponseEntity<?> obtenerCitasPorEspecialidad(@PathVariable Integer id,
+            @PageableDefault(page = 0, size = 5) Pageable pageable, HttpServletRequest request) {
+        return citaServ.obtenerCitasPorEspecialidad(id, pageable);
+    }
+
+    @GetMapping("/resumen/{profesionalId}")
+    @PreAuthorize("hasAuthority('PERM_CITAS') or hasRole('ROLE_ESPECIALISTA') or hasRole('ROLE_PASANTE')")
+    public ResponseEntity<?> obtenerResumenDashboard(@PathVariable Integer profesionalId) {
+        return citaServ.obtenerResumenDashboard(profesionalId);
+    }
+
 }

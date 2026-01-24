@@ -16,4 +16,6 @@ public interface PasanteRepository extends JpaRepository<Pasante, Integer>, JpaS
     boolean existsByCedula(String cedula);
     List<Pasante> findByActivoTrue();
     Page<Pasante> findByActivoTrue(Pageable pageable);
+    
+    List<Pasante> findByEspecialista_Id(Integer especialistaId);
 }

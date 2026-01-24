@@ -15,7 +15,12 @@ import java.time.LocalTime;
 public class RegistrarCitaDTO {
     private Integer idPaciente;
     private Integer idProfesional;
+    private String tipoProfesional;
     private Integer idEspecialidad;
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate fecha;
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "HH:mm")
     private LocalTime hora;
+    private Integer duracionMinutes;
+
 }

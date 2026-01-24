@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Integer>, JpaSpecificationExecutor<Paciente> {
@@ -18,6 +19,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Integer>, Jp
         List<Paciente> findByActivoTrue();
 
         Page<Paciente> findByActivoTrue(Pageable pageable);
+
+        Optional<Paciente> findByCedula(String cedula);
 
         boolean existsByCedula(String cedula);
 
