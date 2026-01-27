@@ -65,11 +65,11 @@ public class Paciente {
     private String numeroCelular;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sede_id")
+    @JoinColumn(name = "sede_id", nullable = true)
     private Sede sede;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "institucion_educativa_id")
+    @JoinColumn(name = "institucion_educativa_id", nullable = true)
     private InstitucionEducativa institucionEducativa;
 
     @Builder.Default
@@ -115,9 +115,8 @@ public class Paciente {
     @Column(name = "anio_educacion")
     private String anioEducacion;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "jornada", length = 20)
-    private JornadaEnum jornada;
+    private String jornada;
 
     @Builder.Default
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -130,16 +129,5 @@ public class Paciente {
         if (fechaNacimiento == null)
             return 0;
         return Period.between(fechaNacimiento, LocalDate.now()).getYears();
-    }
-
-    public enum JornadaEnum {
-        MATUTINA,
-        VESPERTINA,
-        DIURNA,
-        MATUTINA_VESPERTINA,
-        NOCTURNA,
-        INTEGRAL,
-        INDEFINIDA,
-        OTROS
     }
 }

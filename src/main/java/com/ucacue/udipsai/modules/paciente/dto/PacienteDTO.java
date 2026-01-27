@@ -3,7 +3,6 @@ package com.ucacue.udipsai.modules.paciente.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
 import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
-import com.ucacue.udipsai.modules.paciente.domain.Paciente.JornadaEnum;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import lombok.Builder;
 import lombok.Data;
@@ -44,7 +43,7 @@ public class PacienteDTO {
     private SedeDTO sede;
     
     private String proyecto;
-    private JornadaEnum jornada;
+    private String jornada;
     
     private String nivelEducativo;
     private String anioEducacion;

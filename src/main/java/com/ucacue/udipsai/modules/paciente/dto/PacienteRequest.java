@@ -1,6 +1,5 @@
 package com.ucacue.udipsai.modules.paciente.dto;
 
-import com.ucacue.udipsai.modules.paciente.domain.Paciente.JornadaEnum;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -16,7 +15,7 @@ public class PacienteRequest {
     private String numeroCelular; 
     private Integer institucionEducativaId; 
     private Integer sedeId; 
-    private JornadaEnum jornada;
+    private String jornada;
     private String nivelEducativo;
     private String anioEducacion;
     private Boolean perteneceInclusion;

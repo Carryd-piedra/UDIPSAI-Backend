@@ -8,6 +8,7 @@ import com.ucacue.udipsai.modules.paciente.dto.PacienteCriteriaDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteDTO;
 import com.ucacue.udipsai.modules.paciente.dto.PacienteSummaryDTO;
 import com.ucacue.udipsai.modules.paciente.repository.PacienteRepository;
+import com.ucacue.udipsai.modules.pasante.repository.PasanteRepository;
 import com.ucacue.udipsai.modules.sedes.domain.Sede;
 import com.ucacue.udipsai.modules.sedes.repository.SedeRepository;
 import com.ucacue.udipsai.infrastructure.storage.StorageService;
@@ -23,7 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
-
+import com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository;
 import com.ucacue.udipsai.modules.documentos.dto.DocumentoDTO;
 import com.ucacue.udipsai.modules.documentos.repository.DocumentoRepository;
 import com.ucacue.udipsai.modules.historiaclinica.repository.HistoriaClinicaRepository;
@@ -72,10 +73,10 @@ public class PacienteService {
     private PsicologiaEducativaRepository psicologiaEducativaRepository;
 
     @Autowired
-    private com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository asignacionRepository;
+    private AsignacionRepository asignacionRepository;
 
     @Autowired
-    private com.ucacue.udipsai.modules.pasante.repository.PasanteRepository pasanteRepository;
+    private PasanteRepository pasanteRepository;
 
     @Transactional(readOnly = true)
     public Page<PacienteDTO> listarPacientesActivos(Pageable pageable) {
@@ -273,13 +274,13 @@ public class PacienteService {
         paciente.setDetalleDiscapacidad(request.getDetalleDiscapacidad());
         paciente.setPorcentajeDiscapacidad(request.getPorcentajeDiscapacidad());
 
-        if (request.getInstitucionEducativaId() != null) {
+        if (request.getInstitucionEducativaId() != null && request.getInstitucionEducativaId() != 0) {
             InstitucionEducativa ie = institucionEducativaRepository.findById(request.getInstitucionEducativaId())
                     .orElseThrow(() -> new RuntimeException("Institucion Educativa not found"));
             paciente.setInstitucionEducativa(ie);
         }
 
-        if (request.getSedeId() != null) {
+        if (request.getSedeId() != null && request.getSedeId() != 0) {
             Sede sede = sedeRepository.findById(request.getSedeId())
                     .orElseThrow(() -> new RuntimeException("Sede not found"));
             paciente.setSede(sede);
