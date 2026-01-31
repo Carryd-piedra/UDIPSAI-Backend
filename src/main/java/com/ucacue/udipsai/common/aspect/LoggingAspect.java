@@ -12,37 +12,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingAspect {
 
-    // ANSI Escape Codes for Colors
     private static final String RESET = "\u001B[0m";
     private static final String GREEN = "\u001B[32m";
     private static final String CYAN = "\u001B[36m";
     private static final String RED = "\u001B[31m";
     private static final String MAGENTA = "\u001B[35m";
 
-    /**
-     * Pointcut that matches all Spring Controllers.
-     */
     @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
     public void controllerPointcut() {
     }
 
-    /**
-     * Pointcut that matches all Spring Services.
-     */
     @Pointcut("within(@org.springframework.stereotype.Service *)")
     public void servicePointcut() {
     }
 
-    /**
-     * Pointcut that matches all beans in the application's main packages.
-     */
     @Pointcut("within(com.ucacue.udipsai.modules..*) || within(com.ucacue.udipsai.infrastructure..*)")
     public void applicationPackagePointcut() {
     }
 
-    /**
-     * Around advice for Controllers: LOG INFO on Entry/Exit with execution time.
-     */
     @Around("controllerPointcut() && applicationPackagePointcut()")
     public Object logControllerAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
@@ -62,9 +49,6 @@ public class LoggingAspect {
         }
     }
 
-    /**
-     * Around advice for Services: LOG DEBUG on Entry/Exit.
-     */
     @Around("servicePointcut() && applicationPackagePointcut()")
     public Object logServiceAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!log.isDebugEnabled()) {

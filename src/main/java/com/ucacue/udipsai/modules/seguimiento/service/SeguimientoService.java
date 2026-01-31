@@ -140,7 +140,6 @@ public class SeguimientoService {
         doc.setUrl(filename);
         doc.setActivo(true);
 
-        // Asociar al paciente si existe
         if (seguimiento.getPaciente() != null) {
             doc.setPaciente(seguimiento.getPaciente());
         }

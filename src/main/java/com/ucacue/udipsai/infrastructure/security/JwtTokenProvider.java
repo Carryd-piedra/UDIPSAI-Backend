@@ -30,12 +30,11 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal(); // Cast to UserPrincipal
-        String username = userPrincipal.getUsername(); // Use username from Principal
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        String username = userPrincipal.getUsername();
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
-        // Extract authorities (Roles + Permissions)
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -43,7 +42,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("authorities", authorities)
-                .claim("name", userPrincipal.getFullName()) // Add Full Name to token
+                .claim("name", userPrincipal.getFullName())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)

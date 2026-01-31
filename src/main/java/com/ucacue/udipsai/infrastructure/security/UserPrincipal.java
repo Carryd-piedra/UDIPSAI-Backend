@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class UserPrincipal implements UserDetails {
 
-    private String username; // This holds the CEDULA
+    private String username;
     
-    private String fullName; // This holds Nombres y Apellidos
+    private String fullName;
 
     @JsonIgnore
     private String password;

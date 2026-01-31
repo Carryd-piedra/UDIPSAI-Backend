@@ -284,13 +284,10 @@ public class CitaService {
     }
 
     private void validarFechaHora(LocalDate fecha, LocalTime hora) {
-        // Validar fines de semana
         DayOfWeek dia = fecha.getDayOfWeek();
         if (dia == DayOfWeek.SATURDAY || dia == DayOfWeek.SUNDAY) {
             throw new IllegalArgumentException("No se pueden agendar citas los fines de semana");
         }
-
-        // Validar fecha pasada
         LocalDateTime fechaHoraCita = LocalDateTime.of(fecha, hora);
         if (fechaHoraCita.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("No se pueden agendar citas en fechas u horas pasadas");

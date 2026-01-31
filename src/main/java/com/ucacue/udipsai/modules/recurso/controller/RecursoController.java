@@ -32,14 +32,11 @@ public class RecursoController {
     @Autowired
     private RecursoService recursoService;
 
-    // 1. LISTAR TODOS
     @GetMapping
     public List<Recurso> listar() {
         return recursoService.listarTodos();
     }
 
-    // 2. SUBIR NUEVO RECURSO (Datos + Archivo)
-    // Recibe los campos individuales del FormData
     @PostMapping(value = "/subir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> crear(
             @RequestParam("titulo") String titulo,
@@ -51,13 +48,11 @@ public class RecursoController {
                 return ResponseEntity.badRequest().body("El archivo es obligatorio");
             }
 
-            // Creamos el objeto Recurso con los datos del texto
             Recurso nuevoRecurso = new Recurso();
             nuevoRecurso.setNombre(titulo);
             nuevoRecurso.setDescripcion(descripcion);
             nuevoRecurso.setTipo(tipo);
 
-            // Llamamos al servicio para que guarde el archivo físico y la entidad
             Recurso guardado = recursoService.guardarConArchivo(nuevoRecurso, archivo);
 
             return ResponseEntity.ok(guardado);
@@ -67,7 +62,6 @@ public class RecursoController {
         }
     }
 
-    // 3. REEMPLAZAR ARCHIVO (Tu lógica de sustitución)
     @PutMapping(value = "/reemplazar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> reemplazarArchivo(
             @PathVariable Long id,
@@ -79,26 +73,23 @@ public class RecursoController {
 
             Recurso actualizado = recursoService.reemplazarArchivo(id, archivo);
 
-            // Devolvemos JSON con mensaje para que SweetAlert lo muestre
             return ResponseEntity.ok(Map.of(
                     "mensaje", "Archivo actualizado correctamente",
                     "recurso", actualizado));
 
-        } catch (RuntimeException e) { // Recurso no encontrado
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Error de escritura en disco"));
         }
     }
 
-    // 4. ELIMINAR
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         recursoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
-    // 5. DESCARGAR ID
     @GetMapping("/download/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {

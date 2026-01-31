@@ -60,7 +60,6 @@ public class ReporteCitaService {
                     if ("PADRES".equalsIgnoreCase(tipoReporte)) {
                         return estado.equals("PENDIENTE");
                     } else {
-                        // SECRETARIA (default)
                         return estado.equals("PENDIENTE") || estado.equals("FINALIZADA")
                                 || estado.equals("FALTA_INJUSTIFICADA") || estado.equals("FALTA_JUSTIFICADA");
                     }

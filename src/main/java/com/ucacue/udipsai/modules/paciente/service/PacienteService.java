@@ -188,7 +188,6 @@ public class PacienteService {
 
         Paciente saved = pacienteRepository.save(paciente);
         
-        // Guardar documentos adicionales
         guardarDocumentoSiExiste(saved, fichaCompromiso, "Ficha Compromiso");
         guardarDocumentoSiExiste(saved, fichaDeteccion, "Ficha Detección");
         
@@ -200,7 +199,7 @@ public class PacienteService {
             }
         }
         
-        saved = pacienteRepository.save(saved); // Actualizar con los documentos
+        saved = pacienteRepository.save(saved); 
 
         log.info("Paciente creado exitosamente con cédula: {}", saved.getCedula());
         return convertirADTO(saved);
@@ -248,7 +247,6 @@ public class PacienteService {
     private void guardarDocumentoSiExiste(Paciente paciente, MultipartFile file, String nombreDocumento) {
         if (file != null && !file.isEmpty()) {
             try {
-                // Verificar si ya existe un documento con ese nombre y desactivarlo o actualizarlo
                 paciente.getDocumentos().stream()
                     .filter(d -> d.getNombre().equals(nombreDocumento) && d.getActivo())
                     .findFirst()
@@ -261,7 +259,6 @@ public class PacienteService {
                 doc.setPaciente(paciente);
                 doc.setActivo(true);
                 
-                // Persistencia explícita
                 documentoRepository.save(doc);
                 paciente.getDocumentos().add(doc);
                 
@@ -383,7 +380,6 @@ public class PacienteService {
         var pe = psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true);
         if (pe != null) fichasMap.put("Psicología Educativa", pe.getId());
 
-        // Documentos adicionales (Ficha Compromiso, Ficha Detección y Otros)
         List<com.ucacue.udipsai.modules.documentos.domain.Documento> extraDocs = documentoRepository.findByPacienteIdAndActivoTrue(id);
         log.info("Cargando {} documentos desde repositorio para resumen de paciente ID: {}", 
             extraDocs.size(), id);

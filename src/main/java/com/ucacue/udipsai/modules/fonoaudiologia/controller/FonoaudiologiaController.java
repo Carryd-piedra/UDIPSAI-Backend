@@ -69,11 +69,6 @@ public class FonoaudiologiaController {
     public ResponseEntity<FonoaudiologiaDTO> actualizarFichaFonoaudiologia(@PathVariable Integer id, @RequestBody FonoaudiologiaRequest request) {
         log.info("Petición PUT para actualizar ficha de fonoaudiología ID: {}", id);
         try {
-            // Optional: Check ownership relative to patient if ID is passed? 
-            // Ideally we check if the authenticated user has access to the patient of this ficha.
-            // For now, we rely on the generic PERM permission.
-            // Ideally: @PreAuthorize("@asignacionSecurity.checkPasanteAccesoByFichaId(#id)") but we may not have that method.
-            
             return ResponseEntity.ok(fonoaudiologiaService.actualizarFichaFonoaudiologia(id, request));
         } catch (Exception e) {
             log.error("Error al actualizar ficha fonoaudiología: {}", e.getMessage());

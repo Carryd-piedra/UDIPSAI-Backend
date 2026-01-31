@@ -19,7 +19,7 @@ public class PermisoController {
     }
 
     @PutMapping("/especialista/{id}")
-    @PreAuthorize("hasAnyRole('ESPECIALISTA')") // Or more specific: Coordinator
+    @PreAuthorize("hasAnyRole('ESPECIALISTA')")
     public ResponseEntity<PermisosDTO> actualizarPermisosEspecialista(@PathVariable Integer id, @RequestBody PermisosDTO dto) {
         return ResponseEntity.ok(permisoService.actualizarPermisosEspecialista(id, dto));
     }

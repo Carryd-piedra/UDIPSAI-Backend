@@ -59,7 +59,6 @@ public class HistoriaClinicaController {
             mapper.findAndRegisterModules(); 
             HistoriaClinicaRequest request = mapper.readValue(data, HistoriaClinicaRequest.class);
             
-            // Manual Security Checks
             if (!asignacionSecurity.checkPasanteAcceso(request.getPacienteId())) {
                  log.warn("Acceso denegado al crear historia clínica para paciente ID: {}", request.getPacienteId());
                  return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
@@ -98,9 +97,6 @@ public class HistoriaClinicaController {
             mapper.findAndRegisterModules(); 
             HistoriaClinicaRequest request = mapper.readValue(data, HistoriaClinicaRequest.class);
             
-            // Manual Security Checks (Need Paciente ID for Pasante check)
-            // Even if request body has pacienteId, we should verify it matches the entity or just trust the body 
-            // and verify Pasante access to THAT patient.
             if (request.getPacienteId() != null) {
                 if (!asignacionSecurity.checkPasanteAcceso(request.getPacienteId())) {
                      log.warn("Acceso denegado (Pasante) para paciente ID: {}", request.getPacienteId());
