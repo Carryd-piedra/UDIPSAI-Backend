@@ -20,7 +20,6 @@ public class RecursoService {
     @Autowired
     private RecursoRepository recursoRepository;
 
-    // Carpeta donde se guardan los archivos
     private final Path rootLocation;
 
     public RecursoService(@Value("${app.storage.location:uploads}") String storageLocation) {
@@ -39,14 +38,10 @@ public class RecursoService {
         return rootLocation.resolve(nombreArchivo);
     }
 
-    // --- MÉTODOS QUE TE FALTABAN ---
-
-    // 1. LISTAR TODOS
     public List<Recurso> listarTodos() {
         return recursoRepository.findAll();
     }
 
-    // 2. GUARDAR CON ARCHIVO
     public Recurso guardarConArchivo(Recurso recurso, MultipartFile archivo) throws IOException {
         String nombreUnico = UUID.randomUUID().toString() + "-" + archivo.getOriginalFilename();
         Files.copy(archivo.getInputStream(), this.rootLocation.resolve(nombreUnico));
@@ -57,7 +52,6 @@ public class RecursoService {
         return recursoRepository.save(recurso);
     }
 
-    // 3. REEMPLAZAR ARCHIVO
     public Recurso reemplazarArchivo(Long id, MultipartFile nuevoArchivo) throws IOException {
         Recurso recurso = recursoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
@@ -81,7 +75,6 @@ public class RecursoService {
         return recursoRepository.save(recurso);
     }
 
-    // 4. ELIMINAR
     public void eliminar(Long id) {
         Recurso r = recursoRepository.findById(id).orElse(null);
         if (r != null && r.getArchivoUrl() != null) {
