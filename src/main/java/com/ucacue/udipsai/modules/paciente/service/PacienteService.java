@@ -158,7 +158,7 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion) {
+    public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion, List<MultipartFile> otrosDocumentos) {
         log.info("Iniciando creación de paciente: {}", request.getNombresApellidos());
         if (pacienteRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un paciente con la cédula: {}", request.getCedula());
@@ -178,9 +178,17 @@ public class PacienteService {
 
         Paciente saved = pacienteRepository.save(paciente);
         
-        // Guardar documentos adicionales después de guardar el paciente (para tener el ID si fuera necesario, aunque JPA lo maneja)
+        // Guardar documentos adicionales
         guardarDocumentoSiExiste(saved, fichaCompromiso, "Ficha Compromiso");
         guardarDocumentoSiExiste(saved, fichaDeteccion, "Ficha Detección");
+        
+        if (otrosDocumentos != null) {
+            for (MultipartFile file : otrosDocumentos) {
+                if (file != null && !file.isEmpty()) {
+                    guardarDocumentoSiExiste(saved, file, file.getOriginalFilename());
+                }
+            }
+        }
         
         saved = pacienteRepository.save(saved); // Actualizar con los documentos
 
@@ -189,7 +197,7 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion) {
+    public PacienteDTO actualizarPaciente(Integer id, PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion, List<MultipartFile> otrosDocumentos) {
         log.info("Iniciando actualización de paciente ID: {}", id);
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> {
@@ -207,6 +215,14 @@ public class PacienteService {
 
         guardarDocumentoSiExiste(paciente, fichaCompromiso, "Ficha Compromiso");
         guardarDocumentoSiExiste(paciente, fichaDeteccion, "Ficha Detección");
+
+        if (otrosDocumentos != null) {
+            for (MultipartFile file : otrosDocumentos) {
+                if (file != null && !file.isEmpty()) {
+                    guardarDocumentoSiExiste(paciente, file, file.getOriginalFilename());
+                }
+            }
+        }
 
         Paciente saved = pacienteRepository.save(paciente);
         log.info("Paciente actualizado exitosamente ID: {}", saved.getId());
@@ -229,11 +245,16 @@ public class PacienteService {
                 doc.setUrl(filename);
                 doc.setPaciente(paciente);
                 doc.setActivo(true);
+                
+                // Persistencia explícita
+                documentoRepository.save(doc);
                 paciente.getDocumentos().add(doc);
-                log.debug("Documento '{}' guardado para paciente: {}", nombreDocumento, paciente.getNombresApellidos());
+                
+                log.info("Documento '{}' guardado exitosamente con URL '{}' para paciente ID: {}", 
+                    nombreDocumento, filename, paciente.getId());
             } catch (Exception e) {
-                log.error("Error al guardar documento '{}': {}", nombreDocumento, e.getMessage());
-                // No lanzamos excepción para no impedir guardar el paciente, pero logueamos error
+                log.error("Error crítico al guardar documento '{}' para paciente ID {}: {}", 
+                    nombreDocumento, paciente.getId(), e.getMessage(), e);
             }
         }
     }
@@ -347,13 +368,25 @@ public class PacienteService {
         var pe = psicologiaEducativaRepository.findByPacienteIdAndActivo(id, true);
         if (pe != null) fichasMap.put("Psicología Educativa", pe.getId());
 
-        // Documentos adicionales (Ficha Compromiso, Ficha Detección)
-        pacienteRepository.findById(id).ifPresent(paciente -> {
-            paciente.getDocumentos().stream()
-                .filter(d -> Boolean.TRUE.equals(d.getActivo()))
-                .filter(d -> "Ficha Compromiso".equals(d.getNombre()) || "Ficha Detección".equals(d.getNombre()))
-                .forEach(d -> fichasMap.put(d.getNombre(), d.getId()));
+        // Documentos adicionales (Ficha Compromiso, Ficha Detección y Otros)
+        List<com.ucacue.udipsai.modules.documentos.domain.Documento> extraDocs = documentoRepository.findByPacienteIdAndActivoTrue(id);
+        log.info("Cargando {} documentos desde repositorio para resumen de paciente ID: {}", 
+            extraDocs.size(), id);
+        
+        extraDocs.forEach(d -> {
+            String nombre = d.getNombre();
+            if (!StringUtils.hasText(nombre)) nombre = "Documento sin nombre";
+            
+            if (!fichasMap.containsKey(nombre)) {
+                fichasMap.put(nombre, d.getId());
+            } else if ("Ficha Compromiso".equals(nombre) || "Ficha Detección".equals(nombre)) {
+                fichasMap.put(nombre, d.getId());
+            } else {
+                fichasMap.put(nombre + " (" + d.getId() + ")", d.getId());
+            }
         });
+        
+        log.debug("Resumen de fichas generado: {}", fichasMap);
 
         return PacienteSummaryDTO.builder()
                 .totalFichas(fichasMap.size())

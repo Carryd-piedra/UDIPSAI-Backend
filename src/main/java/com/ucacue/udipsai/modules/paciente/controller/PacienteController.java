@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -85,11 +86,12 @@ public class PacienteController {
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart(value = "fichaCompromiso", required = false) MultipartFile fichaCompromiso,
-            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion) {
+            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion,
+            @RequestPart(value = "otrosDocumentos", required = false) List<MultipartFile> otrosDocumentos) {
         log.info("Petición POST para crear paciente. Data length: {}", dataJson.length());
         try {
             PacienteRequest request = objectMapper.readValue(dataJson, PacienteRequest.class);
-            PacienteDTO created = pacienteService.crearPaciente(request, file, fichaCompromiso, fichaDeteccion);
+            PacienteDTO created = pacienteService.crearPaciente(request, file, fichaCompromiso, fichaDeteccion, otrosDocumentos);
             return ResponseEntity.ok(created);
         } catch (JsonProcessingException e) {
             log.error("Error al parsear JSON en creación de paciente: {}", e.getMessage());
@@ -107,11 +109,12 @@ public class PacienteController {
             @RequestPart("data") String dataJson,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart(value = "fichaCompromiso", required = false) MultipartFile fichaCompromiso,
-            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion) {
+            @RequestPart(value = "fichaDeteccion", required = false) MultipartFile fichaDeteccion,
+            @RequestPart(value = "otrosDocumentos", required = false) List<MultipartFile> otrosDocumentos) {
         log.info("Petición PUT para actualizar paciente ID: {}", id);
         try {
             PacienteRequest request = objectMapper.readValue(dataJson, PacienteRequest.class);
-            PacienteDTO updated = pacienteService.actualizarPaciente(id, request, file, fichaCompromiso, fichaDeteccion);
+            PacienteDTO updated = pacienteService.actualizarPaciente(id, request, file, fichaCompromiso, fichaDeteccion, otrosDocumentos);
             return ResponseEntity.ok(updated);
         } catch (JsonProcessingException e) {
             log.error("Error al parsear JSON en actualización de paciente: {}", e.getMessage());
