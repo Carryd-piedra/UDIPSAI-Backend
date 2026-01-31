@@ -1,12 +1,12 @@
 package com.ucacue.udipsai.infrastructure.storage;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -22,11 +22,12 @@ public class FileSystemStorageService implements StorageService {
 
     private final Path rootLocation;
 
-    public FileSystemStorageService(@Value("${app.storage.location:uploads}") String storageLocation) {
-        this.rootLocation = Paths.get(storageLocation);
+    public FileSystemStorageService() {
+        this.rootLocation = Paths.get("..", "uploads").toAbsolutePath().normalize();
     }
 
     @Override
+    @PostConstruct
     public void init() {
         try {
             Files.createDirectories(rootLocation);

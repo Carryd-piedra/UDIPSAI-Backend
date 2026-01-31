@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.ucacue.udipsai.common.util.CedulaValidatorService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -44,6 +45,9 @@ public class EspecialistaService {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private CedulaValidatorService cedulaValidatorService;
 
     @Transactional(readOnly = true)
     public Page<EspecialistaDTO> listarEspecialistasActivos(Pageable pageable) {
@@ -106,6 +110,12 @@ public class EspecialistaService {
     @Transactional
     public EspecialistaDTO crearEspecialista(EspecialistaRequest request, MultipartFile foto) {
         log.info("Iniciando creación de especialista. Cédula: {}", request.getCedula());
+
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
+
         if (especialistaRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un especialista con la cédula: {}", request.getCedula());
             throw new RuntimeException("Ya existe un especialista con la cédula: " + request.getCedula());
@@ -149,6 +159,11 @@ public class EspecialistaService {
                     log.error("Error al actualizar: Especialista no encontrado ID: {}", id);
                     return new RuntimeException("Especialista no encontrado");
                 });
+
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
 
         mapearRequestAEntidad(request, especialista);
         

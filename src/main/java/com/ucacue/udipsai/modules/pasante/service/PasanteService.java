@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import com.ucacue.udipsai.common.util.CedulaValidatorService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public class PasanteService {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private CedulaValidatorService cedulaValidatorService;
 
     @Transactional(readOnly = true)
     public Page<PasanteDTO> listarPasantesActivos(Pageable pageable) {
@@ -124,6 +128,12 @@ public class PasanteService {
     @Transactional
     public PasanteDTO crearPasante(PasanteRequest request, MultipartFile foto) {
         log.info("Iniciando creación de pasante: {}", request.getCedula());
+
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
+
         if (pasanteRepository.existsByCedula(request.getCedula())) {
             log.error("Intento de crear pasante duplicado. Cédula: {}", request.getCedula());
             throw new RuntimeException("Pasante con cédula " + request.getCedula() + " ya existe");
@@ -162,6 +172,11 @@ public class PasanteService {
                     log.error("Pasante ID {} no encontrado para actualización", id);
                     return new RuntimeException("Pasante no encontrado");
                 });
+
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
 
         mapearRequestAEntidad(request, pasante);
 

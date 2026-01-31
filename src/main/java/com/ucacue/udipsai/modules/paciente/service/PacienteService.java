@@ -22,6 +22,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
+import com.ucacue.udipsai.common.util.CedulaValidatorService;
 import com.ucacue.udipsai.modules.instituciones.dto.InstitucionEducativaDTO;
 import com.ucacue.udipsai.modules.sedes.dto.SedeDTO;
 import com.ucacue.udipsai.modules.asignacion.repository.AsignacionRepository;
@@ -77,6 +78,9 @@ public class PacienteService {
 
     @Autowired
     private PasanteRepository pasanteRepository;
+
+    @Autowired
+    private CedulaValidatorService cedulaValidatorService;
 
     @Transactional(readOnly = true)
     public Page<PacienteDTO> listarPacientesActivos(Pageable pageable) {
@@ -160,6 +164,12 @@ public class PacienteService {
     @Transactional
     public PacienteDTO crearPaciente(PacienteRequest request, MultipartFile foto, MultipartFile fichaCompromiso, MultipartFile fichaDeteccion, List<MultipartFile> otrosDocumentos) {
         log.info("Iniciando creación de paciente: {}", request.getNombresApellidos());
+        
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
+
         if (pacienteRepository.existsByCedula(request.getCedula())) {
             log.error("Ya existe un paciente con la cédula: {}", request.getCedula());
             throw new RuntimeException("Ya existe un paciente con la cédula: " + request.getCedula());
@@ -204,6 +214,11 @@ public class PacienteService {
                     log.error("Error al actualizar: Paciente no encontrado ID: {}", id);
                     return new RuntimeException("Paciente no encontrado");
                 });
+
+        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
+            log.error("Cédula inválida: {}", request.getCedula());
+            throw new RuntimeException("La cédula ingresada no es válida.");
+        }
 
         mapearRequestAEntidad(request, paciente);
 
