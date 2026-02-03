@@ -214,11 +214,6 @@ public class PacienteService {
                     return new RuntimeException("Paciente no encontrado");
                 });
 
-        if (!cedulaValidatorService.validarCedulaEcuatoriana(request.getCedula())) {
-            log.error("Cédula inválida: {}", request.getCedula());
-            throw new RuntimeException("La cédula ingresada no es válida.");
-        }
-
         mapearRequestAEntidad(request, paciente);
 
         if (foto != null && !foto.isEmpty()) {
