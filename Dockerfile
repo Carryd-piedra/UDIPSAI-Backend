@@ -30,5 +30,14 @@ COPY --from=builder /app/target/UDIPSAI-Backend-1.0.0.jar app.jar
 # Configuración de variables de entorno por defecto
 ENV SPRING_PROFILES_ACTIVE=prod
 
+
+# Crear usuario no root para mayor seguridad
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
+# HEALTHCHECK para verificar que la app responde en el puerto 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+	CMD wget --spider -q http://localhost:8080/actuator/health || exit 1
+
 # Ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]

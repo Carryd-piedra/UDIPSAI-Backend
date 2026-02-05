@@ -28,10 +28,11 @@ public class ReporteCitaService {
     private CitaRepository citaRepository;
 
     public ReporteCitaRespuestaDTO generarReportePorPaciente(Integer fichaPaciente, String tipoReporte,
-                                                             String alcance) {
+            String alcance) {
         int limit = "COMPLETO".equalsIgnoreCase(alcance) ? 5000 : 10;
 
-        Pageable pageable = PageRequest.of(0, limit, Sort.by("fecha").descending());
+        Pageable pageable = PageRequest.of(0, limit,
+                Sort.by("fecha").descending().and(Sort.by("horaInicio").descending()));
         Page<Cita> paginaCitas = citaRepository.findAllByPaciente_Id(fichaPaciente, pageable);
 
         List<Cita> listaCitas = paginaCitas.getContent();
@@ -103,7 +104,7 @@ public class ReporteCitaService {
     }
 
     public Optional<ReporteCitaRespuestaDTO> generarReportePorCedula(String cedula, String tipoReporte,
-                                                                     String alcance) {
+            String alcance) {
         return pacienteRepository.findByCedula(cedula)
                 .map(paciente -> generarReportePorPaciente(paciente.getId(), tipoReporte, alcance));
     }
